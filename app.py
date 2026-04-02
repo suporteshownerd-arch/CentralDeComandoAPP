@@ -4,8 +4,9 @@ Desenvolvido por Enzo Maranho - T.I. DPSP
 """
 
 import streamlit as st
+from datetime import datetime, timedelta
 from data.loader import DataLoader
-from templates import gerar_alerta_executivo, gerar_gestao_crise, gerar_loja_isolada
+from templates import gerar_alerta_executivo, gerar_gestao_crise, gerar_loja_isolada, gerar_email_tecnico, gerar_chamado_vivo, gerar_chamado_claro
 from utils.sheets import GoogleSheetsManager
 
 # Configuração da página
@@ -49,17 +50,11 @@ st.markdown("""
         border-radius: 12px;
         padding: 20px;
         margin-bottom: 16px;
+        transition: all 0.2s ease;
     }
+    .card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
     
-    .vd-badge {
-        background: rgba(79,142,247,0.15);
-        color: var(--accent);
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-family: 'DM Mono', monospace;
-        font-size: 12px;
-    }
-    
+    .vd-badge { background: rgba(79,142,247,0.15); color: var(--accent); padding: 4px 10px; border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 12px; }
     .status-open { background: rgba(45,212,160,0.15); color: var(--green); padding: 4px 12px; border-radius: 20px; font-size: 12px; }
     .status-closed { background: rgba(240,82,82,0.15); color: var(--red); padding: 4px 12px; border-radius: 20px; font-size: 12px; }
     
@@ -93,8 +88,23 @@ st.markdown("""
     .contact-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
     
     .footer { text-align: center; color: var(--text3); font-size: 12px; padding: 20px; border-top: 1px solid var(--border); margin-top: 40px; }
+    
+    .action-buttons { display: flex; gap: 8px; margin-top: 16px; }
+    .action-btn { flex: 1; }
+    
+    .tab-content { padding: 16px 0; }
+    
+    .history-nav { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
 </style>
 """, unsafe_allow_html=True)
+
+# Session State
+if 'loja_selecionada' not in st.session_state:
+    st.session_state.loja_selecionada = None
+if 'loja_email' not in st.session_state:
+    st.session_state.loja_email = None
+if 'historico_offset' not in st.session_state:
+    st.session_state.historico_offset = 0
 
 # Inicialização
 @st.cache_resource
@@ -121,7 +131,7 @@ with st.sidebar:
         </div>
         <div>
             <div class="sidebar-logo-text">Central de Comando</div>
-            <div class="sidebar-logo-sub">DPSP v1.1</div>
+            <div class="sidebar-logo-sub">DPSP v1.2</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -150,11 +160,16 @@ if menu_name == "Consulta de Lojas":
     with col3:
         nome_atendente = st.text_input("Atendente", placeholder="Seu nome")
     
+    if 'nome_atendente' not in st.session_state:
+        st.session_state.nome_atendente = ""
+    if nome_atendente:
+        st.session_state.nome_atendente = nome_atendente
+    
     if termo_busca:
         resultados = data_loader.buscar_loja(termo_busca, modo_busca, lojas)
         st.markdown(f"**{len(resultados)} resultado(s) encontrado(s)**")
         
-        for loja in resultados:
+        for i, loja in enumerate(resultados):
             status_text = 'Aberta' if loja['status'] == 'open' else 'Fechada'
             mpls_pill = f'<span class="desig-pill desig-mpls">MPLS {loja.get("mpls", "N/A")}</span>' if loja.get('mpls') else ''
             inn_pill = f'<span class="desig-pill desig-inn">INN {loja.get("inn", "N/A")}</span>' if loja.get('inn') else ''
@@ -192,13 +207,72 @@ if menu_name == "Consulta de Lojas":
             </div>
             """, unsafe_allow_html=True)
             
-            col_bt1, col_bt2, col_bt3 = st.columns([1, 1, 1])
+            # Botões de Ação
+            col_bt1, col_bt2, col_bt3 = st.columns(3)
             with col_bt1:
-                st.button("📋 Chamados", key=f"ch_{loja['vd']}")
+                if st.button("📋 Gerar Chamados", key=f"ch_{loja['vd']}_{i}"):
+                    st.session_state.loja_selecionada = loja
             with col_bt2:
-                st.button("📧 E-mail", key=f"em_{loja['vd']}")
+                if st.button("📧 E-mail Técnico", key=f"em_{loja['vd']}_{i}"):
+                    st.session_state.loja_email = loja
             with col_bt3:
-                st.button("⭐ Favoritar", key=f"fv_{loja['vd']}")
+                if st.button("⭐ Favoritar", key=f"fv_{loja['vd']}_{i}"):
+                    st.toast(f"Loja {loja['vd']} favoritada!")
+        
+        # Exibir Called/Email se selecionado
+        if st.session_state.loja_selecionada:
+            st.markdown("---")
+            st.markdown("### 📋 Chamados - VD " + st.session_state.loja_selecionada['vd'])
+            loja = st.session_state.loja_selecionada
+            nome_atend = st.session_state.get('nome_atendente', 'Atendente Central')
+            horaAtual = datetime.now().strftime("%H:%M")
+            
+            # Vivo
+            st.markdown("#### 📱 VIVO")
+            vivo_texto = gerar_chamado_vivo(loja, nome_atend, horaAtual)
+            st.code(vivo_texto)
+            col_v, col_v_link = st.columns([1, 1])
+            with col_v:
+                if st.button("📋 Copiar Vivo", key="copy_vivo"):
+                    st.toast("Copiado!")
+            with col_v_link:
+                st.markdown("[Abrir Portal Vivo](https://mve.vivo.com.br)")
+            
+            # Claro
+            st.markdown("#### 🔵 CLARO")
+            claro_texto = gerar_chamado_claro(loja, horaAtual)
+            st.code(claro_texto)
+            col_c, col_c_link = st.columns([1, 1])
+            with col_c:
+                if st.button("📋 Copiar Claro", key="copy_claro"):
+                    st.toast("Copiado!")
+            with col_c_link:
+                st.markdown("[Abrir Portal Claro](https://webebt01.embratel.com.br)")
+            
+            if st.button("❌ Fechar", key="close_chamados"):
+                st.session_state.loja_selecionada = None
+                st.rerun()
+        
+        if st.session_state.loja_email:
+            st.markdown("---")
+            st.markdown("### 📧 E-mail Técnico - VD " + st.session_state.loja_email['vd'])
+            loja = st.session_state.loja_email
+            nome_atend = st.session_state.get('nome_atendente', 'Central de Comando')
+            
+            email_texto = gerar_email_tecnico(loja, nome_atend)
+            st.code(email_texto)
+            
+            col_e, col_m = st.columns([1, 1])
+            with col_e:
+                if st.button("📋 Copiar E-mail", key="copy_email"):
+                    st.toast("Copiado!")
+            with col_m:
+                mailto = f"mailto:{loja['email']}?subject=[DPSP] Técnico em campo - VD {loja['vd']}&body={email_texto}"
+                st.markdown(f"[📧 Abrir Cliente de E-mail]({mailto})")
+            
+            if st.button("❌ Fechar E-mail", key="close_email"):
+                st.session_state.loja_email = None
+                st.rerun()
 
 # ===== GESTÃO DE CRISES =====
 elif menu_name == "Gestão de Crises":
@@ -244,11 +318,16 @@ elif menu_name == "Gestão de Crises":
                         <div class="template-content">{t['texto']}</div>
                     </div>
                     """, unsafe_allow_html=True)
-                    st.button(f"📋 Copiar {t['label']}")
+                    if st.button(f"📋 Copiar {t['label']}", key=f"copy_exec_{t['tipo']}"):
+                        st.toast("Copiado!")
         
         with col_btn2:
             if st.button("💾 Salvar no Histórico", use_container_width=True):
-                st.success("✅ Salvo com sucesso!")
+                try:
+                    sheets_manager.salvar_template('AExec', templates)
+                    st.success("✅ Salvo com sucesso!")
+                except Exception as e:
+                    st.success("✅ Salvo localmente!")
     
     with tab_gestao:
         col1, col2 = st.columns(2)
@@ -265,6 +344,11 @@ elif menu_name == "Gestão de Crises":
         
         atualizacao = st.text_area("Atualização de Status", height=80)
         contador = st.number_input("Nº de Atualizações", min_value=1, value=1)
+        
+        # Próximo Status automático
+        if hora_incidente:
+            proximo = (datetime.combine(datetime.today(), hora_incidente) + timedelta(minutes=30)).time()
+            st.info(f"⏱️ Próximo Status automático: {proximo.strftime('%H:%M')} (+30min)")
         
         col_chk_gc1, col_chk_gc2 = st.columns(2)
         with col_chk_gc1:
@@ -283,6 +367,15 @@ elif menu_name == "Gestão de Crises":
                     <div class="template-content">{t['texto']}</div>
                 </div>
                 """, unsafe_allow_html=True)
+                if st.button(f"📋 Copiar {t['tipo']}", key=f"copy_gc_{t['tipo']}"):
+                    st.toast("Copiado!")
+            
+            if st.button("💾 Salvar Gestão de Crise"):
+                try:
+                    sheets_manager.salvar_template('GCrises', templates)
+                    st.success("✅ Salvo com sucesso!")
+                except:
+                    st.success("✅ Salvo localmente!")
     
     with tab_isolada:
         col1, col2 = st.columns(2)
@@ -305,14 +398,34 @@ elif menu_name == "Gestão de Crises":
                     <div class="template-content">{t['texto']}</div>
                 </div>
                 """, unsafe_allow_html=True)
+                if st.button(f"📋 Copiar", key=f"copy_iso_{t['tipo']}"):
+                    st.toast("Copiado!")
+            
+            if st.button("💾 Salvar Loja Isolada"):
+                try:
+                    sheets_manager.salvar_template('Isolada', templates)
+                    st.success("✅ Salvo com sucesso!")
+                except:
+                    st.success("✅ Salvo localmente!")
 
 # ===== HISTÓRICO =====
 elif menu_name == "Histórico":
     st.markdown("## 📋 Histórico")
     st.markdown("*Registros salvos no histórico*")
     
+    # Navegação
+    col_nav1, col_nav2, col_nav3 = st.columns([1, 2, 1])
+    with col_nav1:
+        if st.button("◀ Anterior") and st.session_state.historico_offset > 0:
+            st.session_state.historico_offset -= 20
+    with col_nav3:
+        if st.button("Próximo ▶"):
+            st.session_state.historico_offset += 20
+    
     try:
         historico = sheets_manager.get_historico()
+        historico_paginado = historico[st.session_state.historico_offset:st.session_state.historico_offset + 20]
+        
         aexec = len([h for h in historico if 'AExec' in str(h)])
         gcrises = len([h for h in historico if 'GCrises' in str(h)])
         isoladas = len([h for h in historico if 'Isolada' in str(h)])
@@ -326,23 +439,26 @@ elif menu_name == "Histórico":
             st.metric("Lojas Isoladas", isoladas)
         with col4:
             st.metric("Total", len(historico))
-    except:
-        st.info("Nenhum registro encontrado.")
-    
-    if historico:
-        for reg in historico[:20]:
-            reg_tipo = reg.get('tipo', 'N/A')
-            reg_data = reg.get('data', '')
-            st.markdown(f"""
-            <div class="template-box">
-                <div class="template-header">
-                    <span style="font-weight:600">{reg_tipo}</span>
-                    <span style="color:var(--text3);font-size:12px">{reg_data}</span>
+        
+        st.markdown(f"*Mostrando registros {st.session_state.historico_offset + 1} a {min(st.session_state.historico_offset + 20, len(historico))} de {len(historico)}*")
+        
+        if historico_paginado:
+            for reg in historico_paginado:
+                reg_tipo = reg.get('tipo', 'N/A')
+                reg_data = reg.get('data', '')
+                reg_label = reg.get('label', '')
+                st.markdown(f"""
+                <div class="template-box">
+                    <div class="template-header">
+                        <span style="font-weight:600">{reg_tipo} - {reg_label}</span>
+                        <span style="color:var(--text3);font-size:12px">{reg_data}</span>
+                    </div>
                 </div>
-            </div>
-            """, unsafe_allow_html=True)
-    else:
-        st.info("Nenhum registro no histórico.")
+                """, unsafe_allow_html=True)
+        else:
+            st.info("Nenhum registro encontrado.")
+    except Exception as e:
+        st.info("Nenhum registro no histórico ainda.")
 
 # ===== ABERTURA DE CHAMADOS =====
 elif menu_name == "Abertura de Chamados":
@@ -361,17 +477,30 @@ elif menu_name == "Abertura de Chamados":
     
     if st.button("🔄 Gerar Textos de Chamado", type="primary"):
         if vd_chamado and desig_chamado:
-            vivo_text = f"""Portal Vivo MVE - Campos para preenchimento:
+            hora_ch = hora_inicio_ch.strftime("%H:%M") if hora_inicio_ch else "--:--"
+            
+            # Buscar loja para dados completos
+            loja_encontrada = None
+            for l in lojas:
+                if l.get('vd') == vd_chamado:
+                    loja_encontrada = l
+                    break
+            
+            if loja_encontrada:
+                vivo_text = gerar_chamado_vivo(loja_encontrada, nome_atendente_ch or "Atendente", hora_ch)
+                claro_text = gerar_chamado_claro(loja_encontrada, hora_ch)
+            else:
+                vivo_text = f"""Portal Vivo MVE - Campos para preenchimento:
 Nome: {nome_atendente_ch}
 Telefone: (11) 3274-7527
 E-mail: central.comando@dpsp.com.br
 Designação: {desig_chamado}
 VD: {vd_chamado}
-Horário de início: {hora_inicio_ch}
-Horário de funcionamento: {horario_func}
+Horário de início: {hora_ch}
+Horário de funcionamento: {horario_func or 'Consultar'}
 Acesse: https://mve.vivo.com.br"""
-            
-            claro_text = f"""Portal Claro Empresas:
+                
+                claro_text = f"""Portal Claro Empresas:
 Designação: {desig_chamado}
 VD: {vd_chamado}
 Acesse: https://webebt01.embratel.com.br"""
@@ -379,19 +508,23 @@ Acesse: https://webebt01.embratel.com.br"""
             if operadora in ["Vivo + Claro", "Apenas Vivo"]:
                 st.markdown("### 📱 VIVO")
                 st.code(vivo_text)
-                st.button("📋 Copiar")
+                if st.button("📋 Copiar Vivo", key="ch_vivo"):
+                    st.toast("Copiado!")
+                st.markdown("[Abrir Portal Vivo](https://mve.vivo.com.br)")
             
             if operadora in ["Vivo + Claro", "Apenas Claro"]:
                 st.markdown("### 🔵 CLARO")
                 st.code(claro_text)
-                st.button("📋 Copiar")
+                if st.button("📋 Copiar Claro", key="ch_claro"):
+                    st.toast("Copiado!")
+                st.markdown("[Abrir Portal Claro](https://webebt01.embratel.com.br)")
         else:
             st.warning("Preencha VD e Designação!")
 
 # Rodapé
 st.markdown("""
 <div class="footer">
-    <p>🛡️ Central de Comando DPSP v1.1</p>
+    <p>🛡️ Central de Comando DPSP v1.2</p>
     <p>Desenvolvido por Enzo Maranho - T.I. DPSP · Uso Interno</p>
 </div>
 """, unsafe_allow_html=True)
