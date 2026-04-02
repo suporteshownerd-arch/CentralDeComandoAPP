@@ -14,7 +14,6 @@ Mapeamento real dos CSVs (confirmado na fonte):
 """
 
 import os
-import re
 import csv
 import json
 import time
@@ -161,24 +160,25 @@ class DataLoader:
         """
         Dicionário {vd: {mpls: str, inn: str, circuitos: list}} a partir de designacao.csv.
         Join key: designacao.People → relacao.CODIGO
-        Operadora VIVO  → circuito principal (mpls)
-        Operadora EMBRATEL/CLARO → circuito backup (inn)
+        Tipo de acesso "VPN IP MPLS" → circuito principal (mpls)
+        Tipo de acesso "INN"         → circuito backup   (inn)
         """
         idx: Dict[str, dict] = {}
         for row in self._read_csv("designacao"):
-            vd  = str(row.get("People", "")).strip()
-            op  = row.get("Operadora", "").strip().upper()
-            des = row.get("Número (Designação)", "").strip()
-            sta = row.get("Status", "").strip().upper()
+            vd   = str(row.get("People", "")).strip()
+            tipo = row.get("Tipo de acesso", "").strip().upper()
+            op   = row.get("Operadora", "").strip()
+            des  = row.get("Número (Designação)", "").strip()
+            sta  = row.get("Status", "").strip().upper()
             if not vd or not des or sta == "INATIVO":
                 continue
             if vd not in idx:
                 idx[vd] = {"mpls": "", "inn": "", "circuitos": []}
-            idx[vd]["circuitos"].append({"op": op, "des": des})
-            # VIVO → mpls (primário); EMBRATEL / CLARO → inn (backup)
-            if op == "VIVO" and not idx[vd]["mpls"]:
+            idx[vd]["circuitos"].append({"op": op, "tipo": tipo, "des": des})
+            # "VPN IP MPLS" → mpls principal; "INN" → backup inn
+            if tipo == "VPN IP MPLS" and not idx[vd]["mpls"]:
                 idx[vd]["mpls"] = des
-            elif op in ("EMBRATEL", "CLARO") and not idx[vd]["inn"]:
+            elif tipo == "INN" and not idx[vd]["inn"]:
                 idx[vd]["inn"] = des
         return idx
 

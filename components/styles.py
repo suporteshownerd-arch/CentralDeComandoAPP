@@ -34,12 +34,11 @@ def get_base_css() -> str:
     .main .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1200px; }
 
     /* ── Sidebar ── */
-    section[data-testid="stSidebar"] {
+    section[data-testid="stSidebar"],
+    section[data-testid="stSidebar"] > div:first-child {
         background: var(--bg2) !important;
-        border-right: 1px solid var(--border) !important;
     }
-    section[data-testid="stSidebar"] > div { padding: 0 !important; }
-    section[data-testid="stSidebar"] .block-container { padding: 0 !important; }
+    section[data-testid="stSidebar"] { border-right: 1px solid var(--border) !important; }
 
     /* ── Sidebar logo ── */
     .sb-logo {
