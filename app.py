@@ -1,164 +1,116 @@
 """
-Central de Comando DPSP - Versão Ultra Estável v2.5
-Sem imports dinâmicos - tudo inline
+Central de Comando DPSP — v3.0
+Desenvolvido por Enzo Maranho - T.I. DPSP
 """
 
+import os
 import streamlit as st
+from dotenv import load_dotenv
 
-# Configuração
-st.set_page_config(page_title="Central de Comando - DPSP", page_icon="🛡️", layout="wide")
+# Carrega variáveis de ambiente do .env (se existir)
+load_dotenv()
 
-# CSS simples
-st.markdown("""
-<style>
-    .stApp { background: #08090d; }
-    h1, h2, h3 { color: #eaecf0; font-family: sans-serif; }
-    .card { background: #0f1118; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; margin: 8px 0; }
-    .vd-badge { background: rgba(91,141,239,0.2); color: #5b8def; padding: 4px 8px; border-radius: 6px; font-family: monospace; }
-    .status-open { color: #34d399; }
-    .status-closed { color: #f87171; }
-    section[data-testid="stSidebar"] { background: #0f1118; }
-</style>
-""", unsafe_allow_html=True)
+# Importações dos módulos locais
+from components import (
+    setup_page_config,
+    render_styles,
+    render_sidebar,
+    init_session_state,
+    render_footer,
+)
+from data.loader import DataLoader
+from utils.sheets import GoogleSheetsManager
+import pages.consulta_lojas as pg_consulta
+import pages.gestao_crises as pg_crises
+import pages.abertura_chamados as pg_chamados
+import pages.historico as pg_historico
+import pages.dashboard as pg_dashboard
+import pages.ajuda as pg_ajuda
 
-# Session state
-if 'favoritos' not in st.session_state:
-    st.session_state.favoritos = []
-if 'loja_selecionada' not in st.session_state:
-    st.session_state.loja_selecionada = None
 
-# Dados de exemplo
-LOJAS = [
-    {"vd": "318", "nome": "DSP SANTA BARBARA D'OESTE", "endereco": "AV DE CILLO,167", "cidade": "SANTA BARBARA D'OESTE", "estado": "SP", "status": "open"},
-    {"vd": "322", "nome": "DSP SAO CARLOS", "endereco": "AV SAO CARLOS,2358", "cidade": "SAO CARLOS", "estado": "SP", "status": "open"},
-    {"vd": "339", "nome": "DSP SHOPPING TAMBORE", "endereco": "AVENIDA PIRACEMA,669", "cidade": "BARUERI", "estado": "SP", "status": "open"},
-    {"vd": "345", "nome": "DSP PORTUGAL II", "endereco": "AV PORTUGAL,602", "cidade": "SANTO ANDRE", "estado": "SP", "status": "open"},
-    {"vd": "348", "nome": "DSP JARDIM MIRIAM", "endereco": "AV CUPECE,5400", "cidade": "SAO PAULO", "estado": "SP", "status": "open"},
-]
+# ── Configuração da página ─────────────────────────────────────────────────
+setup_page_config()
+render_styles()
+init_session_state()
 
+
+# ── Inicialização do DataLoader ────────────────────────────────────────────
+@st.cache_resource(show_spinner=False)
+def get_data_loader() -> DataLoader:
+    """Cria e devolve um DataLoader singleton com o path correto dos CSVs."""
+    # Tenta encontrar o diretório de CSVs relativo ao app ou ao projeto
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    candidatos = [
+        os.path.join(base_dir, "..", "consulta lojas python", "csvs"),
+        os.path.join(base_dir, "data"),
+    ]
+    csv_dir = next((p for p in candidatos if os.path.isdir(p)), os.path.join(base_dir, "data"))
+
+    master_key = os.environ.get("MASTER_KEY", "")
+    if master_key and isinstance(master_key, str):
+        master_key = master_key.encode()
+
+    return DataLoader(data_dir=csv_dir, master_key=master_key or None)
+
+
+@st.cache_resource(show_spinner=False)
+def get_sheets_manager() -> GoogleSheetsManager:
+    """Cria e devolve um GoogleSheetsManager singleton."""
+    return GoogleSheetsManager()
+
+
+# ── Carregamento de dados ──────────────────────────────────────────────────
+def load_lojas(loader: DataLoader):
+    """Carrega lojas com spinner de feedback."""
+    with st.spinner("Carregando dados das lojas..."):
+        return loader.get_lojas()
+
+
+# ── Roteamento de páginas ──────────────────────────────────────────────────
 def main():
-    # Sidebar
+    loader = get_data_loader()
+    sheets = get_sheets_manager()
+
+    # Carrega lojas uma vez por sessão
+    if "lojas" not in st.session_state:
+        st.session_state.lojas = load_lojas(loader)
+
+    lojas = st.session_state.lojas
+
+    # KPI data para a sidebar
+    kpi_data = {
+        "buscas_hoje": st.session_state.get("buscas_hoje", 0),
+        "chamados_hoje": st.session_state.get("chamados_hoje", 0),
+        "crises_ativas": st.session_state.get("crises_ativas", 0),
+        "lojas_online": len([l for l in lojas if l.get("status") == "open"]),
+        "lojas_total": len(lojas),
+    }
+
+    # Sidebar — retorna nome da página selecionada
     with st.sidebar:
-        st.markdown("### 🛡️ Central de Comando")
-        st.markdown("**DPSP v2.5**")
-        st.markdown("---")
-        
-        st.metric("Total Lojas", len(LOJAS))
-        st.metric("Ativas", len([l for l in LOJAS if l['status'] == 'open']))
-        
-        st.markdown("---")
-        menu = st.radio("Menu", [
-            "🏪 Consulta de Lojas",
-            "⚠️ Gestão de Crises", 
-            "📋 Histórico",
-            "📞 Abertura de Chamados",
-            "📈 Dashboard"
-        ])
-    
-    # Página
-    if "Consulta" in menu:
-        render_consulta()
-    elif "Crises" in menu:
-        render_crises()
-    elif "Histórico" in menu:
-        render_historico()
-    elif "Chamados" in menu:
-        render_chamados()
-    elif "Dashboard" in menu:
-        render_dashboard()
+        pagina = render_sidebar(
+            lojas=lojas,
+            favoritos=st.session_state.get("favoritos", []),
+            kpi_data=kpi_data,
+        )
 
+    # Roteamento
+    if "Consulta" in pagina:
+        pg_consulta.render_page(loader, lojas)
+    elif "Crises" in pagina or "Gestão" in pagina:
+        pg_crises.render_page(sheets, lojas)
+    elif "Chamados" in pagina:
+        pg_chamados.render_page(lojas)
+    elif "Histórico" in pagina or "Historico" in pagina:
+        pg_historico.render_page(sheets)
+    elif "Dashboard" in pagina:
+        pg_dashboard.render_page(loader, lojas)
+    elif "Ajuda" in pagina:
+        pg_ajuda.render_page()
+    else:
+        pg_consulta.render_page(loader, lojas)
 
-def render_consulta():
-    st.markdown("## 🏪 Consulta de Lojas")
-    st.markdown("*Busque informações completas de qualquer loja do parque DPSP*")
-    
-    st.metric("Total Lojas", len(LOJAS))
-    st.markdown("---")
-    
-    termo = st.text_input("Buscar", placeholder="Digite VD ou nome...")
-    
-    resultados = LOJAS
-    if termo:
-        termo_lower = termo.lower()
-        resultados = [l for l in LOJAS if termo_lower in str(l.get('vd','')).lower() or termo_lower in str(l.get('nome','')).lower()]
-    
-    st.markdown(f"**{len(resultados)} resultado(s)**")
-    
-    for i, loja in enumerate(resultados[:20]):
-        with st.container():
-            st.markdown(f"**VD {loja['vd']}** - {loja['nome']}")
-            st.caption(f"📍 {loja['endereco']} - {loja['cidade']}/{loja['estado']}")
-            
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.write(f"Status: {'🟢' if loja['status']=='open' else '🔴'}")
-            with col2:
-                if st.button(f"⭐", key=f"fav_{loja['vd']}_{i}"):
-                    vd = str(loja['vd'])
-                    if vd in st.session_state.favoritos:
-                        st.session_state.favoritos.remove(vd)
-                    else:
-                        st.session_state.favoritos.append(vd)
-            with col3:
-                if st.button(f"📋", key=f"btn_{loja['vd']}_{i}"):
-                    st.session_state.loja_selecionada = loja
-            
-            st.markdown("---")
-
-
-def render_crises():
-    st.markdown("## ⚠️ Gestão de Crises")
-    st.info("Nenhum incidente ativo no momento")
-    
-    tab1, tab2, tab3 = st.tabs(["🔴 Alertas", "🚨 Crise", "⚡ Isolada"])
-    with tab1:
-        st.markdown("### Alertas Executivos")
-        st.text_input("Escopo")
-        st.text_input("Abrangência")
-        st.text_area("Status")
-        if st.button("Gerar"):
-            st.success("Template gerado!")
-
-
-def render_historico():
-    st.markdown("## 📋 Histórico")
-    st.info("Nenhum registro")
-
-
-def render_chamados():
-    st.markdown("## 📞 Abertura de Chamados")
-    col1, col2 = st.columns(2)
-    with col1:
-        vd = st.text_input("VD")
-        nome = st.text_input("Seu Nome")
-    with col2:
-        hora = st.time_input("Hora")
-        op = st.selectbox("Operadora", ["Vivo", "Claro", "Ambas"])
-    
-    if st.button("Gerar"):
-        st.success("Texto gerado!")
-
-
-def render_dashboard():
-    st.markdown("## 📈 Dashboard")
-    
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric("Total Lojas", len(LOJAS))
-    with col2:
-        st.metric("Ativas", len([l for l in LOJAS if l['status']=='open']))
-    with col3:
-        st.metric("Inativas", len([l for l in LOJAS if l['status']=='closed']))
-    with col4:
-        st.metric("Estados", len(set(l['estado'] for l in LOJAS)))
-    
-    st.markdown("### Lojas por Estado")
-    estados = {}
-    for l in LOJAS:
-        e = l.get('estado', 'Outro')
-        estados[e] = estados.get(e, 0) + 1
-    for e, c in sorted(estados.items(), key=lambda x: x[1], reverse=True):
-        st.write(f"{e}: {c}")
+    render_footer()
 
 
 if __name__ == "__main__":

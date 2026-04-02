@@ -16,5 +16,8 @@ gspread>=5.12.0
 google-auth>=2.23.0
 google-auth-oauthlib>=0.8.0
 
+# Busca fuzzy
+rapidfuzz>=3.0.0
+
 # Utilities
 python-dotenv>=1.0.0

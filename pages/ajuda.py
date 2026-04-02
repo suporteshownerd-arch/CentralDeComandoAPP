@@ -1,137 +1,167 @@
 """
-Página de Ajuda e FAQ
-Central de Comando DPSP v2.0
+Página de Ajuda
+Central de Comando DPSP v3.0
 """
 
 import streamlit as st
-from components import render_faq_item
 
 
-FAQS = [
-    {
-        "pergunta": "🔍 Como buscar uma loja?",
-        "resposta": """
-1. Selecione o modo de busca (VD/Designação, Endereço, Nome ou Livre)
-2. Digite o termo de busca no campo de pesquisa
-3. O sistema irá mostrar sugestões automaticamente
-4. Clique na loja desejada para ver todos os detalhes
-        """
-    },
-    {
-        "pergunta": "📋 Como abrir um chamado?",
-        "resposta": """
-1. Busque a loja pelo VD
-2. Clique no botão "Chamados" no card da loja
-3. Selecione a operadora (Vivo ou Claro)
-4. Copie o texto gerado e cole no portal da operadora
-        """
-    },
-    {
-        "pergunta": "⚠️ Como criar um alerta de crise?",
-        "resposta": """
-1. Acesse "Gestão de Crises" no menu
-2. Escolha o tipo: Alertas Executivos, Gestão de Crise ou Loja Isolada
-3. Preencha os campos necessários
-4. Clique em "Gerar" para criar o template
-5. Copie ou salve o informativo
-        """
-    },
-    {
-        "pergunta": "⭐ Como usar favoritos?",
-        "resposta": """
-1. Ao buscar uma loja, clique no botão de estrela (☆)
-2. A loja será adicionada aos favoritos na sidebar
-3. Você pode acessar rapidamente suas lojas favoritadas
-        """
-    },
-    {
-        "pergunta": "⌨️ Quais são os atalhos de teclado?",
-        "resposta": """
-• **Ctrl+K**: Abrir busca rápida
-• **1-4**: Navegar entre as abas do menu
-• **Esc**: Fechar modais
-        """
-    },
-    {
-        "pergunta": "📥 Como exportar dados das lojas?",
-        "resposta": """
-1. Vá para "Consulta de Lojas"
-2. Clique em "Exportar" no canto superior esquerdo
-3. Escolha entre CSV ou JSON
-4. Clique em "Download" para salvar o arquivo
-        """
-    },
-    {
-        "pergunta": "💾 Como salvar templates?",
-        "resposta": """
-1.Após gerar um template (crise, alerta, etc), clique em "Salvar"
-2. O sistema tentará salvar no Google Sheets
-3. Se não houver configuração, salvará localmente no SQLite
-        """
-    },
-    {
-        "pergunta": "📊 Onde vejo as estatísticas de uso?",
-        "resposta": """
-Acesse a página "Dashboard" no menu para ver:
-• Número de buscas e chamados do dia
-• Status das lojas (abertas/fechadas)
-• Distribuição por estado
-• Histórico de uso dos últimos 7 dias
-        """
-    }
+_FAQ = [
+    ("Como buscar uma loja?",
+     "Vá em **Consulta de Lojas**, digite o VD (número), nome ou endereço e escolha o modo de busca. "
+     "Use os filtros avançados para restringir por Estado, Região ou Status."),
+
+    ("O que é VD?",
+     "VD (Virtual Depot) é o identificador único de cada loja no sistema DPSP. "
+     "É um número de até 6 dígitos (ex: 2015, 318)."),
+
+    ("O que é MPLS e INN?",
+     "São as designações dos circuitos de internet de cada loja:\n"
+     "- **MPLS** → Circuito principal Vivo (usado para abrir chamado Vivo MVE)\n"
+     "- **INN** → Circuito Claro Empresas (usado para abrir chamado Claro)"),
+
+    ("Como abrir chamado na Vivo?",
+     "1. Vá em **Abertura de Chamados**\n"
+     "2. Digite o VD da loja — os campos são preenchidos automaticamente\n"
+     "3. Informe seu nome e a hora do incidente\n"
+     "4. Selecione **Apenas Vivo** e clique em Gerar\n"
+     "5. Copie o texto gerado e cole no portal Vivo MVE"),
+
+    ("Como abrir chamado na Claro?",
+     "1. Vá em **Abertura de Chamados**\n"
+     "2. Digite o VD → campos preenchidos automaticamente\n"
+     "3. Informe hora do incidente\n"
+     "4. Selecione **Apenas Claro** e clique em Gerar\n"
+     "5. Copie o texto e cole no portal Claro Empresas"),
+
+    ("Como gerar um Alerta Executivo?",
+     "1. Vá em **Gestão de Crises** → aba **Alertas Executivos**\n"
+     "2. Escolha o Escopo (Internet MPLS, POS, ERP, etc.)\n"
+     "3. Preencha os campos: abrangência, equipes, status\n"
+     "4. Marque quais templates gerar (Abertura / Atualização / Normalização)\n"
+     "5. Clique **Gerar** → copie o texto e envie no grupo executivo"),
+
+    ("Como registrar uma Loja Isolada?",
+     "1. Vá em **Gestão de Crises** → aba **Loja Isolada**\n"
+     "2. Digite o VD da loja\n"
+     "3. Selecione o tipo: **Energia Elétrica** ou **Internet**\n"
+     "4. Informe horário de início e previsão de retorno\n"
+     "5. Clique **Gerar** → dois templates são criados: Abertura e Fechamento"),
+
+    ("Como favoritar uma loja?",
+     "Na **Consulta de Lojas**, abra os detalhes de qualquer loja e clique em **☆ Favoritar**. "
+     "Lojas favoritadas aparecem no topo da consulta e na sidebar. Limite de 10 favoritos."),
+
+    ("O histórico não está aparecendo, o que fazer?",
+     "O histórico requer conexão com o Google Sheets ou banco local SQLite. Verifique:\n"
+     "- Se as variáveis `GCP_SERVICE_ACCOUNT`, `SHEETS_ID_AEXEC` e `SHEETS_ID_GCRISES` estão no `.env`\n"
+     "- Se há templates já salvos (clique em **💾 Salvar** após gerar um template)\n"
+     "- Clique em 🔄 **Atualizar** na página de Histórico"),
+
+    ("Os dados das lojas estão desatualizados, o que fazer?",
+     "Os dados vêm de arquivos CSV encriptados sincronizados pelo script `relacaocheck.py`. "
+     "Para atualizar:\n"
+     "1. Execute `python relacaocheck.py` no diretório `consulta lojas python/`\n"
+     "2. Certifique-se de que a variável `MASTER_KEY` está no `.env`\n"
+     "3. O script lê a planilha Excel da rede e gera novos `.csv.enc`"),
+]
+
+_GLOSSARIO = {
+    "VD":           "Virtual Depot — identificador único da loja",
+    "MPLS":         "Circuito internet principal (Vivo MVE)",
+    "INN":          "Circuito internet secundário (Claro Empresas)",
+    "GGL":          "Gerente Geral de Loja",
+    "GR":           "Gerente Regional",
+    "CD":           "Centro de Distribuição",
+    "PDV":          "Ponto de Venda — sistema de caixa da loja",
+    "ERP":          "Enterprise Resource Planning — sistema de gestão",
+    "NOC":          "Network Operations Center — centro de operações de rede",
+    "Loja Isolada": "Loja sem internet ou energia elétrica",
+    "Fernet":       "Algoritmo de encriptação simétrica usado nos arquivos CSV",
+    "TTL":          "Time To Live — tempo de vida do cache (padrão: 300s)",
+}
+
+_CONTATOS = [
+    ("🎛️ Central de Comando", "(11) 3274-7527", "central.comando@dpsp.com.br"),
+    ("💻 T.I. DPSP",           "(11) 5529-6003", ""),
 ]
 
 
 def render_page():
-    """Renderiza a página de Ajuda e FAQ"""
-    st.markdown("## ❓ Ajuda e FAQ")
-    st.markdown("*Perguntas frequentes e instruções de uso*")
-    
-    # FAQ com expanders
-    for faq in FAQS:
-        with st.expander(faq["pergunta"], expanded=True):
-            st.markdown(faq["resposta"])
-    
-    st.markdown("---")
-    
-    # Contatos de suporte
-    st.markdown("### 📞 Contato de Suporte")
-    
-    col_c1, col_c2, col_c3 = st.columns(3)
-    
-    with col_c1:
+    st.markdown("## ❓ Ajuda")
+    st.markdown("*Guias rápidos, FAQ e contatos úteis*")
+
+    tab_faq, tab_guia, tab_gloss, tab_cont = st.tabs([
+        "🙋 FAQ", "📖 Guias Rápidos", "📚 Glossário", "📞 Contatos"
+    ])
+
+    # ── FAQ ───────────────────────────────────────────────────────────────────
+    with tab_faq:
+        st.markdown("### Perguntas Frequentes")
+        for pergunta, resposta in _FAQ:
+            with st.expander(pergunta):
+                st.markdown(resposta)
+
+    # ── Guias Rápidos ─────────────────────────────────────────────────────────
+    with tab_guia:
+        st.markdown("### Fluxo de Atendimento — Loja sem Internet")
         st.markdown("""
-        **T.I. DPSP**
-        📞 (11) 5529-6003
+1. **Identificar a loja** — Consulta de Lojas → digitar VD
+2. **Verificar circuitos** — confirmar designação MPLS e INN nos detalhes
+3. **Registrar isolamento** — Gestão de Crises → Loja Isolada → gerar templates
+4. **Abrir chamados** — Abertura de Chamados → gerar textos Vivo + Claro
+5. **Comunicar gestão** — enviar template Loja Isolada no grupo WhatsApp
+6. **Acompanhar** — quando normalizar, usar template de **Fechamento**
         """)
-    
-    with col_c2:
+
+        st.markdown("---")
+        st.markdown("### Fluxo de Crise Geral")
         st.markdown("""
-        **Central de Comando**
-        📞 (11) 3274-7527
+1. **Identificar escopo** — qual sistema/rede está impactado?
+2. **Gerar Alerta Executivo de Abertura** 🔴 — enviar para grupo executivo
+3. **Abrir sala de crise** — criar link e registrar em Gestão de Crise
+4. **Atualizar a cada 30min** — gerar template 🟡 Atualização com novo status
+5. **Normalização** — quando resolver, gerar template 🟢 Normalização
+6. **Salvar no histórico** — clique **💾 Salvar** após gerar o template
         """)
-    
-    with col_c3:
-        st.markdown("""
-        **E-mail**
-        📧 central.comando@dpsp.com.br
-        """)
-    
-    st.markdown("---")
-    
-    # Links úteis
-    st.markdown("### 🔗 Links Úteis")
-    
-    col_l1, col_l2 = st.columns(2)
-    
-    with col_l1:
-        st.markdown("""
-        - [Portal Vivo MVE](https://mve.vivo.com.br)
-        - [Claro Empresas](https://webebt01.embratel.com.br/claroempresasonline/index)
-        """)
-    
-    with col_l2:
-        st.markdown("""
-        - [GitHub do Projeto](https://github.com/suporteshownerd-arch/CentralDeComandoAPP)
-        - [Documentação PRD](./PRD_MELHORIAS_CONTINUAS.md)
-        """)
+
+        st.markdown("---")
+        st.markdown("### Como configurar o ambiente")
+        st.code("""# 1. Copiar o arquivo de exemplo
+cp .env.example .env
+
+# 2. Editar o .env com os valores reais
+MASTER_KEY=<chave_fernet_base64>
+GCP_SERVICE_ACCOUNT={"type":"service_account",...}
+SHEETS_ID_AEXEC=<id_planilha_alertas>
+SHEETS_ID_GCRISES=<id_planilha_crises>
+
+# 3. Instalar dependências
+pip install -r requirements.txt
+
+# 4. Rodar o app
+streamlit run app.py""", language="bash")
+
+    # ── Glossário ─────────────────────────────────────────────────────────────
+    with tab_gloss:
+        st.markdown("### Glossário de Termos")
+        for termo, definicao in sorted(_GLOSSARIO.items()):
+            st.markdown(f"**`{termo}`** — {definicao}")
+
+    # ── Contatos ──────────────────────────────────────────────────────────────
+    with tab_cont:
+        st.markdown("### Contatos Úteis")
+        for nome, tel, email in _CONTATOS:
+            with st.container(border=True):
+                st.markdown(f"**{nome}**")
+                st.caption(f"📞 {tel}")
+                if email:
+                    st.caption(f"✉️ {email}")
+
+        st.markdown("---")
+        st.markdown("### Links dos Portais")
+        st.markdown("- [Vivo MVE](https://mve.vivo.com.br)")
+        st.markdown("- [Claro Empresas](https://webebt01.embratel.com.br/claroempresasonline/index)")
+
+        st.markdown("---")
+        st.caption("Central de Comando DPSP v3.0 · Desenvolvido por Enzo Maranho — T.I. DPSP · Uso Interno")
