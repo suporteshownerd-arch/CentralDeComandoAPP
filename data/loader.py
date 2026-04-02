@@ -6,7 +6,90 @@ Desenvolvido por Enzo Maranho - T.I. DPSP
 import os
 import csv
 import json
+import time
+from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
+from typing import Optional, Dict, List
+
+
+class CacheManager:
+    """Gerenciador de cache inteligente para dados"""
+    
+    def __init__(self, ttl_seconds: int = 300):
+        self.ttl_seconds = ttl_seconds
+        self._cache: Dict[str, tuple] = {}
+    
+    def get(self, key: str) -> Optional[any]:
+        """Obtém valor do cache se não expirou"""
+        if key in self._cache:
+            value, timestamp = self._cache[key]
+            if time.time() - timestamp < self.ttl_seconds:
+                return value
+            else:
+                del self._cache[key]
+        return None
+    
+    def set(self, key: str, value: any) -> None:
+        """Define valor no cache com timestamp"""
+        self._cache[key] = (value, time.time())
+    
+    def invalidate(self, key: str = None) -> None:
+        """Invalida cache específico ou todo"""
+        if key:
+            self._cache.pop(key, None)
+        else:
+            self._cache.clear()
+    
+    def clear_expired(self) -> int:
+        """Remove itens expirados e retorna quantidade"""
+        now = time.time()
+        expired = [k for k, (_, t) in self._cache.items() if now - t >= self.ttl_seconds]
+        for k in expired:
+            del self._cache[k]
+        return len(expired)
+
+
+class UsageLogger:
+    """Sistema de logs de uso"""
+    
+    def __init__(self, log_file: str = "data/usage.log"):
+        self.log_file = log_file
+        os.makedirs(os.path.dirname(log_file) if os.path.dirname(log_file) else "data", exist_ok=True)
+    
+    def log(self, action: str, user: str = "anonymous", details: dict = None):
+        """Registra ação no log"""
+        try:
+            with open(self.log_file, "a", encoding="utf-8") as f:
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                details_str = json.dumps(details) if details else "{}"
+                f.write(f"[{timestamp}] {action} | user:{user} | {details_str}\n")
+        except Exception as e:
+            print(f"Erro ao salvar log: {e}")
+    
+    def get_stats(self, days: int = 7) -> dict:
+        """Retorna estatísticas de uso"""
+        try:
+            if not os.path.exists(self.log_file):
+                return {"total_buscas": 0, "total_chamados": 0, "usuarios": 0}
+            
+            stats = {"buscas": 0, "chamados": 0, "templates": 0, "usuarios": set()}
+            
+            with open(self.log_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    if "busca" in line.lower():
+                        stats["buscas"] += 1
+                    if "chamado" in line.lower():
+                        stats["chamados"] += 1
+                    if "template" in line.lower():
+                        stats["templates"] += 1
+                    if "user:" in line:
+                        user = line.split("user:")[1].split("|")[0].strip()
+                        stats["usuarios"].add(user)
+            
+            stats["usuarios"] = len(stats["usuarios"])
+            return stats
+        except:
+            return {"buscas": 0, "chamados": 0, "templates": 0, "usuarios": 0}
 
 
 class DataLoader:
@@ -16,6 +99,8 @@ class DataLoader:
         self.data_dir = data_dir
         self.master_key = master_key or os.getenv("MASTER_KEY", "").encode()
         self.lojas_cache = None
+        self.cache_manager = CacheManager(ttl_seconds=300)
+        self.usage_logger = UsageLogger()
         self._init_fernet()
     
     def _init_fernet(self):
@@ -27,6 +112,35 @@ class DataLoader:
                 self.cipher = None
         except Exception:
             self.cipher = None
+    
+    def validar_vd(self, vd: str) -> Dict[str, any]:
+        """
+        Valida se VD existe antes de buscar
+        
+        Args:
+            vd: Número da VD
+            
+        Returns:
+            Dicionário com {valido: bool, loja: dict or None, mensagem: str}
+        """
+        if not vd:
+            return {"valido": False, "loja": None, "mensagem": "VD não fornecido"}
+        
+        vd = vd.strip()
+        
+        if not vd.isdigit():
+            return {"valido": False, "loja": None, "mensagem": "VD deve conter apenas números"}
+        
+        if len(vd) > 5:
+            return {"valido": False, "loja": None, "mensagem": "VD deve ter no máximo 5 dígitos"}
+        
+        lojas = self.get_lojas()
+        
+        for loja in lojas:
+            if loja.get("vd") == vd:
+                return {"valido": True, "loja": loja, "mensagem": "VD encontrado"}
+        
+        return {"valido": False, "loja": None, "mensagem": f"VD {vd} não encontrado no banco de dados"}
     
     def _decrypt_data(self, encrypted_data: bytes) -> bytes:
         """Descriptografa dados usando Fernet"""
@@ -40,8 +154,10 @@ class DataLoader:
         Tenta ler de arquivos CSV criptografados, 
         fallback para dados de exemplo se não encontrar
         """
-        if self.lojas_cache is not None:
-            return self.lojas_cache
+        cache_key = "all_lojas"
+        cached = self.cache_manager.get(cache_key)
+        if cached is not None:
+            return cached
         
         # Tentar carregar de CSV
         lojas = self._load_from_csv()
@@ -50,6 +166,7 @@ class DataLoader:
         if not lojas:
             lojas = self._get_sample_data()
         
+        self.cache_manager.set(cache_key, lojas)
         self.lojas_cache = lojas
         return lojas
     
