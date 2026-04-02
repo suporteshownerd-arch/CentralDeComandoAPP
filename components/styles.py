@@ -3,22 +3,20 @@ Módulo de estilos e design system
 Central de Comando DPSP v2.0
 """
 
-from typing import Optional
-
 
 def get_base_css() -> str:
     """CSS base com variáveis, fontes e reset"""
     return """
     @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
-    
+
     :root {
         --bg: #08090d;
         --bg2: #0f1118;
         --bg3: #161920;
         --surface: #1c2029;
         --surface2: #232a36;
-        --border: rgba(255,255,255,0.06);
-        --border2: rgba(255,255,255,0.12);
+        --border: rgba(255,255,255,0.07);
+        --border2: rgba(255,255,255,0.14);
         --text: #eaecf0;
         --text2: #9094a6;
         --text3: #5c6370;
@@ -30,40 +28,201 @@ def get_base_css() -> str:
         --purple: #a78bfa;
         --cyan: #22d3ee;
     }
-    
-    .stApp { background: var(--bg); }
-    section[data-testid="stSidebar"] { background: var(--bg2) !important; border-right: 1px solid var(--border); }
-    
-    h1 { font-family: 'Syne', sans-serif !important; font-weight: 800 !important; font-size: 32px !important; letter-spacing: -0.03em; }
+
+    /* ── App background ── */
+    .stApp { background: var(--bg) !important; }
+    .main .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1200px; }
+
+    /* ── Sidebar ── */
+    section[data-testid="stSidebar"] {
+        background: var(--bg2) !important;
+        border-right: 1px solid var(--border) !important;
+    }
+    section[data-testid="stSidebar"] > div { padding: 0 !important; }
+    section[data-testid="stSidebar"] .block-container { padding: 0 !important; }
+
+    /* ── Sidebar logo ── */
+    .sb-logo {
+        display: flex; align-items: center; gap: 12px;
+        padding: 20px 16px 16px 16px;
+    }
+    .sb-logo-icon {
+        width: 38px; height: 38px; flex-shrink: 0;
+        background: linear-gradient(135deg,#5b8def 0%,#7c3aed 100%);
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 18px;
+    }
+    .sb-logo-title {
+        font-family: 'Syne', sans-serif !important;
+        font-weight: 700; font-size: 14px; color: #eaecf0; line-height: 1.2;
+    }
+    .sb-logo-sub {
+        font-family: 'DM Mono', monospace !important;
+        font-size: 10px; color: #5c6370; letter-spacing: .06em; margin-top: 2px;
+    }
+
+    /* ── Sidebar status badge ── */
+    .sb-status {
+        display: flex; align-items: center; gap: 8px;
+        margin: 0 12px 4px 12px;
+        padding: 7px 12px;
+        background: rgba(52,211,153,.08);
+        border: 1px solid rgba(52,211,153,.2);
+        border-radius: 8px;
+    }
+    .sb-status span {
+        font-size: 11px !important; color: #34d399 !important; font-weight: 600;
+        font-family: 'DM Sans', sans-serif !important;
+    }
+    .sb-status-dot {
+        width: 7px; height: 7px; background: #34d399; border-radius: 50%;
+        animation: sb-pulse 2s infinite; flex-shrink: 0;
+    }
+    @keyframes sb-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* ── Dividers ── */
+    .sb-divider {
+        border-top: 1px solid rgba(255,255,255,.06);
+        margin: 12px 0;
+    }
+
+    /* ── Section labels ── */
+    .sb-section-label {
+        font-family: 'DM Mono', monospace !important;
+        font-size: 9px !important; color: #5c6370 !important;
+        text-transform: uppercase; letter-spacing: .14em;
+        padding: 0 16px; margin-bottom: 8px;
+    }
+
+    /* ── KPI row ── */
+    .sb-kpi-row {
+        display: flex; align-items: center;
+        margin: 0 12px 10px 12px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 0;
+    }
+    .sb-kpi { flex: 1; text-align: center; }
+    .sb-kpi-value {
+        font-family: 'Syne', sans-serif !important;
+        font-size: 20px !important; font-weight: 700; line-height: 1;
+    }
+    .sb-kpi-value.accent { color: #5b8def; }
+    .sb-kpi-value.green  { color: #34d399; }
+    .sb-kpi-value.red    { color: #f87171; }
+    .sb-kpi-label {
+        font-family: 'DM Mono', monospace !important;
+        font-size: 9px !important; color: #5c6370 !important;
+        text-transform: uppercase; margin-top: 3px;
+    }
+    .sb-kpi-sep {
+        width: 1px; height: 28px;
+        background: rgba(255,255,255,.07); flex-shrink: 0;
+    }
+
+    /* ── Progress bar ── */
+    .sb-bar-wrap {
+        margin: 0 12px 4px 12px;
+        height: 5px; border-radius: 4px;
+        background: rgba(248,113,113,.2);
+        overflow: hidden;
+    }
+    .sb-bar-fill {
+        height: 100%; background: #34d399; border-radius: 4px;
+        transition: width .5s ease;
+    }
+    .sb-bar-legend {
+        display: flex; justify-content: space-between;
+        padding: 0 12px;
+        font-family: 'DM Mono', monospace !important;
+        font-size: 10px !important;
+    }
+    .sb-bar-legend .green { color: #34d399; }
+    .sb-bar-legend .red   { color: #f87171; }
+
+    /* ── Favorites ── */
+    .sb-fav-item {
+        display: flex; align-items: center; gap: 8px;
+        padding: 5px 12px;
+        margin: 0 4px 2px 4px;
+        border-radius: 7px;
+    }
+    .sb-fav-item:hover { background: rgba(91,141,239,.07); }
+    .sb-fav-vd {
+        font-family: 'DM Mono', monospace !important;
+        font-size: 11px !important; color: #5b8def;
+        background: rgba(91,141,239,.14);
+        padding: 1px 6px; border-radius: 4px; flex-shrink: 0;
+    }
+    .sb-fav-nome {
+        font-size: 12px !important; color: #9094a6;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ── Contacts ── */
+    .sb-contacts {
+        margin: 0 12px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .sb-contact-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 9px 12px;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .sb-contact-item:last-child { border-bottom: none; }
+    .sb-contact-name {
+        font-size: 12px !important; color: #eaecf0 !important;
+        font-weight: 600; line-height: 1.2;
+    }
+    .sb-contact-tel {
+        font-family: 'DM Mono', monospace !important;
+        font-size: 11px !important; color: #5c6370;
+    }
+
+    /* ── Radio nav (inside sidebar) ── */
+    section[data-testid="stSidebar"] [data-testid="stRadio"] label {
+        font-size: 13px !important;
+        border-radius: 8px !important;
+        padding: 6px 10px !important;
+        margin-bottom: 2px !important;
+    }
+    section[data-testid="stSidebar"] [data-testid="stRadio"] > div {
+        background: transparent !important;
+        border: none !important;
+        gap: 2px !important;
+        padding: 0 8px !important;
+    }
+
+    /* ── Headings ── */
+    h1 { font-family: 'Syne', sans-serif !important; font-weight: 800 !important; font-size: 30px !important; letter-spacing: -.03em; color: var(--text) !important; }
     h2, h3 { font-family: 'Syne', sans-serif !important; color: var(--text) !important; }
-    h4 { font-family: 'Syne', sans-serif !important; color: var(--text) !important; }
-    
-    p, span, div { font-family: 'DM Sans', sans-serif !important; }
-    
-    code, pre, .mono { font-family: 'DM Mono', monospace !important; }
-    
-    [data-testid="stMetric"] { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
-    [data-testid="stMetricLabel"] { color: var(--text3); font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; }
-    [data-testid="stMetricValue"] { color: var(--text); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 28px; }
-    
-    .stButton > button { border-radius: 10px; font-family: 'DM Sans', sans-serif; font-weight: 600; transition: all 0.2s; border: 1px solid var(--border); }
-    .stButton > button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-    
-    .stTabs [data-baseweb="tab-list"] { gap: 8px; background: var(--surface); padding: 8px; border-radius: 12px; }
-    .stTabs [data-baseweb="tab"] { background: transparent; border-radius: 8px; padding: 12px 20px; font-weight: 500; }
-    .stTabs [aria-selected="true"] { background: var(--accent); color: white; }
-    
-    .stTextInput > div > div > input { background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: 12px !important; color: var(--text) !important; }
-    .stTextInput > div > div > input:focus { border-color: var(--accent) !important; }
-    
-    .stSelectbox > div > div > div { background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: 12px !important; }
-    
-    .stTextArea > div > div > textarea { background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: 12px !important; color: var(--text) !important; }
-    
-    .stCheckbox > label > div:first-child { border-radius: 6px !important; }
-    
-    .stRadio > label > div { background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: 12px !important; }
-    
+
+    /* ── Metrics ── */
+    [data-testid="stMetric"] { background: var(--bg2) !important; border: 1px solid var(--border) !important; border-radius: 12px !important; padding: 16px !important; }
+    [data-testid="stMetricLabel"] { color: var(--text3) !important; font-family: 'DM Mono', monospace !important; font-size: 10px !important; text-transform: uppercase; }
+    [data-testid="stMetricValue"] { color: var(--text) !important; font-family: 'Syne', sans-serif !important; font-weight: 700 !important; font-size: 26px !important; }
+
+    /* ── Inputs ── */
+    .stTextInput > div > div > input { background: var(--surface) !important; border: 1px solid var(--border2) !important; border-radius: 10px !important; color: var(--text) !important; }
+    .stTextInput > div > div > input:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(91,141,239,.15) !important; }
+    .stSelectbox > div > div > div { background: var(--surface) !important; border: 1px solid var(--border2) !important; border-radius: 10px !important; }
+    .stTextArea > div > div > textarea { background: var(--surface) !important; border: 1px solid var(--border2) !important; border-radius: 10px !important; color: var(--text) !important; }
+
+    /* ── Buttons ── */
+    .stButton > button { border-radius: 8px !important; font-family: 'DM Sans', sans-serif !important; font-weight: 600 !important; transition: all .18s !important; border: 1px solid var(--border2) !important; }
+    .stButton > button:hover { transform: translateY(-1px) !important; box-shadow: 0 6px 16px rgba(0,0,0,.3) !important; }
+
+    /* ── Tabs ── */
+    .stTabs [data-baseweb="tab-list"] { gap: 6px; background: var(--surface); padding: 6px; border-radius: 10px; }
+    .stTabs [data-baseweb="tab"] { background: transparent; border-radius: 7px; padding: 10px 18px; font-weight: 500; }
+    .stTabs [aria-selected="true"] { background: var(--accent) !important; color: white !important; }
+
+    /* ── Footer ── */
     .footer { text-align: center; color: var(--text3); font-size: 12px; padding: 24px; border-top: 1px solid var(--border); margin-top: 48px; }
 """
 
