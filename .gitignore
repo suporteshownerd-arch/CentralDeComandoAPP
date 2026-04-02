@@ -28,9 +28,9 @@ venv.bak/
 .env.local
 .env.*.local
 
-# Dados
+# Dados sensíveis — CSVs planos nunca commitados, .enc são seguros
 data/*.csv
-data/*.csv.enc
+!data/*.csv.enc
 data/*.db
 data/historico.db
 
