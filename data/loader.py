@@ -284,16 +284,28 @@ class DataLoader:
             lojas = self.get_lojas()
 
         t = termo.strip().lower()
+        import re as _re
+        t_clean = _re.sub(r"[^a-z0-9]", "", t)
+        # VD = apenas dígitos com até 4 caracteres (ex: "318", "2015")
+        # Designação = número longo (≥5 dígitos) ou alfanumérico (INN, MPLS)
+        e_vd = t.isdigit() and len(t) <= 4
         resultados = []
 
         for loja in lojas:
             if modo == "VD / Designação":
-                match = (
-                    t == loja.get("vd", "").lower()
-                    or t in str(loja.get("mpls", "")).lower()
-                    or t in str(loja.get("inn", "")).lower()
-                    or any(t in c.get("des", "").lower() for c in loja.get("circuitos", []))
-                )
+                if e_vd:
+                    # Número curto → match exato de VD apenas
+                    match = (t == loja.get("vd", "").lower())
+                else:
+                    # Número longo ou alfanumérico → busca em MPLS, INN e circuitos
+                    def _des_match(des: str) -> bool:
+                        d = _re.sub(r"[^a-z0-9]", "", des.lower())
+                        return bool(t_clean) and (t_clean == d or d.startswith(t_clean) or t_clean in d)
+                    match = (
+                        _des_match(loja.get("mpls", ""))
+                        or _des_match(loja.get("inn", ""))
+                        or any(_des_match(c.get("des", "")) for c in loja.get("circuitos", []))
+                    )
             elif modo == "Endereço":
                 match = (
                     t in loja.get("endereco", "").lower()
