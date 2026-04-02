@@ -1,7 +1,7 @@
 """
-Central de Comando DPSP - Aplicação Principal v2.0
+Central de Comando DPSP - Aplicação Principal v2.1
 Desenvolvido por Enzo Maranho - T.I. DPSP
-Refatorado com arquitetura modular
+Refatorado com Pandas e Plotly
 """
 
 import streamlit as st
@@ -12,7 +12,10 @@ from components import (
     init_session_state,
     setup_page_config
 )
-from data.loader import DataLoader
+
+# Importar novo data loader com pandas
+from data.loader_pandas import DataLoaderPandas
+
 from utils.sheets import GoogleSheetsManager
 from pages import (
     render_consulta_lojas,
@@ -36,7 +39,7 @@ def main():
     # Inicializar serviços
     @st.cache_resource
     def get_data_loader():
-        return DataLoader()
+        return DataLoaderPandas()
     
     @st.cache_resource
     def get_sheets_manager():
@@ -44,7 +47,15 @@ def main():
     
     data_loader = get_data_loader()
     sheets_manager = get_sheets_manager()
-    lojas = data_loader.get_lojas()
+    
+    # Obter dados (agora como lista para compatibilidade)
+    lojas = data_loader.get_lojas_list()
+    
+    # Atualizar KPIs com dados reais
+    stats = data_loader.get_estatisticas()
+    if stats.get('total', 0) > 0:
+        st.session_state.kpi_data['lojas_online'] = stats.get('ativas', 0)
+        st.session_state.kpi_data['lojas_total'] = stats.get('total', 0)
     
     # Renderizar sidebar e obter menu
     menu_name = render_sidebar(

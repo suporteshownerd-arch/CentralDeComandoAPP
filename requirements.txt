@@ -8,6 +8,9 @@ streamlit>=1.28.0
 cryptography>=41.0.0
 pandas>=2.0.0
 
+# Visualização
+plotly>=5.18.0
+
 # Google Sheets API
 gspread>=5.12.0
 google-auth>=2.23.0

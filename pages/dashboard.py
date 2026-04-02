@@ -1,9 +1,13 @@
 """
 Página de Dashboard
-Central de Comando DPSP v2.0
+Central de Comando DPSP v2.1
+Com Gráficos Plotly
 """
 
 import streamlit as st
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 from components import render_kpi_card
 
 
@@ -11,6 +15,9 @@ def render_page(data_loader, lojas):
     """Renderiza a página de Dashboard"""
     st.markdown("## 📈 Dashboard")
     st.markdown("*Visão geral das operações*")
+    
+    # Obter DataFrame
+    df = data_loader.get_df()
     
     # Estatísticas de uso
     stats = data_loader.usage_logger.get_stats()
@@ -21,82 +28,236 @@ def render_page(data_loader, lojas):
     
     with col1:
         st.metric(
-            "Buscas Hoje",
-            stats.get("buscas", kpi['buscas_hoje']),
-            "+12%",
-            delta_color="normal"
+            "Total Lojas",
+            len(df) if not df.empty else kpi.get('buscas_hoje', 0)
         )
     with col2:
-        st.metric(
-            "Chamados Hoje",
-            stats.get("chamados", kpi['chamados_hoje']),
-            "+3%",
-            delta_color="normal"
-        )
+        ativas = len(df[df['status'] == 'open']) if not df.empty and 'status' in df.columns else kpi.get('chamados_hoje', 0)
+        st.metric("Lojas Ativas", ativas)
     with col3:
-        st.metric(
-            "Crises Ativas",
-            kpi['crises_ativas'],
-            "-1",
-            delta_color="normal"
-        )
+        inativas = len(df[df['status'] == 'closed']) if not df.empty and 'status' in df.columns else kpi.get('crises_ativas', 0)
+        st.metric("Lojas Inativas", inativas)
     with col4:
-        st.metric(
-            "MTTR Médio",
-            kpi['mttr_medio'],
-            "-5min",
-            delta_color="normal"
-        )
+        if 'estado' in df.columns:
+            st.metric("Estados", df['estado'].nunique())
+        else:
+            st.metric("MTTR Médio", kpi.get('mttr_medio', 'N/A'))
     
     st.markdown("---")
     
     # Gráficos
-    col_d1, col_d2 = st.columns(2)
+    col_g1, col_g2 = st.columns(2)
     
-    with col_d1:
-        render_lojas_por_estado(lojas)
+    with col_g1:
+        if not df.empty and 'estado' in df.columns:
+            render_grafico_estado(df)
+        else:
+            st.info("Dados de estado não disponíveis")
     
-    with col_d2:
-        render_status_lojas(lojas)
+    with col_g2:
+        if not df.empty and 'status' in df.columns:
+            render_grafico_status(df)
+        else:
+            render_grafico_status_fallback(kpi)
     
     st.markdown("---")
+    
+    # Mais gráficos
+    col_g3, col_g4 = st.columns(2)
+    
+    with col_g3:
+        if not df.empty and 'cidade' in df.columns:
+            render_grafico_cidades(df)
+    
+    with col_g4:
+        if not df.empty:
+            render_grafico_tipo_loja(df)
+    
+    st.markdown("---")
+    
+    # Tabela de lojas por região
+    if not df.empty:
+        render_tabela_regioes(df)
     
     # Histórico de uso
     render_historico_uso(stats)
 
 
-def render_lojas_por_estado(lojas):
+def render_grafico_estado(df: pd.DataFrame):
     """Renderiza gráfico de lojas por estado"""
     st.markdown("### 🏪 Lojas por Estado")
     
-    estados = {}
-    for l in lojas:
-        e = l.get('estado', 'Outro')
-        estados[e] = estados.get(e, 0) + 1
+    if 'estado' not in df.columns:
+        st.warning("Coluna Estado não encontrada")
+        return
     
-    for estado, count in sorted(estados.items(), key=lambda x: x[1], reverse=True):
-        pct = (count / len(lojas)) * 100
-        st.progress(pct/100, f"{estado}: {count} ({pct:.1f}%)")
+    estado_counts = df['estado'].value_counts().reset_index()
+    estado_counts.columns = ['Estado', 'Quantidade']
+    
+    fig = px.bar(
+        estado_counts,
+        x='Estado',
+        y='Quantidade',
+        title="Lojas por Estado",
+        color='Quantidade',
+        color_continuous_scale='Blues',
+        text='Quantidade'
+    )
+    
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font_color='#eaecf0',
+        showlegend=False
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
 
 
-def render_status_lojas(lojas):
-    """Renderiza status das lojas"""
+def render_grafico_status(df: pd.DataFrame):
+    """Renderiza gráfico de status das lojas"""
     st.markdown("### 📊 Status das Lojas")
     
-    abertas = len([l for l in lojas if l.get('status') == 'open'])
-    fechadas = len([l for l in lojas if l.get('status') == 'closed'])
+    if 'status' not in df.columns:
+        st.warning("Coluna Status não encontrada")
+        return
     
-    col_s1, col_s2 = st.columns(2)
-    with col_s1:
-        st.metric("Abertas", abertas)
-    with col_s2:
-        st.metric("Fechadas", fechadas)
+    status_counts = df['status'].value_counts().reset_index()
+    status_counts.columns = ['Status', 'Quantidade']
     
-    pct_online = (abertas / len(lojas) * 100) if len(lojas) > 0 else 0
-    st.progress(pct_online/100, f"Uptime: {pct_online:.1f}%")
+    status_labels = {'open': 'Ativas', 'closed': 'Inativas'}
+    status_counts['Status'] = status_counts['Status'].map(status_labels).fillna(status_counts['Status'])
+    
+    colors = {'Ativas': '#34d399', 'Inativas': '#f87171'}
+    
+    fig = px.pie(
+        status_counts,
+        names='Status',
+        values='Quantidade',
+        title="Lojas Ativas vs Inativas",
+        color='Status',
+        color_discrete_map=colors,
+        hole=0.4
+    )
+    
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        font_color='#eaecf0'
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
 
 
-def render_historico_uso(stats):
+def render_grafico_status_fallback(kpi: dict):
+    """Renderiza gráfico de status com dados fallback"""
+    st.markdown("### 📊 Status das Lojas")
+    
+    labels = ['Ativas', 'Inativas']
+    valores = [kpi.get('lojas_online', 100), kpi.get('lojas_total', 162) - kpi.get('lojas_online', 100)]
+    
+    fig = go.Figure(data=[go.Pie(
+        labels=labels,
+        values=valores,
+        hole=0.4,
+        marker=dict(colors=['#34d399', '#f87171'])
+    )])
+    
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        font_color='#eaecf0'
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
+
+
+def render_grafico_cidades(df: pd.DataFrame):
+    """Renderiza gráfico das principais cidades"""
+    st.markdown("### 🏙️ Top Cidades")
+    
+    if 'cidade' not in df.columns:
+        st.warning("Coluna Cidade não encontrada")
+        return
+    
+    cidade_counts = df['cidade'].value_counts().head(10).reset_index()
+    cidade_counts.columns = ['Cidade', 'Quantidade']
+    
+    fig = px.bar(
+        cidade_counts,
+        x='Quantidade',
+        y='Cidade',
+        orientation='h',
+        title="Top 10 Cidades",
+        color='Quantidade',
+        color_continuous_scale='Greens'
+    )
+    
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font_color='#eaecf0',
+        showlegend=False,
+        yaxis={'categoryorder': 'total ascending'}
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
+
+
+def render_grafico_tipo_loja(df: pd.DataFrame):
+    """Renderiza gráfico de tipo de loja"""
+    st.markdown("### 🏪 Tipos de Loja")
+    
+    tipo_col = 'tipo_loja' if 'tipo_loja' in df.columns else 'TIPO LOJA'
+    
+    if tipo_col not in df.columns:
+        st.warning("Coluna Tipo de Loja não encontrada")
+        return
+    
+    tipo_counts = df[tipo_col].value_counts().head(8).reset_index()
+    tipo_counts.columns = ['Tipo', 'Quantidade']
+    
+    fig = px.pie(
+        tipo_counts,
+        names='Tipo',
+        values='Quantidade',
+        title="Tipos de Loja"
+    )
+    
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        font_color='#eaecf0'
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
+
+
+def render_tabela_regioes(df: pd.DataFrame):
+    """Renderiza tabela de lojas por região/estado"""
+    st.markdown("### 📋 Lojas por Região")
+    
+    if 'estado' not in df.columns:
+        return
+    
+    regiao_df = df.groupby('estado').agg({
+        'vd': 'count',
+        'nome': 'first'
+    }).reset_index()
+    
+    regiao_df.columns = ['Estado', 'Total Lojas', 'Exemplo']
+    
+    col_vis1, col_vis2 = st.columns([3, 1])
+    
+    with col_vis1:
+        st.dataframe(
+            regiao_df.sort_values('Total Lojas', ascending=False),
+            use_container_width=True,
+            hide_index=True
+        )
+    
+    with col_vis2:
+        st.metric("Média por Estado", f"{regiao_df['Total Lojas'].mean():.0f}")
+
+
+def render_historico_uso(stats: dict):
     """Renderiza histórico de uso"""
     st.markdown("### 📈 Histórico de Uso (7 dias)")
     
