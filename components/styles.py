@@ -183,18 +183,59 @@ def get_base_css() -> str:
         font-size: 11px !important; color: #5c6370;
     }
 
-    /* ── Radio nav (inside sidebar) ── */
-    section[data-testid="stSidebar"] [data-testid="stRadio"] label {
-        font-size: 13px !important;
-        border-radius: 8px !important;
-        padding: 6px 10px !important;
-        margin-bottom: 2px !important;
-    }
-    section[data-testid="stSidebar"] [data-testid="stRadio"] > div {
+    /* ── Navegação: botões como nav links ── */
+    /* Wrapper da nav */
+    .sb-nav-wrap { padding: 0 8px; }
+
+    /* Todos os botões dentro do sidebar → estilo nav link */
+    section[data-testid="stSidebar"] .stButton > button {
         background: transparent !important;
-        border: none !important;
-        gap: 2px !important;
-        padding: 0 8px !important;
+        border: 1px solid transparent !important;
+        border-radius: 8px !important;
+        text-align: left !important;
+        padding: 9px 14px !important;
+        color: #9094a6 !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        width: 100% !important;
+        transition: background .15s, color .15s !important;
+        box-shadow: none !important;
+        letter-spacing: 0 !important;
+    }
+    section[data-testid="stSidebar"] .stButton > button:hover {
+        background: rgba(91,141,239,.08) !important;
+        color: #eaecf0 !important;
+        border-color: transparent !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+    section[data-testid="stSidebar"] .stButton > button:focus:not(:active) {
+        box-shadow: none !important;
+        outline: none !important;
+    }
+    section[data-testid="stSidebar"] .stButton > button p {
+        font-size: 13px !important;
+        color: inherit !important;
+        text-align: left !important;
+    }
+    /* Marcador antes do botão ativo → irmão seguinte fica em destaque */
+    .nav-active-marker {
+        display: none;
+        height: 0;
+        margin: 0;
+        padding: 0;
+    }
+    .nav-active-marker + div[data-testid="stButton"] > button,
+    .nav-active-marker + div > div[data-testid="stButton"] > button {
+        background: rgba(91,141,239,.12) !important;
+        color: #5b8def !important;
+        border-color: rgba(91,141,239,.22) !important;
+        font-weight: 600 !important;
+    }
+    .nav-active-marker + div[data-testid="stButton"] > button:hover,
+    .nav-active-marker + div > div[data-testid="stButton"] > button:hover {
+        background: rgba(91,141,239,.18) !important;
+        color: #5b8def !important;
     }
 
     /* ── Headings ── */

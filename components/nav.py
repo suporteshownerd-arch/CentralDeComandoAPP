@@ -16,14 +16,19 @@ _MENU = [
     ("❓", "Ajuda"),
 ]
 
+_PAGE_DEFAULT = "Consulta de Lojas"
+
 
 def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
-    total  = len(lojas) if lojas else 0
-    ativas = sum(1 for l in lojas if l.get("status") == "open") if lojas else 0
+    total    = len(lojas) if lojas else 0
+    ativas   = sum(1 for l in lojas if l.get("status") == "open") if lojas else 0
     inativas = total - ativas
-    pct_ativas = round(ativas / total * 100) if total else 0
+    pct      = round(ativas / total * 100) if total else 0
 
-    # ── Logo / cabeçalho ─────────────────────────────────────────────────────
+    if "nav_page" not in st.session_state:
+        st.session_state.nav_page = _PAGE_DEFAULT
+
+    # ── Logo ─────────────────────────────────────────────────────────────────
     st.markdown(
         """
         <div class="sb-logo">
@@ -37,22 +42,16 @@ def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
         unsafe_allow_html=True,
     )
 
-    # ── Status online ─────────────────────────────────────────────────────────
+    # ── Status ────────────────────────────────────────────────────────────────
     st.markdown(
-        """
-        <div class="sb-status">
-            <div class="sb-status-dot"></div>
-            <span>Sistema Operacional</span>
-        </div>
-        """,
+        '<div class="sb-status"><div class="sb-status-dot"></div>'
+        '<span>Sistema Operacional</span></div>',
         unsafe_allow_html=True,
     )
-
     st.markdown("<div class='sb-divider'></div>", unsafe_allow_html=True)
 
-    # ── Parque de Lojas ───────────────────────────────────────────────────────
+    # ── KPIs ──────────────────────────────────────────────────────────────────
     st.markdown("<div class='sb-section-label'>Parque de Lojas</div>", unsafe_allow_html=True)
-
     st.markdown(
         f"""
         <div class="sb-kpi-row">
@@ -72,58 +71,66 @@ def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
             </div>
         </div>
         <div class="sb-bar-wrap">
-            <div class="sb-bar-fill" style="width:{pct_ativas}%"></div>
+            <div class="sb-bar-fill" style="width:{pct}%"></div>
         </div>
         <div class="sb-bar-legend">
-            <span class="green">● {pct_ativas}% ativas</span>
-            <span class="red">● {100-pct_ativas}% inativas</span>
+            <span class="green">● {pct}% ativas</span>
+            <span class="red">● {100-pct}% inativas</span>
         </div>
         """,
         unsafe_allow_html=True,
     )
-
     st.markdown("<div class='sb-divider'></div>", unsafe_allow_html=True)
 
     # ── Navegação ─────────────────────────────────────────────────────────────
+    # Técnica: insere <div class="nav-active"> ANTES do botão ativo.
+    # CSS usa seletor "+ [data-testid='stButton'] > button" para estilizar
+    # o botão seguinte ao marcador.
     st.markdown("<div class='sb-section-label'>Navegação</div>", unsafe_allow_html=True)
+    st.markdown('<div class="sb-nav-wrap">', unsafe_allow_html=True)
 
-    menu_labels = [f"{icon}  {nome}" for icon, nome in _MENU]
-    escolha = st.radio("nav", menu_labels, label_visibility="collapsed")
-    pagina = escolha.split("  ", 1)[1] if "  " in escolha else escolha
+    for icon, nome in _MENU:
+        ativo = st.session_state.nav_page == nome
+        if ativo:
+            st.markdown('<div class="nav-active-marker"></div>', unsafe_allow_html=True)
+        if st.button(f"{icon}  {nome}", key=f"navbtn_{nome}", use_container_width=True):
+            st.session_state.nav_page = nome
+            st.rerun()
 
+    st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("<div class='sb-divider'></div>", unsafe_allow_html=True)
 
     # ── Favoritos ─────────────────────────────────────────────────────────────
     if favoritos:
         st.markdown("<div class='sb-section-label'>⭐ Favoritos</div>", unsafe_allow_html=True)
         idx = {l.get("vd"): l.get("nome", "") for l in lojas} if lojas else {}
-        items_html = ""
+        items = ""
         for vd in favoritos[:5]:
-            nome = idx.get(vd, f"VD {vd}")
-            nome_curto = nome[:20] + "…" if len(nome) > 20 else nome
-            items_html += f"""
-            <div class="sb-fav-item">
-                <span class="sb-fav-vd">{vd}</span>
-                <span class="sb-fav-nome">{nome_curto}</span>
-            </div>
-            """
-        st.markdown(items_html, unsafe_allow_html=True)
+            nome_loja = idx.get(vd, f"VD {vd}")
+            curto = nome_loja[:20] + "…" if len(nome_loja) > 20 else nome_loja
+            items += (
+                f'<div class="sb-fav-item">'
+                f'<span class="sb-fav-vd">{vd}</span>'
+                f'<span class="sb-fav-nome">{curto}</span>'
+                f'</div>'
+            )
+        st.markdown(items, unsafe_allow_html=True)
         st.markdown("<div class='sb-divider'></div>", unsafe_allow_html=True)
 
-    # ── Contatos rápidos ──────────────────────────────────────────────────────
+    # ── Contatos ──────────────────────────────────────────────────────────────
     st.markdown("<div class='sb-section-label'>Contatos</div>", unsafe_allow_html=True)
     st.markdown(
         """
         <div class="sb-contacts">
             <div class="sb-contact-item">
-                <span>🎛️</span>
+                <div class="sb-contact-icon">🎛️</div>
                 <div>
-                    <div class="sb-contact-name">Central</div>
+                    <div class="sb-contact-name">Central de Comando</div>
                     <div class="sb-contact-tel">(11) 3274-7527</div>
                 </div>
             </div>
             <div class="sb-contact-item">
-                <span>💻</span>
+                <div class="sb-contact-icon">💻</div>
                 <div>
                     <div class="sb-contact-name">T.I. DPSP</div>
                     <div class="sb-contact-tel">(11) 5529-6003</div>
@@ -134,7 +141,7 @@ def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
         unsafe_allow_html=True,
     )
 
-    return pagina
+    return st.session_state.nav_page
 
 
 def render_page_header(title: str, subtitle: str = None, icon: str = None):
@@ -161,6 +168,7 @@ def init_session_state():
         "nome_atendente": "",
         "favoritos": [],
         "consulta_pagina": 1,
+        "nav_page": _PAGE_DEFAULT,
     }
     for key, value in defaults.items():
         if key not in st.session_state:
