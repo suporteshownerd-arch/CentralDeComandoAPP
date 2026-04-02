@@ -1,31 +1,16 @@
 """
-Central de Comando DPSP - Aplicação Principal v2.2
-Desenvolvido por Enzo Maranho - T.I. DPSP
-Com tratamento de erros robusto
+Central de Comando DPSP - Aplicação Principal v2.3
+Simplificado e estável
 """
 
 import streamlit as st
 
-# Importar componentes
-from components import (
-    render_styles,
-    init_session_state,
-    setup_page_config
-)
-
-# Importar data loader
-from data.loader_pandas import DataLoaderPandas, get_sample_data_legacy
-from utils.sheets import GoogleSheetsManager
-
-from pages import (
-    render_consulta_lojas,
-    render_gestao_crises,
-    render_historico,
-    render_abertura_chamados,
-    render_dashboard,
-    render_ajuda
-)
+# Componentes
+from components import render_styles, init_session_state, setup_page_config
 from components.nav import render_sidebar, render_footer
+
+# Data
+from data.loader_pandas import DataLoaderPandas, get_sample_data_legacy
 
 
 def main():
@@ -36,9 +21,8 @@ def main():
     render_styles()
     init_session_state()
     
-    # Inicializar serviços com tratamento de erros
-    data_loader = None
-    lojas = []
+    # Carregar dados
+    lojas = get_sample_data_legacy()
     df = None
     
     try:
@@ -46,75 +30,41 @@ def main():
         def get_data_loader():
             return DataLoaderPandas()
         
-        data_loader = get_data_loader()
-        lojas = data_loader.get_lojas_list()
-        
-        try:
-            df = data_loader.get_df()
-            stats = data_loader.get_estatisticas()
-            if stats.get('total', 0) > 0:
-                st.session_state.kpi_data['lojas_online'] = stats.get('ativas', 0)
-                st.session_state.kpi_data['lojas_total'] = stats.get('total', 0)
-        except Exception:
-            pass
-            
+        loader = get_data_loader()
+        lojas = loader.get_lojas_list()
+        df = loader.get_df()
     except Exception as e:
-        st.error(f"Erro ao carregar dados: {e}")
-        # Usar dados de exemplo
-        lojas = get_sample_data_legacy()
+        st.warning(f"Usando dados de exemplo: {e}")
     
-    sheets_manager = None
+    # Sidebar
     try:
-        @st.cache_resource
-        def get_sheets_manager():
-            return GoogleSheetsManager()
-        sheets_manager = get_sheets_manager()
-    except Exception:
-        pass
-    
-    # Renderizar sidebar e obter menu
-    try:
-        menu_name = render_sidebar(
-            lojas=lojas,
-            favoritos=st.session_state.favoritos,
-            kpi_data=st.session_state.kpi_data
-        )
-    except Exception as e:
-        st.error(f"Erro na sidebar: {e}")
+        menu_name = render_sidebar(lojas, st.session_state.favoritos, st.session_state.kpi_data)
+    except:
         menu_name = "Consulta de Lojas"
     
-    # Renderizar página selecionada
-    try:
-        if menu_name == "Consulta de Lojas":
-            render_consulta_lojas(data_loader, lojas)
-        
-        elif menu_name == "Gestão de Crises":
-            if sheets_manager:
-                render_gestao_crises(sheets_manager, lojas)
-            else:
-                render_gestao_crises(None, lojas)
-        
-        elif menu_name == "Histórico":
-            if sheets_manager:
-                render_historico(sheets_manager)
-            else:
-                st.error("Google Sheets não disponível")
-        
-        elif menu_name == "Abertura de Chamados":
-            render_abertura_chamados(lojas)
-        
-        elif menu_name == "Dashboard":
-            render_dashboard(data_loader, lojas)
-        
-        elif menu_name == "Ajuda":
-            render_ajuda()
-    except Exception as e:
-        st.error(f"Erro ao renderizar página: {e}")
+    # Páginas
+    if menu_name == "Consulta de Lojas":
+        from pages.consulta_lojas import render_page
+        render_page(None, lojas)
+    elif menu_name == "Gestão de Crises":
+        from pages.gestao_crises import render_page
+        render_page(None, lojas)
+    elif menu_name == "Histórico":
+        from pages.historico import render_page
+        render_page(None)
+    elif menu_name == "Abertura de Chamados":
+        from pages.abertura_chamados import render_page
+        render_page(lojas)
+    elif menu_name == "Dashboard":
+        from pages.dashboard import render_page
+        render_page(None, lojas)
+    elif menu_name == "Ajuda":
+        from pages.ajuda import render_page
+        render_page()
     
-    # Renderizar rodapé
     try:
         render_footer()
-    except Exception:
+    except:
         pass
 
 
