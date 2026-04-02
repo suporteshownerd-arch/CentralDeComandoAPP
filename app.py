@@ -21,7 +21,6 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
     
-    /* Tema Escuro Premium */
     :root {
         --bg: #0a0b0f;
         --bg2: #111318;
@@ -34,59 +33,24 @@ st.markdown("""
         --text2: #8b909e;
         --text3: #555b6a;
         --accent: #4f8ef7;
-        --accent2: #3d7ef6;
         --green: #2dd4a0;
         --red: #f05252;
         --amber: #f59e0b;
-        --purple: #9f7aea;
-        --cyan: #22d3ee;
     }
     
-    .stApp {
-        background: var(--bg);
-    }
+    .stApp { background: var(--bg); }
+    section[data-testid="stSidebar"] { background: var(--bg2) !important; border-right: 1px solid var(--border); }
+    h1, h2, h3 { font-family: 'Syne', sans-serif !important; color: var(--text) !important; font-weight: 700 !important; }
+    h1 { font-size: 28px !important; }
     
-    /* Sidebar Premium */
-    section[data-testid="stSidebar"] {
-        background: var(--bg2) !important;
-        border-right: 1px solid var(--border);
-    }
-    
-    /* Títulos */
-    h1, h2, h3 {
-        font-family: 'Syne', sans-serif !important;
-        color: var(--text) !important;
-        font-weight: 700 !important;
-    }
-    
-    h1 { font-size: 28px !important; letter-spacing: -0.02em; }
-    h2 { font-size: 22px !important; }
-    h3 { font-size: 16px !important; }
-    
-    /* Cards */
     .card {
         background: var(--bg2);
         border: 1px solid var(--border);
         border-radius: 12px;
         padding: 20px;
         margin-bottom: 16px;
-        transition: all 0.2s ease;
     }
     
-    .card:hover {
-        border-color: var(--border2);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 24px rgba(0,0,0,0.3);
-    }
-    
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-    }
-    
-    /* VD Badge */
     .vd-badge {
         background: rgba(79,142,247,0.15);
         color: var(--accent);
@@ -94,299 +58,41 @@ st.markdown("""
         border-radius: 6px;
         font-family: 'DM Mono', monospace;
         font-size: 12px;
-        border: 1px solid rgba(79,142,247,0.3);
     }
     
-    /* Status Badge */
-    .status-open {
-        background: rgba(45,212,160,0.15);
-        color: var(--green);
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-family: 'DM Mono', monospace;
-        font-size: 12px;
-    }
+    .status-open { background: rgba(45,212,160,0.15); color: var(--green); padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+    .status-closed { background: rgba(240,82,82,0.15); color: var(--red); padding: 4px 12px; border-radius: 20px; font-size: 12px; }
     
-    .status-closed {
-        background: rgba(240,82,82,0.15);
-        color: var(--red);
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-family: 'DM Mono', monospace;
-        font-size: 12px;
-    }
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .info-section { background: var(--surface); border-radius: 8px; padding: 14px; }
+    .info-section h4 { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); text-transform: uppercase; margin-bottom: 10px; }
+    .info-row { font-size: 13px; color: var(--text2); margin-bottom: 6px; }
     
-    /* Info Grid */
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-    }
+    .desig-pill { display: inline-flex; font-family: 'DM Mono', monospace; font-size: 11px; padding: 3px 9px; border-radius: 4px; margin: 2px 4px 2px 0; }
+    .desig-mpls { background: rgba(45,212,160,0.12); color: var(--green); border: 1px solid rgba(45,212,160,0.25); }
+    .desig-inn { background: rgba(79,142,247,0.12); color: var(--accent); border: 1px solid rgba(79,142,247,0.25); }
     
-    .info-section {
-        background: var(--surface);
-        border-radius: 8px;
-        padding: 14px;
-    }
+    .template-box { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .template-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .template-type { font-family: 'DM Mono', monospace; font-size: 11px; padding: 3px 10px; border-radius: 4px; }
+    .template-abertura { background: rgba(240,82,82,0.15); color: var(--red); }
+    .template-atualizacao { background: rgba(245,158,11,0.15); color: var(--amber); }
+    .template-normalizacao { background: rgba(45,212,160,0.15); color: var(--green); }
+    .template-content { background: var(--surface); border-radius: 8px; padding: 16px; font-family: 'DM Mono', monospace; font-size: 12px; line-height: 1.7; white-space: pre-wrap; }
     
-    .info-section h4 {
-        font-family: 'DM Mono', monospace;
-        font-size: 11px;
-        color: var(--text3);
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        margin-bottom: 10px;
-    }
+    [data-testid="stMetric"] { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    [data-testid="stMetricLabel"] { color: var(--text3); font-family: 'DM Mono', monospace; font-size: 11px; }
+    [data-testid="stMetricValue"] { color: var(--text); font-family: 'Syne', sans-serif; font-weight: 700; }
     
-    .info-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13px;
-        color: var(--text2);
-        margin-bottom: 6px;
-    }
+    .sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 16px; margin-bottom: 8px; }
+    .sidebar-logo-icon { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .sidebar-logo-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; }
+    .sidebar-logo-sub { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); }
     
-    .info-row svg {
-        width: 14px;
-        height: 14px;
-        color: var(--text3);
-    }
+    .contact-card { background: var(--surface); border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+    .contact-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
     
-    /* Designação Pills */
-    .desig-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        font-family: 'DM Mono', monospace;
-        font-size: 11px;
-        padding: 3px 9px;
-        border-radius: 4px;
-        margin: 2px 4px 2px 0;
-    }
-    
-    .desig-mpls {
-        background: rgba(45,212,160,0.12);
-        color: var(--green);
-        border: 1px solid rgba(45,212,160,0.25);
-    }
-    
-    .desig-inn {
-        background: rgba(79,142,247,0.12);
-        color: var(--accent);
-        border: 1px solid rgba(79,142,247,0.25);
-    }
-    
-    /* Botões */
-    .stButton > button {
-        border-radius: 8px;
-        font-family: 'DM Sans', sans-serif;
-        font-weight: 500;
-        transition: all 0.15s ease;
-    }
-    
-    .stButton > button:hover {
-        transform: translateY(-1px);
-    }
-    
-    /* Tabs */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 4px;
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        background: transparent;
-        border-radius: 8px 8px 0 0;
-        padding: 8px 16px;
-        font-family: 'DM Sans', sans-serif;
-    }
-    
-    .stTabs [aria-selected="true"] {
-        background: var(--surface);
-        color: var(--accent);
-    }
-    
-    /* Input Fields */
-    .stTextInput > div > div,
-    .stSelectbox > div > div,
-    .stTextArea > div > div {
-        background: var(--surface);
-        border: 1px solid var(--border2);
-        border-radius: 8px;
-    }
-    
-    .stTextInput > div > div:focus,
-    .stSelectbox > div > div:focus,
-    .stTextArea > div > div:focus {
-        border-color: var(--accent);
-    }
-    
-    /* Checkbox */
-    .stCheckbox > label {
-        color: var(--text2);
-    }
-    
-    /* Metrics */
-    [data-testid="stMetric"] {
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 16px;
-    }
-    
-    [data-testid="stMetricLabel"] {
-        color: var(--text3);
-        font-family: 'DM Mono', monospace;
-        font-size: 11px;
-    }
-    
-    [data-testid="stMetricValue"] {
-        color: var(--text);
-        font-family: 'Syne', sans-serif;
-        font-weight: 700;
-    }
-    
-    /* Template Box */
-    .template-box {
-        background: var(--bg3);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 16px;
-    }
-    
-    .template-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-    }
-    
-    .template-type {
-        font-family: 'DM Mono', monospace;
-        font-size: 11px;
-        padding: 3px 10px;
-        border-radius: 4px;
-    }
-    
-    .template-abertura {
-        background: rgba(240,82,82,0.15);
-        color: var(--red);
-    }
-    
-    .template-atualizacao {
-        background: rgba(245,158,11,0.15);
-        color: var(--amber);
-    }
-    
-    .template-normalizacao {
-        background: rgba(45,212,160,0.15);
-        color: var(--green);
-    }
-    
-    /* Code Block */
-    .template-content {
-        background: var(--surface);
-        border-radius: 8px;
-        padding: 16px;
-        font-family: 'DM Mono', monospace;
-        font-size: 12px;
-        line-height: 1.7;
-        white-space: pre-wrap;
-        color: var(--text);
-    }
-    
-    /* Divider */
-    hr {
-        border-color: var(--border);
-        margin: 24px 0;
-    }
-    
-    /* Footer */
-    .footer {
-        text-align: center;
-        color: var(--text3);
-        font-size: 12px;
-        padding: 20px;
-        border-top: 1px solid var(--border);
-        margin-top: 40px;
-    }
-    
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(8px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .fade-in {
-        animation: fadeIn 0.3s ease;
-    }
-    
-    /* Logo no sidebar */
-    .sidebar-logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 16px;
-        margin-bottom: 8px;
-    }
-    
-    .sidebar-logo-icon {
-        width: 32px;
-        height: 32px;
-        background: var(--accent);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .sidebar-logo-text {
-        font-family: 'Syne', sans-serif;
-        font-weight: 700;
-        font-size: 14px;
-    }
-    
-    .sidebar-logo-sub {
-        font-family: 'DM Mono', monospace;
-        font-size: 10px;
-        color: var(--text3);
-    }
-    
-    /* Contact Card */
-    .contact-card {
-        background: var(--surface);
-        border-radius: 8px;
-        padding: 12px;
-        margin-bottom: 8px;
-    }
-    
-    .contact-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 12px;
-        color: var(--text2);
-    }
-    
-    /* Filter Chips */
-    .filter-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 14px;
-        background: var(--surface);
-        border: 1px solid var(--border2);
-        border-radius: 20px;
-        font-size: 13px;
-        color: var(--text2);
-        cursor: pointer;
-    }
-    
-    .filter-chip:hover {
-        border-color: var(--accent);
-        color: var(--text);
-    }
+    .footer { text-align: center; color: var(--text3); font-size: 12px; padding: 20px; border-top: 1px solid var(--border); margin-top: 40px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -401,13 +107,10 @@ def get_sheets_manager():
 
 data_loader = get_data_loader()
 sheets_manager = get_sheets_manager()
-
-# Carregar dados
 lojas = data_loader.get_lojas()
 
 # ===== SIDEBAR =====
 with st.sidebar:
-    # Logo
     st.markdown("""
     <div class="sidebar-logo">
         <div class="sidebar-logo-icon">
@@ -424,44 +127,14 @@ with st.sidebar:
     """, unsafe_allow_html=True)
     
     st.markdown("---")
+    st.markdown('<div style="display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;background:#2dd4a0;border-radius:50%;"></div><span style="font-size:12px;color:#2dd4a0;font-family:monospace;">Sistema operacional</span></div>', unsafe_allow_html=True)
     
-    # Status
-    st.markdown("""
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
-        <div style="width:8px;height:8px;background:#2dd4a0;border-radius:50%;animation:pulse 2s infinite;"></div>
-        <span style="font-size:12px;color:#2dd4a0;font-family:'DM Mono',monospace;">Sistema operacional</span>
-    </div>
-    <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}</style>
-    """, unsafe_allow_html=True)
-    
-    # Menu
-    menu = st.radio(
-        "Navegação",
-        ["🏪 Consulta de Lojas", "⚠️ Gestão de Crises", "📋 Histórico", "📞 Abertura de Chamados"]
-    )
+    menu = st.radio("Navegação", ["🏪 Consulta de Lojas", "⚠️ Gestão de Crises", "📋 Histórico", "📞 Abertura de Chamados"])
     
     st.markdown("---")
-    
-    # Contatos
     st.markdown("**Contatos Suporte**")
-    st.markdown("""
-    <div class="contact-card">
-        <div class="contact-item">
-            <span>📞</span>
-            <span>T.I. DPSP: (11) 5529-6003</span>
-        </div>
-        <div class="contact-item" style="margin-top:8px;">
-            <span>🎛️</span>
-            <span>Central: (11) 3274-7527</span>
-        </div>
-        <div class="contact-item" style="margin-top:8px;">
-            <span>✉️</span>
-            <span>central.comando@dpsp.com.br</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="contact-card"><div class="contact-item"><span>📞</span><span>T.I. DPSP: (11) 5529-6003</span></div><div class="contact-item" style="margin-top:8px"><span>🎛️</span><span>Central: (11) 3274-7527</span></div><div class="contact-item" style="margin-top:8px"><span>✉️</span><span>central.comando@dpsp.com.br</span></div></div>', unsafe_allow_html=True)
 
-# Extrair nome do menu
 menu_name = menu.split(" ", 1)[1] if " " in menu else menu
 
 # ===== CONSULTA DE LOJAS =====
@@ -469,13 +142,9 @@ if menu_name == "Consulta de Lojas":
     st.markdown("## 🏪 Consulta de Lojas")
     st.markdown("*Busque informações completas de qualquer loja do parque DPSP*")
     
-    # Search Bar
     col1, col2, col3 = st.columns([1, 2, 1])
     with col1:
-        modo_busca = st.selectbox(
-            "Modo",
-            ["VD / Designação", "Endereço", "Nome de Loja", "Outra Informação"]
-        )
+        modo_busca = st.selectbox("Modo", ["VD / Designação", "Endereço", "Nome de Loja", "Outra Informação"])
     with col2:
         termo_busca = st.text_input("", placeholder="Digite VD, endereço, nome ou designação...", label_visibility="collapsed")
     with col3:
@@ -483,78 +152,53 @@ if menu_name == "Consulta de Lojas":
     
     if termo_busca:
         resultados = data_loader.buscar_loja(termo_busca, modo_busca, lojas)
-        
         st.markdown(f"**{len(resultados)} resultado(s) encontrado(s)**")
         
-        for i, loja in enumerate(resultados):
-            delay = i * 50
-            st.markdown(f'<div class="card fade-in" style="animation-delay:{delay}ms">', unsafe_allow_html=True)
+        for loja in resultados:
+            status_text = 'Aberta' if loja['status'] == 'open' else 'Fechada'
+            mpls_pill = f'<span class="desig-pill desig-mpls">MPLS {loja.get("mpls", "N/A")}</span>' if loja.get('mpls') else ''
+            inn_pill = f'<span class="desig-pill desig-inn">INN {loja.get("inn", "N/A")}</span>' if loja.get('inn') else ''
             
-            # Header
-            st.markdown("""
-            <div class="card-header">
-                <div>
-                    <span class="vd-badge">VD {}</span>
-                    <h3 style="margin:12px 0 4px 0">{}</h3>
-                    <p style="color:var(--text2);font-size:13px">{} - {}</p>
+            st.markdown(f"""
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                    <div>
+                        <span class="vd-badge">VD {loja['vd']}</span>
+                        <h3 style="margin:12px 0 4px 0">{loja['nome']}</h3>
+                        <p style="color:var(--text2);font-size:13px">{loja['cidade']} - {loja['estado']}</p>
+                    </div>
+                    <span class="status-{loja['status']}">● {status_text}</span>
                 </div>
-                <span class="status-{}">● {}</span>
-            </div>
-            """.format(
-                loja['vd'],
-                loja['nome'],
-                loja['cidade'],
-                loja['estado'],
-                loja['status'],
-                'Aberta' if loja['status'] == 'open' else 'Fechada'
-            ), unsafe_allow_html=True)
-            
-            # Info Grid
-            st.markdown("""
-            <div class="info-grid">
-                <div class="info-section">
-                    <h4>📍 Contato & Localização</h4>
-                    <div class="info-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>{}</div>
-                    <div class="info-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.72A2 2 0 012.18 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 8.09a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>{}</div>
-                    <div class="info-row"><a href="https://wa.me/55{}" style="color:var(--accent);text-decoration:none">{}</a></div>
-                    <div class="info-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>{}</div>
-                </div>
-                <div class="info-section">
-                    <h4>🕐 Horários & Gestão</h4>
-                    <div class="info-row">{}</div>
-                    <div class="info-row" style="margin-top:10px"><strong>GGL:</strong> {} · {}</div>
-                    <div class="info-row"><strong>GR:</strong> {} · {}</div>
-                </div>
-                <div class="info-section">
-                    <h4>🔗 Designações</h4>
-                    <div style="margin-bottom:6px">{}</div>
-                    <div class="info-row" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)">CNPJ: {}</div>
+                <div class="info-grid">
+                    <div class="info-section">
+                        <h4>📍 Contato & Localização</h4>
+                        <div class="info-row">{loja['endereco']}</div>
+                        <div class="info-row">{loja['tel']}</div>
+                        <div class="info-row"><a href="https://wa.me/55{loja['cel'].replace('-','').replace('(','').replace(')','')}" style="color:var(--accent)">{loja['cel']}</a></div>
+                        <div class="info-row">{loja['email']}</div>
+                    </div>
+                    <div class="info-section">
+                        <h4>🕐 Horários & Gestão</h4>
+                        <div class="info-row">{loja['horario']}</div>
+                        <div class="info-row" style="margin-top:10px"><strong>GGL:</strong> {loja['ggl']} · {loja['ggl_tel']}</div>
+                        <div class="info-row"><strong>GR:</strong> {loja['gr']} · {loja['gr_tel']}</div>
+                    </div>
+                    <div class="info-section">
+                        <h4>🔗 Designações</h4>
+                        <div style="margin-bottom:6px">{mpls_pill} {inn_pill}</div>
+                        <div class="info-row" style="font-family:monospace;font-size:11px;color:var(--text3)">CNPJ: {loja['cnpj']}</div>
+                    </div>
                 </div>
             </div>
-            """.format(
-                loja['endereco'],
-                loja['tel'],
-                loja['cel'].replace('-','').replace('(','').replace(')',''),
-                loja['cel'],
-                loja['email'],
-                loja['horario'],
-                loja['ggl'], loja['ggl_tel'],
-                loja['gr'], loja['gr_tel'],
-                '<span class="desig-pill desig-mpls">MPLS ' + loja['mpls'] + '</span>' if loja.get('mpls') else '<span class="desig-pill desig-mpls">MPLS N/A</span>' + 
-                '<br><span class="desig-pill desig-inn">INN ' + loja['inn'] + '</span>' if loja.get('inn') else '<span class="desig-pill desig-inn">INN N/A</span>',
-                loja['cnpj']
-            ), unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
             
-            # Botões
             col_bt1, col_bt2, col_bt3 = st.columns([1, 1, 1])
             with col_bt1:
-                st.button(f"📋 Chamados", key=f"chamados_{loja['vd']}")
+                st.button("📋 Chamados", key=f"ch_{loja['vd']}")
             with col_bt2:
-                st.button(f"📧 E-mail", key=f"email_{loja['vd']}")
+                st.button("📧 E-mail", key=f"em_{loja['vd']}")
             with col_bt3:
-                st.button(f"⭐ Favoritar", key=f"fav_{loja['vd']}")
-            
-            st.markdown("</div>", unsafe_allow_html=True)
+                st.button("⭐ Favoritar", key=f"fv_{loja['vd']}")
 
 # ===== GESTÃO DE CRISES =====
 elif menu_name == "Gestão de Crises":
@@ -563,19 +207,11 @@ elif menu_name == "Gestão de Crises":
     
     tab_executivo, tab_gestao, tab_isolada = st.tabs(["🔴 Alertas Executivos", "🚨 Gestão de Crise", "⚡ Loja Isolada"])
     
-    # Alertas Executivos
     with tab_executivo:
         col1, col2 = st.columns(2)
         with col1:
-            escopo = st.selectbox("Escopo da Crise", [
-                "Internet - MPLS", "Internet - INN", "Sistema POS", 
-                "Sistema ERP", "VPN Corporativa", "Data Center", "Energia Elétrica"
-            ])
-            identificacao = st.selectbox("Identificação", [
-                "Central identificou o incidente", 
-                "Central foi acionada por terceiros",
-                "Alerta automático do sistema"
-            ])
+            escopo = st.selectbox("Escopo da Crise", ["Internet - MPLS", "Internet - INN", "Sistema POS", "Sistema ERP", "VPN Corporativa", "Data Center", "Energia Elétrica"])
+            identificacao = st.selectbox("Identificação", ["Central identificou o incidente", "Central foi acionada por terceiros", "Alerta automático do sistema"])
             inicio = st.time_input("Horário de Início")
             termino = st.time_input("Horário de Término")
         with col2:
@@ -605,16 +241,15 @@ elif menu_name == "Gestão de Crises":
                             <span style="font-weight:600">{t['label']}</span>
                             <span class="template-type {tipo_classe}">{t['tipo'].upper()}</span>
                         </div>
-                        <div class="template-content">{}</div>
+                        <div class="template-content">{t['texto']}</div>
                     </div>
-                    """.format(t['texto']), unsafe_allow_html=True)
+                    """, unsafe_allow_html=True)
                     st.button(f"📋 Copiar {t['label']}")
         
         with col_btn2:
             if st.button("💾 Salvar no Histórico", use_container_width=True):
                 st.success("✅ Salvo com sucesso!")
     
-    # Gestão de Crise
     with tab_gestao:
         col1, col2 = st.columns(2)
         with col1:
@@ -640,9 +275,15 @@ elif menu_name == "Gestão de Crises":
         if st.button("🔄 Gerar Templates de Crise", type="primary"):
             templates = gerar_gestao_crise(num_incidente, link_sala, unidades, causa, responsavel_tecnico, responsavel_command, hora_incidente, hora_acionamento, atualizacao, contador, gerar_gc_abertura, gerar_gc_normalizacao)
             for t in templates:
-                st.code(t['texto'])
+                st.markdown(f"""
+                <div class="template-box">
+                    <div class="template-header">
+                        <span style="font-weight:600">{t['label']}</span>
+                    </div>
+                    <div class="template-content">{t['texto']}</div>
+                </div>
+                """, unsafe_allow_html=True)
     
-    # Loja Isolada
     with tab_isolada:
         col1, col2 = st.columns(2)
         with col1:
@@ -656,14 +297,20 @@ elif menu_name == "Gestão de Crises":
         if st.button("🔄 Gerar Informativos", type="primary"):
             templates = gerar_loja_isolada(vd_isolada, tipo_isol, hora_inicio_iso, hora_retorno_iso, lojas)
             for t in templates:
-                st.code(t['texto'])
+                st.markdown(f"""
+                <div class="template-box">
+                    <div class="template-header">
+                        <span style="font-weight:600">{t['label']}</span>
+                    </div>
+                    <div class="template-content">{t['texto']}</div>
+                </div>
+                """, unsafe_allow_html=True)
 
 # ===== HISTÓRICO =====
 elif menu_name == "Histórico":
     st.markdown("## 📋 Histórico")
     st.markdown("*Registros salvos no histórico*")
     
-    # Stats
     try:
         historico = sheets_manager.get_historico()
         aexec = len([h for h in historico if 'AExec' in str(h)])
@@ -684,14 +331,16 @@ elif menu_name == "Histórico":
     
     if historico:
         for reg in historico[:20]:
+            reg_tipo = reg.get('tipo', 'N/A')
+            reg_data = reg.get('data', '')
             st.markdown(f"""
             <div class="template-box">
                 <div class="template-header">
-                    <span style="font-weight:600">{}</span>
-                    <span style="color:var(--text3);font-size:12px">{}</span>
+                    <span style="font-weight:600">{reg_tipo}</span>
+                    <span style="color:var(--text3);font-size:12px">{reg_data}</span>
                 </div>
             </div>
-            """.format(reg.get('tipo', 'N/A'), reg.get('data', '')), unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
     else:
         st.info("Nenhum registro no histórico.")
 
