@@ -4,7 +4,7 @@ Central de Comando DPSP v2.0
 """
 
 import streamlit as st
-from typing import List, Dict, Optional
+from typing import List, Dict
 from .ui import (
     render_sidebar_logo,
     render_status_indicator,
@@ -16,7 +16,7 @@ from .ui import (
 def render_sidebar(
     lojas: List[dict],
     favoritos: List[str],
-    kpi_data: Dict,
+    kpi_data: Dict = None,
     menu_itens: List[str] = None
 ) -> str:
     """
@@ -44,24 +44,17 @@ def render_sidebar(
     st.markdown(render_sidebar_logo(), unsafe_allow_html=True)
     st.markdown(render_status_indicator("Sistema operacional"), unsafe_allow_html=True)
     st.markdown("---")
-    
-    st.markdown("**📊 KPIs em Tempo Real**")
-    
-    kpi = kpi_data
+
+    # KPIs reais das lojas
+    total_lojas  = len(lojas)
+    lojas_ativas = sum(1 for l in lojas if l.get("status") == "open")
+    pct = round(lojas_ativas / total_lojas * 100) if total_lojas else 0
     col_k1, col_k2 = st.columns(2)
     with col_k1:
-        st.markdown(render_kpi_card("Buscas Hoje", str(kpi.get('buscas_hoje', 0)), color="var(--accent)"), unsafe_allow_html=True)
+        st.markdown(render_kpi_card("Total", str(total_lojas), color="var(--accent)"), unsafe_allow_html=True)
     with col_k2:
-        st.markdown(render_kpi_card("Chamados", str(kpi.get('chamados_hoje', 0)), color="var(--green)"), unsafe_allow_html=True)
-    
-    col_k3, col_k4 = st.columns(2)
-    with col_k3:
-        st.markdown(render_kpi_card("Crises", str(kpi.get('crises_ativas', 0)), color="var(--red)"), unsafe_allow_html=True)
-    with col_k4:
-        online = kpi.get('lojas_online', 0)
-        total = kpi.get('lojas_total', len(lojas))
-        st.markdown(render_kpi_card("Online", f"{online}/{total}", color="var(--green)"), unsafe_allow_html=True)
-    
+        st.markdown(render_kpi_card("Ativas", f"{lojas_ativas} ({pct}%)", color="var(--green)"), unsafe_allow_html=True)
+
     st.markdown("---")
     
     menu = st.radio("Navegação", menu_itens)
