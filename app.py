@@ -487,7 +487,8 @@ if menu_name == "Consulta de Lojas":
         st.markdown(f"**{len(resultados)} resultado(s) encontrado(s)**")
         
         for i, loja in enumerate(resultados):
-            st.markdown(f'<div class="card fade-in" style="animation-delay:{}ms">'.format(i*50), unsafe_allow_html=True)
+            delay = i * 50
+            st.markdown(f'<div class="card fade-in" style="animation-delay:{delay}ms">', unsafe_allow_html=True)
             
             # Header
             st.markdown("""
