@@ -104,22 +104,42 @@ def render_search_box(
 
 def render_filters(df: pd.DataFrame) -> tuple:
     """Renderiza filtros de busca usando pandas"""
-    col_f1, col_f2, col_f3 = st.columns([1, 1, 1])
+    # Verificar se DataFrame é válido
+    if df is None or df.empty:
+        return [], [], 'vd'
+    
+    try:
+        col_f1, col_f2, col_f3 = st.columns([1, 1, 1])
+    except Exception:
+        # Se não puder usar columns, retornar valores padrão
+        return [], [], 'vd'
     
     estados = []
     if 'estado' in df.columns:
-        estados = sorted(df['estado'].dropna().unique().tolist())
+        try:
+            estados = sorted(df['estado'].dropna().unique().tolist())
+        except Exception:
+            estados = []
     
-    with col1:
-        filtro_estado = st.multiselect("Estado", estados if estados else ["SP", "RJ", "MG", "PR", "RS"])
+    try:
+        with col1:
+            filtro_estado = st.multiselect("Estado", estados if estados else ["SP", "RJ", "MG", "PR", "RS"])
+    except Exception:
+        filtro_estado = []
     
-    with col2:
-        filtro_status = st.multiselect("Status", ["Aberta", "Fechada"])
+    try:
+        with col2:
+            filtro_status = st.multiselect("Status", ["Aberta", "Fechada"])
+    except Exception:
+        filtro_status = []
     
-    with col3:
-        colunas_ordenar = ['nome', 'vd', 'cidade', 'estado']
-        disponiveis = [c for c in colunas_ordenar if c in df.columns]
-        ordenar_por = st.selectbox("Ordenar por", disponiveis if disponiveis else ['vd'])
+    try:
+        with col3:
+            colunas_ordenar = ['nome', 'vd', 'cidade', 'estado']
+            disponiveis = [c for c in colunas_ordenar if c in df.columns]
+            ordenar_por = st.selectbox("Ordenar por", disponiveis if disponiveis else ['vd'])
+    except Exception:
+        ordenar_por = 'vd'
     
     return filtro_estado, filtro_status, ordenar_por
 
