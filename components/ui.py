@@ -134,7 +134,7 @@ def render_contact_card(contatos: List[Dict[str, str]]) -> str:
     """Renderiza card de contatos"""
     items = ""
     for contato in contatos:
-        items += f'<div class="contact-item">{contatto["icon"]} {contato["label"]}: {contato["value"]}</div>'
+        items += f'<div class="contact-item">{contato["icon"]} {contato["label"]}: {contato["value"]}</div>'
     
     return f'<div class="contact-card">{items}</div>'
 
