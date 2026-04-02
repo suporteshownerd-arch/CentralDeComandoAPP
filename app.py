@@ -18,12 +18,12 @@ from components import (
 )
 from data.loader import DataLoader
 from utils.sheets import GoogleSheetsManager
-import pages.consulta_lojas as pg_consulta
-import pages.gestao_crises as pg_crises
-import pages.abertura_chamados as pg_chamados
-import pages.historico as pg_historico
-import pages.dashboard as pg_dashboard
-import pages.ajuda as pg_ajuda
+import pg.consulta_lojas as pg_consulta
+import pg.gestao_crises as pg_crises
+import pg.abertura_chamados as pg_chamados
+import pg.historico as pg_historico
+import pg.dashboard as pg_dashboard
+import pg.ajuda as pg_ajuda
 
 setup_page_config()
 render_styles()
