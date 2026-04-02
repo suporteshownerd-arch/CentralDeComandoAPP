@@ -13,11 +13,5 @@ gspread>=5.12.0
 google-auth>=2.23.0
 google-auth-oauthlib>=0.8.0
 
-# Banco de dados local (fallback)
-sqlite3 (built-in)
-
 # Utilities
 python-dotenv>=1.0.0
-
-# Frontend assets (opcional)
-# pillow>=10.0.0
