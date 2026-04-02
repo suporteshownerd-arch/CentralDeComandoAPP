@@ -1,0 +1,23 @@
+# Central de Comando DPSP - Requirements
+# Desenvolvido por Enzo Maranho - T.I. DPSP
+
+# Streamlit
+streamlit>=1.28.0
+
+# Dados e Criptografia
+cryptography>=41.0.0
+pandas>=2.0.0
+
+# Google Sheets API
+gspread>=5.12.0
+google-auth>=2.23.0
+google-auth-oauthlib>=0.8.0
+
+# Banco de dados local (fallback)
+sqlite3 (built-in)
+
+# Utilities
+python-dotenv>=1.0.0
+
+# Frontend assets (opcional)
+# pillow>=10.0.0
