@@ -12,95 +12,62 @@ def render_page(loader, lojas):
     
     # Inicializar session state
     if "feed_imagens" not in st.session_state:
-        st.session_state.feed_imagens = []  # URLs externas
+        st.session_state.feed_imagens = []
     if "feed_uploaded_images" not in st.session_state:
-        st.session_state.feed_uploaded_images = []  # Arquivos do PC
+        st.session_state.feed_uploaded_images = []
     
-    # Seção de Imagens
-    st.markdown("### 🖼️ Imagens")
-    
-    # Upload de arquivo do PC
-    uploaded_file = st.file_uploader("Enviar imagem do PC", type=['png', 'jpg', 'jpeg', 'gif', 'webp'], key="feed_upload")
-    
-    if uploaded_file is not None:
-        if uploaded_file not in st.session_state.feed_uploaded_images:
-            st.session_state.feed_uploaded_images.append(uploaded_file)
-            st.rerun()
-    
-    # Campo para adicionar URL
-    nova_url = st.text_input("Ou adicionar URL:", placeholder="https://...", key="feed_url")
-    
-    if st.button("➕ Adicionar") and nova_url:
-        st.session_state.feed_imagens.append(nova_url)
-        st.rerun()
-    
-    st.markdown("---")
-    
-    # Exibir imagens do PC (prioridade)
-    if st.session_state.feed_uploaded_images:
-        st.markdown("#### 📁 Imagens do PC")
+    # Seção de Imagens (sutil)
+    with st.expander("🖼️ Adicionar Imagem"):
+        col1, col2 = st.columns(2)
         
+        with col1:
+            uploaded_file = st.file_uploader("Do PC", type=['png', 'jpg', 'jpeg', 'gif', 'webp'], key="feed_upload")
+            if uploaded_file and uploaded_file not in st.session_state.feed_uploaded_images:
+                st.session_state.feed_uploaded_images.append(uploaded_file)
+                st.rerun()
+        
+        with col2:
+            nova_url = st.text_input("URL", placeholder="https://...", key="feed_url")
+            if st.button("Adicionar") and nova_url:
+                st.session_state.feed_imagens.append(nova_url)
+                st.rerun()
+    
+    # Exibir imagens do PC
+    if st.session_state.feed_uploaded_images:
         if len(st.session_state.feed_uploaded_images) == 1:
             st.image(st.session_state.feed_uploaded_images[0], use_container_width=True)
-            if st.button("🗑️ Excluir", key="excluir_pc_0"):
+            if st.button("🗑️", key="excluir_pc_0"):
                 st.session_state.feed_uploaded_images.pop(0)
                 st.rerun()
         else:
             col_prev, col_img, col_next = st.columns([1, 6, 1])
             idx = st.session_state.get("feed_idx", 0)
-            
             with col_prev:
-                if st.button("◀"):
-                    st.session_state.feed_idx = (idx - 1) % len(st.session_state.feed_uploaded_images)
-                    st.rerun()
-            
+                if st.button("◀"): st.session_state.feed_idx = (idx - 1) % len(st.session_state.feed_uploaded_images); st.rerun()
             with col_img:
                 st.image(st.session_state.feed_uploaded_images[idx], use_container_width=True)
-                st.caption(f"{idx + 1} / {len(st.session_state.feed_uploaded_images)}")
-                if st.button("🗑️ Excluir", key=f"excluir_pc_{idx}"):
-                    st.session_state.feed_uploaded_images.pop(idx)
-                    if st.session_state.feed_uploaded_images:
-                        st.session_state.feed_idx = 0
-                    st.rerun()
-            
+                st.caption(f"{idx + 1}/{len(st.session_state.feed_uploaded_images)}")
+                if st.button("🗑️", key=f"excluir_pc_{idx}"): st.session_state.feed_uploaded_images.pop(idx); st.rerun()
             with col_next:
-                if st.button("▶"):
-                    st.session_state.feed_idx = (idx + 1) % len(st.session_state.feed_uploaded_images)
-                    st.rerun()
+                if st.button("▶"): st.session_state.feed_idx = (idx + 1) % len(st.session_state.feed_uploaded_images); st.rerun()
     
-    # Exibir imagens de URL
+    # Exibir imagens URL
     if st.session_state.feed_imagens:
-        if st.session_state.feed_uploaded_images:
-            st.markdown("---")
-        st.markdown("#### 🔗 Imagens URL")
-        
+        if st.session_state.feed_uploaded_images: st.markdown("---")
         if len(st.session_state.feed_imagens) == 1:
             st.image(st.session_state.feed_imagens[0], use_container_width=True)
-            if st.button("🗑️ Excluir", key="excluir_url_0"):
-                st.session_state.feed_imagens.pop(0)
-                st.rerun()
+            if st.button("🗑️", key="excluir_url_0"): st.session_state.feed_imagens.pop(0); st.rerun()
         else:
             col_prev, col_img, col_next = st.columns([1, 6, 1])
             idx = st.session_state.get("feed_url_idx", 0)
-            
             with col_prev:
-                if st.button("◀", key="prev_url"):
-                    st.session_state.feed_url_idx = (idx - 1) % len(st.session_state.feed_imagens)
-                    st.rerun()
-            
+                if st.button("◀", key="prev_url"): st.session_state.feed_url_idx = (idx - 1) % len(st.session_state.feed_imagens); st.rerun()
             with col_img:
                 st.image(st.session_state.feed_imagens[idx], use_container_width=True)
-                st.caption(f"{idx + 1} / {len(st.session_state.feed_imagens)}")
-                if st.button("🗑️ Excluir", key=f"excluir_url_{idx}"):
-                    st.session_state.feed_imagens.pop(idx)
-                    if st.session_state.feed_imagens:
-                        st.session_state.feed_url_idx = 0
-                    st.rerun()
-            
+                st.caption(f"{idx + 1}/{len(st.session_state.feed_imagens)}")
+                if st.button("🗑️", key=f"excluir_url_{idx}"): st.session_state.feed_imagens.pop(idx); st.rerun()
             with col_next:
-                if st.button("▶", key="next_url"):
-                    st.session_state.feed_url_idx = (idx + 1) % len(st.session_state.feed_imagens)
-                    st.rerun()
+                if st.button("▶", key="next_url"): st.session_state.feed_url_idx = (idx + 1) % len(st.session_state.feed_imagens); st.rerun()
     
     st.markdown("---")
     
