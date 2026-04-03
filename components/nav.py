@@ -6,144 +6,189 @@ import streamlit as st
 
 
 def render_sidebar(lojas, favoritos):
-    # Logo
+    # CSS global para o sidebar
     st.markdown("""
     <style>
+        /* Wrapper principal */
+        .sidebar-content {
+            padding: 12px;
+        }
+        
+        /* Logo */
         .sidebar-logo {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 16px;
-            padding: 20px;
+            padding: 24px 16px;
             text-align: center;
-            margin-bottom: 8px;
-            border: 1px solid rgba(102, 126, 234, 0.2);
+            margin-bottom: 16px;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
         }
         .logo-icon {
-            font-size: 40px;
+            font-size: 36px;
             margin-bottom: 8px;
+            display: block;
         }
         .logo-title {
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 16px;
+            font-weight: 700;
             color: white;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 4px;
         }
         .logo-subtitle {
             font-size: 10px;
-            color: #666;
+            color: rgba(255,255,255,0.7);
             font-family: monospace;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
+            display: block;
         }
-        .status-badge {
+        
+        /* Status */
+        .status-container {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             background: rgba(34, 197, 94, 0.1);
             border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 20px;
-            padding: 8px 12px;
-            margin-bottom: 16px;
-            font-size: 11px;
-            color: #22c55e;
+            border-radius: 24px;
+            padding: 10px 16px;
+            margin-bottom: 20px;
         }
         .status-dot {
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             background: #22c55e;
             border-radius: 50%;
             animation: pulse 2s infinite;
+            box-shadow: 0 0 8px #22c55e;
         }
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.9); }
         }
-    </style>
-    <div class="sidebar-logo">
-        <div class="logo-icon">🛡️</div>
-        <div class="logo-title">CENTRAL DE COMANDO</div>
-        <div class="logo-subtitle">DPSP • T.I. v5.0</div>
-    </div>
-    <div class="status-badge">
-        <span class="status-dot"></span>
-        SISTEMA OPERACIONAL
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Menu de navegação
-    st.markdown("**📌 Menu**")
-    
-    menu_itens = [
-        ("🏠 Início", "🏠 Início"),
-        ("📊 Feed", "📊 Feed"),
-        ("📈 Dashboard", "📈 Dashboard"),
-        ("🏪 Busca de Lojas", "🏪 Buscar uma loja"),
-        ("🚨 Registro de Crises", "🚨 Registrar uma crise"),
-        ("📞 Abertura de Chamados", "📞 Abrir chamado na Vivo/Claro"),
-        ("📋 Histórico", "📋 Ver histórico de alertas"),
-        ("❓ Ajuda", "❓ Ajuda e manual"),
-    ]
-    
-    current_page = st.session_state.get("nav_page", "🏠 Início")
-    
-    for emoji_label, page_value in menu_itens:
-        is_active = current_page == page_value
+        .status-text {
+            font-size: 11px;
+            font-weight: 600;
+            color: #22c55e;
+            letter-spacing: 0.5px;
+        }
         
-        if is_active:
-            st.markdown(f"""
-            <style>
-                .nav-btn-active {{
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white !important;
-                    border: none;
-                    border-radius: 12px;
-                    padding: 12px 16px;
-                    font-weight: 600;
-                    text-align: left;
-                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-                    margin-bottom: 4px;
-                }}
-            </style>
-            <div class="nav-btn-active">{emoji_label}</div>
-            """, unsafe_allow_html=True)
-        else:
-            if st.button(emoji_label, key=f"nav_{page_value}", use_container_width=True):
-                st.session_state.nav_page = page_value
-                st.rerun()
-    
-    st.markdown("---")
-    
-    # Footer usuário
-    st.markdown("""
-    <style>
-        .user-card {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border: 1px solid rgba(102, 126, 234, 0.2);
+        /* Menu */
+        .menu-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            padding-left: 4px;
+        }
+        
+        /* Item ativo */
+        .nav-active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.15) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.3);
             border-radius: 12px;
-            padding: 16px;
+            padding: 14px 16px;
+            margin-bottom: 6px;
+            color: #818cf8 !important;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Usuário */
+        .user-container {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
             text-align: center;
+            margin-top: 16px;
         }
         .user-avatar {
-            font-size: 32px;
-            margin-bottom: 8px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 28px;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
         }
         .user-name {
             font-size: 14px;
             font-weight: 600;
             color: white;
+            margin-bottom: 4px;
         }
         .user-role {
-            font-size: 11px;
-            color: #666;
+            font-size: 12px;
+            color: #888;
         }
         .version {
-            font-size: 9px;
-            color: #444;
+            font-size: 10px;
+            color: #555;
             text-align: center;
-            margin-top: 12px;
+            margin-top: 16px;
             font-family: monospace;
         }
     </style>
-    <div class="user-card">
+    """, unsafe_allow_html=True)
+    
+    # Logo
+    st.markdown("""
+    <div class="sidebar-logo">
+        <span class="logo-icon">🛡️</span>
+        <span class="logo-title">CENTRAL DE COMANDO</span>
+        <span class="logo-subtitle">DPSP • T.I. v5.0</span>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Status
+    st.markdown("""
+    <div class="status-container">
+        <span class="status-dot"></span>
+        <span class="status-text">SISTEMA OPERACIONAL</span>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('<div class="menu-label">Navegação</div>', unsafe_allow_html=True)
+    
+    # Menu de navegação
+    menu_itens = [
+        ("🏠", "Início", "🏠 Início"),
+        ("📊", "Feed", "📊 Feed"),
+        ("📈", "Dashboard", "📈 Dashboard"),
+        ("🏪", "Busca de Lojas", "🏪 Buscar uma loja"),
+        ("🚨", "Registro de Crises", "🚨 Registrar uma crise"),
+        ("📞", "Abertura de Chamados", "📞 Abrir chamado na Vivo/Claro"),
+        ("📋", "Histórico", "📋 Ver histórico de alertas"),
+        ("❓", "Ajuda", "❓ Ajuda e manual"),
+    ]
+    
+    current_page = st.session_state.get("nav_page", "🏠 Início")
+    
+    for icon, label, page_value in menu_itens:
+        is_active = current_page == page_value
+        full_label = f"{icon} {label}"
+        
+        if is_active:
+            st.markdown(f'<div class="nav-active">{icon} {label}</div>', unsafe_allow_html=True)
+        else:
+            if st.button(full_label, key=f"nav_{page_value}", use_container_width=True):
+                st.session_state.nav_page = page_value
+                st.rerun()
+    
+    # Footer usuário
+    st.markdown("""
+    <div class="user-container">
         <div class="user-avatar">👤</div>
         <div class="user-name">Enzo Maranho</div>
         <div class="user-role">Analista T.I.</div>
