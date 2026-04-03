@@ -5,6 +5,9 @@ Sidebar - Apenas o necessário
 import streamlit as st
 
 
+_PAGINA_INICIAL = "🏪 Consulta de Lojas"
+
+
 def render_sidebar(lojas, favoritos):
     st.markdown("### 🛡️ Central de Comando")
     
@@ -18,11 +21,11 @@ def render_sidebar(lojas, favoritos):
         "❓ Ajuda"
     ]
     
-    # Pega página atual ou默认值
-    atual = st.session_state.get("nav_page", opcoes[0])
+    # Pega página atual
+    atual = st.session_state.get("nav_page", _PAGINA_INICIAL)
     
     # Menu de seleção
-    pagina = st.selectbox("Ir para:", opcoes, index=opcoes.index(atual))
+    pagina = st.selectbox("Ir para:", opcoes, index=opcoes.index(atual) if atual in opcoes else 0)
     
     # Atualiza se mudou
     if pagina != atual:
@@ -42,29 +45,13 @@ def render_sidebar(lojas, favoritos):
 
 
 def render_footer():
-    st.markdown(
-        """<div class="footer">
-            <div class="footer-logo">🛡️</div>
-            <div class="footer-title">Central de Comando DPSP</div>
-            <div class="footer-version">v4.1</div>
-            <div class="footer-dev">Desenvolvido por Enzo Maranho — T.I. DPSP</div>
-            <div class="footer-copy">Uso Interno · Todos os direitos reservados</div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
+    st.markdown("---")
+    st.caption("🛡️ Central de Comando DPSP - Uso Interno")
 
 
 def init_session_state():
-    defaults = {
-        "loja_selecionada": None,
-        "nome_atendente": "",
-        "favoritos": [],
-        "consulta_pagina": 1,
-        "nav_page": _PAGE_DEFAULT,
-    }
-    for key, value in defaults.items():
-        if key not in st.session_state:
-            st.session_state[key] = value
+    if "nav_page" not in st.session_state:
+        st.session_state.nav_page = _PAGINA_INICIAL
 
 
 def setup_page_config():
