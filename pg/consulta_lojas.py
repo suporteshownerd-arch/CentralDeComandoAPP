@@ -3,7 +3,16 @@ Página de Consulta de Lojas
 Central de Comando DPSP v3.0
 """
 
+import re as _re
 import streamlit as st
+
+
+def _wa_link(phone: str, label: str) -> str:
+    """Retorna link WhatsApp se o número tiver ≥ 10 dígitos, senão texto simples."""
+    digits = _re.sub(r"\D", "", phone)
+    if len(digits) >= 10:
+        return f"[{label}](https://wa.me/55{digits})"
+    return label
 
 _POR_PAGINA = 10
 
@@ -166,10 +175,18 @@ def _render_card(loja: dict, key_suffix: str = ""):
     gr_tel   = loja.get("gr_tel", "")
     circuitos = loja.get("circuitos", [])
 
-    is_open = status == "open"
-    status_color = "#34d399" if is_open else "#f87171"
-    status_label = "Ativa" if is_open else "Inativa"
-    status_bg    = "rgba(52,211,153,.1)" if is_open else "rgba(248,113,113,.1)"
+    if status == "open":
+        status_color = "#34d399"
+        status_label = "Ativa"
+        status_bg    = "rgba(52,211,153,.1)"
+    elif status == "pending":
+        status_color = "#fbbf24"
+        status_label = "A Inaugurar"
+        status_bg    = "rgba(251,191,36,.1)"
+    else:
+        status_color = "#f87171"
+        status_label = "Inativa"
+        status_bg    = "rgba(248,113,113,.1)"
 
     addr_parts = [p for p in [end, bairro] if p]
     loc_parts  = [p for p in [cidade, estado] if p]
@@ -193,7 +210,7 @@ def _render_card(loja: dict, key_suffix: str = ""):
             f"font-size:11px;font-family:monospace;margin-right:5px'>INN {inn}</span>"
         )
     outros = [c for c in circuitos if c.get("des") not in (mpls, inn) and c.get("des")]
-    for c in outros[:2]:
+    for c in outros:
         chips += (
             f"<span style='background:rgba(34,211,238,.08);color:#22d3ee;"
             f"border:1px solid rgba(34,211,238,.18);padding:2px 9px;border-radius:10px;"
@@ -242,9 +259,9 @@ def _render_card(loja: dict, key_suffix: str = ""):
 
             with d1:
                 st.markdown("**📞 Contato**")
-                if tel:   st.caption(f"Fone 1: {tel}")
-                if tel2:  st.caption(f"Fone 2: {tel2}")
-                if cel:   st.caption(f"Celular: {cel}")
+                if tel:   st.markdown(_wa_link(tel,  f"📞 {tel}"))
+                if tel2:  st.markdown(_wa_link(tel2, f"📞 {tel2}"))
+                if cel:   st.markdown(_wa_link(cel,  f"📱 {cel}"))
                 if email: st.caption(f"✉️ {email}")
                 if horario:
                     st.markdown("**🕐 Horário**")
@@ -256,10 +273,10 @@ def _render_card(loja: dict, key_suffix: str = ""):
                 st.markdown("**👥 Gestão**")
                 if ggl:
                     st.caption(f"GGL: {ggl}")
-                    if ggl_tel: st.caption(f"📱 {ggl_tel}")
+                    if ggl_tel: st.markdown(_wa_link(ggl_tel, f"📱 {ggl_tel}"))
                 if gr:
                     st.caption(f"GR: {gr}")
-                    if gr_tel: st.caption(f"📱 {gr_tel}")
+                    if gr_tel: st.markdown(_wa_link(gr_tel, f"📱 {gr_tel}"))
 
             with d3:
                 st.markdown("**⚡ Ações**")

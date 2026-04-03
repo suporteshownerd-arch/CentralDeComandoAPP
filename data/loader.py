@@ -196,7 +196,12 @@ class DataLoader:
                 continue
 
             status_raw = row.get("STATUS", "").strip().upper()
-            status = "open" if status_raw == "ATIVA" else "closed"
+            if status_raw == "ATIVA":
+                status = "open"
+            elif status_raw == "A INAUGURAR":
+                status = "pending"
+            else:
+                status = "closed"
 
             # Horário: combina dias úteis + sábado + domingo
             hora_semana = row.get("2ª a 6ª", "").strip()

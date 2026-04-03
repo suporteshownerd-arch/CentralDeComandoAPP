@@ -22,7 +22,7 @@ _PAGE_DEFAULT = "Consulta de Lojas"
 def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
     total    = len(lojas) if lojas else 0
     ativas   = sum(1 for l in lojas if l.get("status") == "open") if lojas else 0
-    inativas = total - ativas
+    inativas = sum(1 for l in lojas if l.get("status") == "closed") if lojas else 0
     pct      = round(ativas / total * 100) if total else 0
 
     if "nav_page" not in st.session_state:
