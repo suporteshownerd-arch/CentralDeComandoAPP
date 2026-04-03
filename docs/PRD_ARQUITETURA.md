@@ -17,41 +17,41 @@ CentralDeComandoAPP/
 ├── requirements.txt            # Dependências
 ├── .env.example                # Variáveis de ambiente
 ├── README.md                   # Documentação
-├── PRD_ARQUITETURA.md          # Este documento
+├── .streamlit/
+│   └── config.toml             # Tema dark (commitado no git)
 │
 ├── components/                 # Componentes reutilizáveis
 │   ├── __init__.py
 │   ├── ui.py                   # Elementos de UI (cards, badges, etc)
 │   ├── styles.py               # CSS e design system
-│   └── nav.py                  # Navegação e menu
+│   └── nav.py                  # Navegação e menu (botões, não radio)
 │
-├── pages/                      # Páginas do sistema
+├── pg/                         # Páginas do sistema
+│   │   ATENÇÃO: "pg/", NÃO "pages/" — Streamlit auto-descobre
+│   │   "pages/" e cria rotas separadas, quebrando a navegação.
 │   ├── __init__.py
 │   ├── consulta_lojas.py       # Consulta de lojas
 │   ├── gestao_crises.py        # Gestão de crises
 │   ├── historico.py            # Histórico
-│   ├── abertura_chamados.py   # Abertura de chamados
+│   ├── abertura_chamados.py    # Abertura de chamados
 │   ├── dashboard.py            # Dashboard KPIs
 │   └── ajuda.py                # FAQ e ajuda
 │
 ├── data/                       # Dados e carregamento
 │   ├── __init__.py
-│   ├── loader.py               # Carregamento de dados
-│   ├── cache.py               # Gerenciador de cache
-│   └── logs.py                # Sistema de logs
+│   ├── loader.py               # DataLoader + CacheManager + UsageLogger
+│   ├── loader_pandas.py        # Loader alternativo com Pandas
+│   ├── relacao.csv(.enc)       # Dados mestres das lojas
+│   ├── designacao.csv(.enc)    # Circuitos MPLS/INN
+│   ├── GGL.csv(.enc)           # Gerentes de Loja
+│   └── GR.csv(.enc)            # Gerentes Regionais
 │
 ├── templates/                  # Templates de comunicação
-│   ├── __init__.py
-│   ├── alertas.py              # Alertas executivos
-│   ├── crises.py               # Gestão de crise
-│   ├── isolada.py              # Loja isolada
-│   └── comunicados.py         # E-mails e chamados
+│   └── __init__.py             # gerar_alerta_executivo, gerar_gestao_crise, etc.
 │
 └── utils/                      # Utilitários
     ├── __init__.py
-    ├── sheets.py               # Google Sheets
-    ├── export.py              # Exportação CSV/JSON
-    └── validators.py          # Validações
+    └── sheets.py               # Google Sheets (GoogleSheetsManager)
 ```
 
 ---
@@ -249,19 +249,23 @@ from data.loader import DataLoader
 
 ## 7. Checklist de Implementação
 
-### v2.0 - Refatoração
+### v3.0 — Estado Atual
 - [x] PRD Arquitetura
-- [ ] components/ui.py
-- [ ] components/styles.py
-- [ ] components/nav.py
-- [ ] pages/consulta_lojas.py
-- [ ] pages/gestao_crises.py
-- [ ] pages/historico.py
-- [ ] pages/abertura_chamados.py
-- [ ] pages/dashboard.py
-- [ ] pages/ajuda.py
-- [ ] app.py refatorado
-- [ ] Testes
+- [x] components/ui.py
+- [x] components/styles.py (CSS design system completo)
+- [x] components/nav.py (botões + CSS active state)
+- [x] pg/consulta_lojas.py
+- [x] pg/gestao_crises.py
+- [x] pg/historico.py
+- [x] pg/abertura_chamados.py
+- [x] pg/dashboard.py
+- [x] pg/ajuda.py (placeholder)
+- [x] app.py refatorado
+- [x] data/loader.py (DataLoader + CacheManager + UsageLogger)
+- [x] .streamlit/config.toml (tema dark commitado)
+- [ ] Autenticação (SSO/Azure AD)
+- [ ] Testes automatizados
+- [ ] Export PDF/Excel
 
 ---
 
@@ -272,6 +276,7 @@ from data.loader import DataLoader
 | 1.0 | 01/04/2026 | Versão inicial |
 | 1.4 | 02/04/2026 | Melhorias contínuas |
 | 2.0 | 02/04/2026 | Refatoração modular |
+| 3.0 | 03/04/2026 | Fix MPLS/INN (Tipo de acesso), sidebar botões, pages→pg, config.toml |
 
 ---
 

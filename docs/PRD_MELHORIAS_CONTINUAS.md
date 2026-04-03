@@ -2,7 +2,7 @@
 ## Plano de Melhorias Contínuas v1.3
 
 **Data:** 02/04/2026  
-**Versão Atual:** 1.3  
+**Versão Atual:** 1.4  
 **Responsável:** Enzo Maranho — T.I. DPSP
 
 ---
@@ -43,7 +43,7 @@ Sistema web interno para consulta de lojas, gestão de crises e abertura de cham
 
 | # | Melhoria | Descrição | Prioridade | Status |
 |---|----------|-----------|------------|--------|
-| L1 | **Dados Reais** | Integrar com CSVs criptografados (Fernet) | Alta | Pendente |
+| L1 | **Dados Reais** | Integrar com CSVs criptografados (Fernet) | Alta | ✅ Implementado |
 | L2 | **Busca Avançada** | Filtros por região, GGL, GR, status | Alta | ✅ Implementado |
 | L3 | **Auto-complete** | Suggestion ao digitar na busca | Média | Pendente |
 | L4 | **Validação VD** | Validar se VD existe antes de buscar | Média | Pendente |
@@ -66,8 +66,8 @@ Sistema web interno para consulta de lojas, gestão de crises e abertura de cham
 | # | Melhoria | Descrição | Prioridade | Status |
 |---|----------|-----------|------------|--------|
 | U1 | **Mobile First** | Layout responsivo para celular | Alta | ✅ Parcial |
-| U2 | **Dark/Light Toggle** | Alternar entre temas | Alta | ✅ HTML only |
-| U3 | **Atalhos Teclado** | Ctrl+K busca, 1-4 navegação | Alta | ✅ HTML only |
+| U2 | **Dark/Light Toggle** | Alternar entre temas | Alta | ✅ Streamlit config.toml |
+| U3 | **Atalhos Teclado** | Ctrl+K busca, 1-4 navegação | Alta | Pendente |
 | U4 | **Loading States** | Skeletons durante carregamento | Média | Pendente |
 | U5 | **Toasts Melhorados** | Feedback visual mais claro | Média | ✅ Parcial |
 | U6 | **Drag & Drop** | Reordenar favoritos | Baixa | Pendente |
@@ -80,10 +80,10 @@ Sistema web interno para consulta de lojas, gestão de crises e abertura de cham
 
 | ID | Feature | Esforço | Prioridade |
 |----|---------|---------|------------|
-| S1 | Dados reais via CSV Fernet | 3 dias | P0 |
+| ~~S1~~ | ~~Dados reais via CSV Fernet~~ | — | ✅ Concluído |
 | S2 | Auto-complete na busca | 2 dias | P1 |
-| S3 | Layout mobile responsivo | 2 dias | P1 |
-| S4 | Dashboard KPIs reais | 2 dias | P2 |
+| S3 | Filtros avançados (estado, região, status) | 2 dias | P0 |
+| S4 | Dashboard KPIs reais (plotly/altair) | 2 dias | P1 |
 
 ### 4.2 Próximo Release (1 mês)
 
@@ -198,31 +198,31 @@ Deploy:   Docker + K8s
 
 ## 9. Checklist de Implementação
 
-### ✅ Concluído (v1.3)
+### ✅ Concluído (v1.4)
 - [x] Layout Premium com CSS customizado
-- [x] Tema escuro elegante
-- [x] Busca por VD/Designação/Endereço/Nome/Livre
-- [x] Filtros por Estado e Status
-- [x] Favoritos na sidebar
-- [x] Quick Stats na sidebar
-- [x] E-mail técnico funcional
+- [x] Tema escuro via .streamlit/config.toml (Streamlit Cloud)
+- [x] Dados reais — ~2055 lojas via CSV Fernet (relacao, designacao, GGL, GR)
+- [x] Busca VD: match exato ≤ 4 dígitos; busca designação para entradas longas
+- [x] Detecção MPLS/INN via campo "Tipo de acesso" (não Operadora)
+- [x] Sidebar navegação por botões com CSS active state
+- [x] KPIs dinâmicos na sidebar (total/ativas/inativas)
 - [x] Chamados Vivo/Claro funcionais
 - [x] Templates Crises (Abertura/Atualização/Normalização)
-- [x] Templates Loja Isolada (4 tipos)
+- [x] Templates Loja Isolada
 - [x] Histórico com navegação
 - [x] Salvar em Sheets/SQLite
 
 ### 🔄 Em Andamento
-- [ ] Dados reais via CSV Fernet
-- [ ] Configuração Google Sheets
+- [ ] Configuração Google Sheets (variáveis de ambiente no Streamlit Cloud)
 
 ### ⏳ Pendente
 - [ ] Autenticação SSO
-- [ ] Layout mobile
-- [ ] Dashboard KPIs reais
+- [ ] Filtros avançados na UI (estado, região, cluster)
+- [ ] Dashboard KPIs reais (plotly/altair)
 - [ ] Mapa de lojas
 - [ ] Notificações push
-- [ ] Logs de auditoria
+- [ ] Logs de auditoria persistentes
+- [ ] Favoritos persistentes (além de session_state)
 
 ---
 
@@ -246,4 +246,4 @@ Deploy:   Docker + K8s
 ---
 
 *Documento criado para planejamento de melhorias contínuas.*  
-*Versão 1.3 — 02/04/2026*
+*Versão 1.4 — 03/04/2026*
