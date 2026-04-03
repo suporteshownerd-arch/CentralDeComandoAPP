@@ -112,20 +112,21 @@ def main():
     except Exception as e:
         logger.error(f"Erro na sidebar: {e}")
         ErrorHandler.log_error(e, context="render_sidebar")
-        pagina = "Consulta de Lojas"
+        pagina = "🏪 Buscar uma loja"
     
     try:
-        if "Consulta" in pagina:
+        # Verificar qual página baseado no emoji
+        if "🏪" in pagina:
             pg_consulta.render_page(loader, lojas)
-        elif "Crises" in pagina or "Gestão" in pagina:
+        elif "🚨" in pagina:
             pg_crises.render_page(sheets, lojas)
-        elif "Chamados" in pagina:
+        elif "📞" in pagina:
             pg_chamados.render_page(lojas)
-        elif "Histórico" in pagina or "Historico" in pagina:
+        elif "📋" in pagina:
             pg_historico.render_page(sheets)
-        elif "Dashboard" in pagina:
+        elif "📈" in pagina:
             pg_dashboard.render_page(loader, lojas)
-        elif "Ajuda" in pagina:
+        elif "❓" in pagina:
             pg_ajuda.render_page()
         else:
             pg_consulta.render_page(loader, lojas)

@@ -1,50 +1,73 @@
 """
-Sidebar - Super simples
+Sidebar - Claro e objective
 """
 
 import streamlit as st
 
 
 def render_sidebar(lojas, favoritos):
-    # Título
-    st.markdown("### 🛡️ Central de Comando")
+    # Logo/Título
+    st.markdown("**🛡️ CENTRAL DE COMANDO**")
     
-    # Navegação com radio
-    pagina = st.radio(
-        "Páginas",
-        [
-            "🏪 Consulta de Lojas",
-            "🚨 Gestão de Crises",
-            "📞 Chamados",
-            "📋 Histórico",
-            "📈 Dashboard",
-            "❓ Ajuda"
-        ]
+    st.markdown("---")
+    
+    # Navegação com LABELS CLAROS
+    st.markdown("**O que você quer fazer?**")
+    
+    opcoes = {
+        "Buscar uma loja": "🏪",
+        "Registrar uma crise": "🚨",
+        "Abrir chamado na Vivo/Claro": "📞",
+        "Ver histórico de alertas": "📋",
+        "Ver gráficos do parque": "📈",
+        "Ajuda e manual": "❓"
+    }
+    
+    # Lista de opções com emoji
+    lista = [f"{emoji} {nome}" for nome, emoji in opcoes.items()]
+    
+    # Selectbox para navegar
+    escolha = st.selectbox(
+        "Selecione:",
+        lista,
+        label_visibility="collapsed"
     )
     
     # Atualiza sessão
-    st.session_state.nav_page = pagina
+    st.session_state.nav_page = escolha
+    
+    st.markdown("---")
+    
+    # Estatísticas
+    if lojas:
+        total = len(lojas)
+        ativas = sum(1 for l in lojas if l.get("status") == "open")
+        st.markdown(f"📊 **{total}** lojas no total")
+        st.markdown(f"✅ **{ativas}** lojas ativas")
+    else:
+        st.markdown("Nenhuma loja carregada")
     
     st.markdown("---")
     
     # Contato
-    st.caption("📞 (11) 3274-7527")
+    st.markdown("**Precisa de ajuda?**")
+    st.info("📞 Ligue: (11) 3274-7527")
     
-    return pagina
+    return escolha
 
 
 def render_footer():
-    st.caption("Central de Comando DPSP")
+    st.caption("Central de Comando DPSP - v5.0")
 
 
 def init_session_state():
     if "nav_page" not in st.session_state:
-        st.session_state.nav_page = "🏪 Consulta de Lojas"
+        st.session_state.nav_page = "🏪 Buscar uma loja"
 
 
 def setup_page_config():
     st.set_page_config(
-        page_title="Central de Comando — DPSP",
+        page_title="Central de Comando",
         page_icon="🛡️",
         layout="wide",
     )
