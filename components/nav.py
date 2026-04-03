@@ -1,74 +1,73 @@
 """
-Sidebar de Navegação
+Sidebar de Navegação - Super Simples
 """
 
 import streamlit as st
 from typing import List
 
 
-_MENU = [
+_PAGINAS = [
     "🏪 Consulta de Lojas",
-    "🚨 Gestão de Crises",
+    "🚨 Gestão de Crises", 
     "📞 Abertura de Chamados",
     "📋 Histórico",
     "📈 Dashboard",
     "❓ Ajuda",
 ]
 
-_PAGE_DEFAULT = "Consulta de Lojas"
+_DEFAULT = "🏪 Consulta de Lojas"
 
 
 def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
+    # Pegar ou criar página atual
     if "nav_page" not in st.session_state:
-        st.session_state.nav_page = _PAGE_DEFAULT
+        st.session_state.nav_page = _DEFAULT
 
-    pagina_atual = st.session_state.nav_page
+    # ═══════════════════════════════════════════════════════════════════════
+    # TÍTULO DO APP
+    # ═══════════════════════════════════════════════════════════════════════
+    st.title("🛡️ Central de Comando")
+    st.divider()
     
     # ═══════════════════════════════════════════════════════════════════════
-    # TÍTULO
+    # SELETOR DE PÁGINA (st.selectbox)
     # ═══════════════════════════════════════════════════════════════════════
-    st.markdown("### 🛡️ Central de Comando")
-    st.markdown("---")
+    st.header("Navegação")
     
-    # ═══════════════════════════════════════════════════════════════════════
-    # NAVEGAÇÃO COM RADIO (mais bonito que botão)
-    # ═══════════════════════════════════════════════════════════════════════
-    st.markdown("**Navegação**")
-    
-    # Usar radio para seleção de página
-    opcao = st.radio(
-        "Selecione uma página:",
-        _MENU,
-        index=_MENU.index(pagina_atual) if pagina_atual in _MENU else 0,
-        label_visibility="collapsed",
-        key="nav_radio"
+    # Selectbox para mudar de página
+    pagina_selecionada = st.selectbox(
+        "Escolha uma página:",
+        _PAGINAS,
+        index=_PAGINAS.index(st.session_state.nav_page) if st.session_state.nav_page in _PAGINAS else 0,
+        label_visibility="collapsed"
     )
     
-    if opcao != pagina_atual:
-        st.session_state.nav_page = opcao
+    # Se mudou, atualizar
+    if pagina_selecionada != st.session_state.nav_page:
+        st.session_state.nav_page = pagina_selecionada
         st.rerun()
     
-    st.markdown("---")
+    st.divider()
     
     # ═══════════════════════════════════════════════════════════════════════
-    # ESTATÍSTICAS
+    # INFO DO PARQUE
     # ═══════════════════════════════════════════════════════════════════════
-    st.markdown("**Estatísticas**")
-    total = len(lojas) if lojas else 0
-    if total > 0:
+    if lojas:
+        total = len(lojas)
         ativas = sum(1 for l in lojas if l.get("status") == "open")
         st.metric("Total de Lojas", total)
         st.metric("Lojas Ativas", ativas)
+    else:
+        st.info("Nenhuma loja carregada")
     
-    st.markdown("---")
+    st.divider()
     
     # ═══════════════════════════════════════════════════════════════════════
     # CONTATO
     # ═══════════════════════════════════════════════════════════════════════
-    st.markdown("**Contato**")
-    st.info("📞 Central: (11) 3274-7527")
+    st.caption("📞 Central: (11) 3274-7527")
 
-    return pagina_atual
+    return st.session_state.nav_page
 
 
 def render_footer():
