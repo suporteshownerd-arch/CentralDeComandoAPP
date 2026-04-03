@@ -37,7 +37,7 @@ def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
             <div class="sb-logo-icon">🛡️</div>
             <div>
                 <div class="sb-logo-title">Central de Comando</div>
-                <div class="sb-logo-sub">DPSP T.I. · v3.1</div>
+                <div class="sb-logo-sub">DPSP T.I. · v4.0</div>
             </div>
         </div>
         """,
@@ -151,7 +151,7 @@ def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
 def render_footer():
     st.markdown(
         """<div class="footer">
-            <b>🛡️ Central de Comando DPSP v3.1</b><br>
+            <b>🛡️ Central de Comando DPSP v4.0</b><br>
             Desenvolvido por Enzo Maranho — T.I. DPSP · Uso Interno
         </div>""",
         unsafe_allow_html=True,

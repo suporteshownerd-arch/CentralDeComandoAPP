@@ -180,13 +180,13 @@ def _render_card(loja: dict, key_suffix: str = ""):
     circuitos = loja.get("circuitos", [])
     regiao    = loja.get("regiao", "")
 
-    # Status
+    # Status colors - v4.0 design system
     if status == "open":
-        s_color, s_bg, s_label = "#34d399", "rgba(52,211,153,.12)", "Ativa"
+        s_color, s_bg, s_label = "#10b981", "rgba(16,185,129,.12)", "Ativa"
     elif status == "pending":
-        s_color, s_bg, s_label = "#fbbf24", "rgba(251,191,36,.12)", "A Inaugurar"
+        s_color, s_bg, s_label = "#f59e0b", "rgba(245,158,11,.12)", "A Inaugurar"
     else:
-        s_color, s_bg, s_label = "#f87171", "rgba(248,113,113,.12)", "Inativa"
+        s_color, s_bg, s_label = "#ef4444", "rgba(239,68,68,.12)", "Inativa"
 
     # Endereço
     parts = [p for p in [end, bairro, cidade] if p]

@@ -11,15 +11,15 @@ try:
 except ImportError:
     PLOTLY_OK = False
 
-_DARK_BG    = "#08090d"
-_CARD_BG    = "#0f1118"
-_TEXT       = "#eaecf0"
-_TEXT2      = "#9094a6"
-_ACCENT     = "#5b8def"
-_GREEN      = "#34d399"
-_RED        = "#f87171"
-_AMBER      = "#fbbf24"
-_PURPLE     = "#a78bfa"
+_DARK_BG    = "#0a0a0f"
+_CARD_BG    = "#12121a"
+_TEXT       = "#f0f0f5"
+_TEXT2      = "#a0a0b0"
+_ACCENT     = "#6366f1"
+_GREEN      = "#10b981"
+_RED        = "#ef4444"
+_AMBER      = "#f59e0b"
+_PURPLE     = "#a855f7"
 
 
 def _pie(labels, values, title, colors):
@@ -61,8 +61,18 @@ def _bar_h(labels, values, title, color=_ACCENT):
 
 
 def render_page(_data_loader, lojas):
-    st.markdown("## 📈 Dashboard")
-    st.markdown("*Visão geral das operações DPSP*")
+    st.markdown(
+        """
+        <div class="page-header">
+            <div class="page-header-icon">📈</div>
+            <div>
+                <h2 class="page-title">Dashboard</h2>
+                <p class="page-sub">Visão geral do parque de lojas DPSP</p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     if not lojas:
         st.warning("Sem dados de lojas para exibir.")
@@ -82,7 +92,7 @@ def render_page(_data_loader, lojas):
     k4.metric("Estados",          estados)
     k5.metric("Regiões",          regioes)
 
-    st.markdown("---")
+    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
 
     # ── Gráficos ──────────────────────────────────────────────────────────────
     if not PLOTLY_OK:
@@ -133,8 +143,12 @@ def render_page(_data_loader, lojas):
     # ── Tabela de lojas inativas ──────────────────────────────────────────────
     inativas_list = [l for l in lojas if l.get("status") == "closed"]
     if inativas_list:
-        st.markdown("---")
-        st.markdown(f"#### 🔴 Lojas Inativas ({len(inativas_list)})")
+        st.markdown(
+            f"<div style='font-family:DM Mono,monospace;font-size:10px;color:#5c6370;"
+            f"text-transform:uppercase;letter-spacing:.14em;margin:24px 0 10px 0'>"
+            f"🔴 Lojas Inativas · {len(inativas_list)}</div>",
+            unsafe_allow_html=True,
+        )
         rows = [
             {
                 "VD":       l.get("vd", ""),
