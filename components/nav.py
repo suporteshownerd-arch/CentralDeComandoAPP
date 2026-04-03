@@ -76,7 +76,7 @@ def render_sidebar(lojas, favoritos):
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
-        /* Menu */
+        /* Menu label */
         .menu-label {
             font-size: 11px;
             font-weight: 600;
@@ -88,21 +88,67 @@ def render_sidebar(lojas, favoritos):
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
-        /* Item ativo - mais impactante */
-        .nav-active {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.25) 100%);
-            border: 1px solid rgba(139, 92, 246, 0.5);
-            border-radius: 14px;
-            padding: 16px 18px;
-            margin-bottom: 8px;
-            color: #c4b5fd !important;
-            font-weight: 700;
-            font-size: 14px;
+        /* Card de navegação */
+        .nav-card {
+            background: linear-gradient(145deg, #1a1a24 0%, #12121a 100%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 14px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .nav-card:hover {
+            background: linear-gradient(145deg, #22222e 0%, #1a1a24 100%);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        .nav-card.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.25) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.5);
             box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .nav-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .nav-card-icon.home { background: rgba(99, 102, 241, 0.2); }
+        .nav-card-icon.feed { background: rgba(34, 197, 94, 0.2); }
+        .nav-card-icon.dashboard { background: rgba(59, 130, 246, 0.2); }
+        .nav-card-icon.search { background: rgba(245, 158, 11, 0.2); }
+        .nav-card-icon.crisis { background: rgba(239, 68, 68, 0.2); }
+        .nav-card-icon.ticket { background: rgba(168, 85, 247, 0.2); }
+        .nav-card-icon.history { background: rgba(6, 182, 212, 0.2); }
+        .nav-card-icon.help { background: rgba(156, 163, 175, 0.2); }
+        
+        .nav-card-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .nav-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin-bottom: 2px;
+        }
+        .nav-card.active .nav-card-title {
+            color: #c4b5fd;
+        }
+        .nav-card-desc {
+            font-size: 11px;
+            color: #666;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
         /* Usuário - mais sofisticado */
@@ -172,28 +218,35 @@ def render_sidebar(lojas, favoritos):
     
     st.markdown('<div class="menu-label">Navegação</div>', unsafe_allow_html=True)
     
-    # Menu de navegação
+    # Menu de navegação com cards
     menu_itens = [
-        ("🏠", "Início", "🏠 Início"),
-        ("📊", "Feed", "📊 Feed"),
-        ("📈", "Dashboard", "📈 Dashboard"),
-        ("🏪", "Busca de Lojas", "🏪 Buscar uma loja"),
-        ("🚨", "Registro de Crises", "🚨 Registrar uma crise"),
-        ("📞", "Abertura de Chamados", "📞 Abrir chamado na Vivo/Claro"),
-        ("📋", "Histórico", "📋 Ver histórico de alertas"),
-        ("❓", "Ajuda", "❓ Ajuda e manual"),
+        ("🏠", "Início", "Página inicial", "home", "🏠 Início"),
+        ("📊", "Feed", "Visão geral", "feed", "📊 Feed"),
+        ("📈", "Dashboard", "Gráficos e métricas", "dashboard", "📈 Dashboard"),
+        ("🏪", "Busca de Lojas", "Consultar lojas", "search", "🏪 Buscar uma loja"),
+        ("🚨", "Registro de Crises", "Cadastrar crise", "crisis", "🚨 Registrar uma crise"),
+        ("📞", "Abertura de Chamados", "Abrir chamado", "ticket", "📞 Abrir chamado na Vivo/Claro"),
+        ("📋", "Histórico", "Ver registros", "history", "📋 Ver histórico de alertas"),
+        ("❓", "Ajuda", "Manual e suporte", "help", "❓ Ajuda e manual"),
     ]
     
     current_page = st.session_state.get("nav_page", "🏠 Início")
     
-    for icon, label, page_value in menu_itens:
+    for icon, title, desc, icon_class, page_value in menu_itens:
         is_active = current_page == page_value
-        full_label = f"{icon}   {label}"
         
         if is_active:
-            st.markdown(f'<div class="nav-active">{icon}   {label}</div>', unsafe_allow_html=True)
+            st.markdown(f'''
+            <div class="nav-card active">
+                <div class="nav-card-icon {icon_class}">{icon}</div>
+                <div class="nav-card-info">
+                    <div class="nav-card-title">{title}</div>
+                    <div class="nav-card-desc">{desc}</div>
+                </div>
+            </div>
+            ''', unsafe_allow_html=True)
         else:
-            if st.button(full_label, key=f"nav_{page_value}", use_container_width=True):
+            if st.button(f"{icon} {title}", key=f"nav_{page_value}", use_container_width=True):
                 st.session_state.nav_page = page_value
                 st.rerun()
     
