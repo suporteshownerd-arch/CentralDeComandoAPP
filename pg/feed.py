@@ -90,18 +90,27 @@ def render_page(loader, lojas):
         }
         .img-card {
             background: var(--surface);
-            border: 2px solid var(--border);
+            border: 3px solid var(--border);
             border-radius: 16px;
-            padding: 12px;
+            padding: 8px;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             animation: zoomIn 0.5s ease-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .img-card:hover {
             transform: scale(1.03);
             box-shadow: 0 8px 25px rgba(0,0,0,0.5);
             border-color: var(--accent);
             animation: pulse 1s infinite;
+        }
+        .img-frame {
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            overflow: hidden;
+            padding: 0;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -111,6 +120,7 @@ def render_page(loader, lojas):
             idx = idx_inicio + i
             with cols[i]:
                 st.markdown('<div class="img-card">', unsafe_allow_html=True)
+                st.markdown('<div class="img-frame">', unsafe_allow_html=True)
                 try:
                     if img["tipo"] == "upload":
                         img_data = Image.open(img["dados"])
@@ -122,7 +132,8 @@ def render_page(loader, lojas):
                     st.image(buf.getvalue(), width=540)
                 except:
                     st.image(img["dados"], width=540)
-                st.markdown(f"📤 **{img['usuario']}** • {img['data']}")
+                st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown(f"<div style='text-align:center;margin-top:8px;'>📤 <b>{img['usuario']}</b> • {img['data']}</div>")
                 if st.button("🗑️", key="del_" + str(idx)):
                     st.session_state.feed_imagens.pop(idx)
                     st.rerun()
