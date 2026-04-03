@@ -78,10 +78,29 @@ def render_page(loader, lojas):
                 st.session_state.feed_page = (st.session_state.feed_page + 1) % total_paginas
                 st.rerun()
         
+        st.markdown("""
+    <style>
+        .img-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .img-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border-color: var(--accent);
+        }
+    </style>
+    """, unsafe_allow_html=True)
+        
         cols = st.columns(len(imagens_pagina))
         for i, img in enumerate(imagens_pagina):
             idx = idx_inicio + i
             with cols[i]:
+                st.markdown('<div class="img-card">', unsafe_allow_html=True)
                 try:
                     if img["tipo"] == "upload":
                         img_data = Image.open(img["dados"])
@@ -97,6 +116,7 @@ def render_page(loader, lojas):
                 if st.button("🗑️", key="del_" + str(idx)):
                     st.session_state.feed_imagens.pop(idx)
                     st.rerun()
+                st.markdown('</div>', unsafe_allow_html=True)
         
         st.markdown(f"<div style='text-align: center; color: #888; margin-top: 10px;'>Página {st.session_state.feed_page + 1} de {total_paginas}</div>", unsafe_allow_html=True)
     
