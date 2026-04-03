@@ -86,10 +86,17 @@ def render_page(data_loader, lojas):
             st.markdown("---")
 
     # ── Resultado e paginação ─────────────────────────────────────────────────
+    filtros_ativos = (
+        filtro_estado != "Todos"
+        or filtro_regiao != "Todas"
+        or filtro_status != "Todos"
+    )
     total_res = len(resultados)
     if total_res == 0:
         if termo:
             st.info(f'Nenhuma loja encontrada para **"{termo}"**. Tente outro modo de busca.')
+        elif filtros_ativos:
+            st.info("Nenhuma loja encontrada com os filtros aplicados.")
         else:
             st.info("Use a busca acima para encontrar lojas.")
         return
@@ -273,4 +280,6 @@ def _render_card(loja: dict, key_suffix: str = ""):
 
                 if st.button("📞 Abrir Chamado", key=f"ch_{vd}_{key_suffix}", use_container_width=True):
                     st.session_state.loja_selecionada = loja
+                    st.session_state.nav_page = "Abertura de Chamados"
+                    st.session_state.pop("_ch_gerado", None)
                     st.rerun()

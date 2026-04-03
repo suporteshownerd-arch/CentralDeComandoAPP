@@ -20,6 +20,11 @@ def render_page(lojas):
     loja_pre = st.session_state.get("loja_selecionada")
     vd_default = loja_pre.get("vd", "") if loja_pre else ""
 
+    # Limpa textos gerados se mudou de loja
+    if vd_default and st.session_state.get("_ch_ultima_loja") != vd_default:
+        st.session_state.pop("_ch_gerado", None)
+        st.session_state["_ch_ultima_loja"] = vd_default
+
     with col_vd:
         vd = st.text_input(
             "VD da loja",
