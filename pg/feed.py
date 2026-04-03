@@ -119,9 +119,9 @@ def render_page(loader, lojas):
                 st.rerun()
         
         cols = st.columns(len(imagens_pagina))
-    for i, img in enumerate(imagens_pagina):
-        idx = idx_inicio + i
-        with cols[i]:
+        for i, img in enumerate(imagens_pagina):
+            idx = idx_inicio + i
+            with cols[i]:
             try:
                 if img["tipo"] == "upload":
                     img_data = Image.open(img["dados"])
