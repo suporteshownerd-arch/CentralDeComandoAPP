@@ -82,17 +82,17 @@ def render_page(loader, lojas):
         for i, img in enumerate(imagens_pagina):
             idx = idx_inicio + i
             with cols[i]:
-                try:
+try:
                     if img["tipo"] == "upload":
                         img_data = Image.open(img["dados"])
                     else:
                         img_data = Image.open(BytesIO(requests.get(img["dados"]).content))
-img_data = img_data.resize((600, 350), Image.Resampling.LANCZOS)
-                buf = BytesIO()
-                img_data.save(buf, format="PNG")
-                st.image(buf.getvalue(), width=600)
+                    img_data = img_data.resize((600, 350), Image.Resampling.LANCZOS)
+                    buf = BytesIO()
+                    img_data.save(buf, format="PNG")
+                    st.image(buf.getvalue(), width=600)
                 except:
-                    st.image(img["dados"], width=400)
+                    st.image(img["dados"], width=600)
                 st.markdown(f"📤 **{img['usuario']}** • {img['data']}")
                 if st.button("🗑️", key="del_" + str(idx)):
                     st.session_state.feed_imagens.pop(idx)
