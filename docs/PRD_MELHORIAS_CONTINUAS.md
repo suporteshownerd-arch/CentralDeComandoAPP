@@ -1,8 +1,8 @@
 # PRD — Central de Comando DPSP
-## Plano de Melhorias Contínuas v1.3
+## Plano de Melhorias Contínuas v1.5
 
-**Data:** 02/04/2026  
-**Versão Atual:** 1.4  
+**Data:** 03/04/2026  
+**Versão Atual:** 1.5  
 **Responsável:** Enzo Maranho — T.I. DPSP
 
 ---
@@ -10,7 +10,7 @@
 ## 1. Visão Geral do Produto
 
 ### 1.1 O que é
-Sistema web interno para consulta de lojas, gestão de crises e abertura de chamados da DPSP.
+Sistema web interno para consulta de lojas, gestão de crises, abertura de chamados e feed de comunicados/imagens da DPSP.
 
 ### 1.2 Objetivos do PRD
 - Documentar melhorias identificadas
@@ -20,7 +20,75 @@ Sistema web interno para consulta de lojas, gestão de crises e abertura de cham
 
 ---
 
-## 2. Análise SWOT
+## 2. Feed de Comunicados e Imagens
+
+### 2.1 Overview da Página Feed
+A página Feed (📊) é uma das principais páginas do sistema, responsável por:
+- Exibir comunicados e notícias importantes
+- Compartilhar imagens (prints, alertas, comunicados visuais)
+- Manter equipe informada sobre manutenções e mudanças
+
+### 2.2 Estado Atual (v1.5)
+
+| Feature | Status | Observações |
+|---------|--------|------------|
+| Carrossel de 3 imagens por página | ✅ Implementado | Navegação com ◀ ▶ |
+| Redimensionamento 540x720 (3:4) | ✅ Implementado | PIL resize |
+| Bordas coloridas | ✅ Implementado | Roxo/Azul |
+| Upload de imagens (PC) | ✅ Implementado | Via popover |
+| Adicionar por URL | ✅ Implementado | Via popover |
+| Exibir usuário e data | ✅ Implementado | Metadata simples |
+| Excluir imagens | ✅ Implementado | Botão lixeira |
+| Comunicados (cards) | ✅ Implementado | Estáticos |
+| Zoom no hover | ⚠️ CSS não funciona | Streamlit limita |
+| Animações CSS | ⚠️ Limitado | Streamlit limita |
+| Exibir 3+ por página | ✅ Implementado | Paginação |
+| Imagens de exemplo (mock) | ✅ Implementado | picsum.photos |
+| Limpar cache imagens | ⚠️ Pendente | Não implementado |
+
+### 2.3 Melhorias Propostas para Feed
+
+| ID | Melhoria | Descrição | Prioridade | Status |
+|----|---------|-----------|------------|--------|--------|
+| F1 | **Slide Automático** | Carrossel avança automaticamente (5-10s) | Alta | Pendente |
+| F2 | **Thumbnails** | Miniaturas clicáveis para navegar | Alta | Pendente |
+| F3 | **Lightbox** | Clique na imagem abre em tela cheia | Média | Pendente |
+| F4 | **Comunicados Dinâmicos** | Buscar comunicados do Sheets | Alta | Pendente |
+| F5 | **Tipos de Comunicado** | Categorias: Manutenção, Alerta, Info, Novidade | Média | Pendente |
+| F6 | **Ordenar Imagens** | Arrastar para reordenar | Baixa | Pendente |
+| F7 | **Compartilhar** | Copiar link da imagem | Baixa | Pendente |
+| F8 | **Download** | Baixar imagem original | Baixa | Pendente |
+| F9 | **Galeria Grid** | Visualização em grid (opcional) | Média | Pendente |
+| F10 | **Filtros** | Filtrar por usuário, data, tipo | Baixa | Pendente |
+| F11 | **Animações Reais** | Usar biblioteca JS externa | Alta | Pendente |
+| F12 | **Upload Múltiplo** | Selecionar várias imagens | Alta | Pendente |
+
+### 2.4 Especificações Técnicas do Feed Atual
+
+```
+Dimensão Imagem: 540x720 pixels (proporção 3:4 - Instagram/Feed)
+Bordas: 6px Roxo (#6366f1) + 4px Azul (#1e1e2e)
+Imagens por página: 3
+Navegação: ◀ Anterior | Próxima ▶
+Cache: session_state (memória)
+Dados: st.file_uploader + URL
+```
+
+### 2.5 Backlog Feed
+
+| ID | Feature | Esforço | Prioridade |
+|----|---------|---------|------------|
+| F1 | Slide Automático | 1 dia | P1 |
+| F2 | Thumbnails | 1 dia | P1 |
+| F3 | Lightbox | 1 dia | P2 |
+| F4 | Comunicados Sheets | 2 dias | P0 |
+| F5 | Categorias | 1 dia | P2 |
+| F7 | Download | 0.5 dia | P2 |
+| F12 | Upload Múltiplo | 1 dia | P1 |
+
+---
+
+## 3. Análise SWOT
 
 | **Forças** | **Fraquezas** |
 |------------|---------------|
@@ -28,6 +96,7 @@ Sistema web interno para consulta de lojas, gestão de crises e abertura de cham
 | Tema escuro premium | Integração Sheets não configurada |
 | Múltiplos modos de busca | Sem autenticação |
 | Templates automáticos | Sem backup automático |
+| Feed com imagens | Cache em memória |
 
 | **Oportunidades** | **Ameaças** |
 |-------------------|--------------|
@@ -39,7 +108,9 @@ Sistema web interno para consulta de lojas, gestão de crises e abertura de cham
 
 ## 3. Melhorias por Categoria
 
-### 3.1 Lógica & Dados
+## 4. Melhorias por Categoria
+
+### 4.1 Lógica & Dados
 
 | # | Melhoria | Descrição | Prioridade | Status |
 |---|----------|-----------|------------|--------|
@@ -50,7 +121,7 @@ Sistema web interno para consulta de lojas, gestão de crises e abertura de cham
 | L5 | **Cache Inteligente** | Cachear dados por tempo configurável | Média | Pendente |
 | L6 | **Logs de Uso** | Registrar quem buscou o que | Baixa | Pendente |
 
-### 3.2 Informações & Conteúdo
+### 4.2 Informações & Conteúdo
 
 | # | Melhoria | Descrição | Prioridade | Status |
 |---|----------|-----------|------------|--------|
@@ -61,7 +132,7 @@ Sistema web interno para consulta de lojas, gestão de crises e abertura de cham
 | I5 | **FAQ/Help** | Tutorial integrado ao sistema | Baixa | Pendente |
 | I6 | **Contatos Úteis** | Lista completa de emergências | Baixa | ✅ Sidebar |
 
-### 3.3 Layout & UX
+### 4.3 Layout & UX
 
 | # | Melhoria | Descrição | Prioridade | Status |
 |---|----------|-----------|------------|--------|
@@ -74,7 +145,7 @@ Sistema web interno para consulta de lojas, gestão de crises e abertura de cham
 
 ---
 
-## 4. Backlog de Funcionalidades
+## 5. Backlog de Funcionalidades
 
 ### 4.1 Sprint Atual (1-2 semanas)
 
@@ -105,7 +176,7 @@ Sistema web interno para consulta de lojas, gestão de crises e abertura de cham
 
 ---
 
-## 5. Arquitetura Técnica
+## 6. Arquitetura Técnica
 
 ### 5.1 Stack Atual
 ```
@@ -153,7 +224,7 @@ Deploy:   Docker + K8s
 
 ---
 
-## 6. Variáveis de Ambiente
+## 7. Variáveis de Ambiente
 
 | Variável | Descrição | Obrigatório | Atual |
 |----------|-----------|-------------|-------|
@@ -166,7 +237,7 @@ Deploy:   Docker + K8s
 
 ---
 
-## 7. Métricas de Sucesso
+## 8. Métricas de Sucesso
 
 ### 7.1 Produto
 | Métrica | Meta |
@@ -185,7 +256,7 @@ Deploy:   Docker + K8s
 
 ---
 
-## 8. Riscos e Mitigações
+## 9. Riscos e Mitigações
 
 | Risco | Prob. | Impacto | Mitigação |
 |-------|-------|---------|------------|
@@ -196,9 +267,9 @@ Deploy:   Docker + K8s
 
 ---
 
-## 9. Checklist de Implementação
+## 10. Checklist de Implementação
 
-### ✅ Concluído (v1.4)
+### ✅ Concluído (v1.5)
 - [x] Layout Premium com CSS customizado
 - [x] Tema escuro via .streamlit/config.toml (Streamlit Cloud)
 - [x] Dados reais — ~2055 lojas via CSV Fernet (relacao, designacao, GGL, GR)
@@ -211,6 +282,10 @@ Deploy:   Docker + K8s
 - [x] Templates Loja Isolada
 - [x] Histórico com navegação
 - [x] Salvar em Sheets/SQLite
+- [x] Feed: Carrossel 3 imagens/página (540x720)
+- [x] Feed: Upload (PC) e URL
+- [x] Feed: Bordas coloridas (PIL)
+- [x] Feed: Comunicados cards
 
 ### 🔄 Em Andamento
 - [ ] Configuração Google Sheets (variáveis de ambiente no Streamlit Cloud)
@@ -226,7 +301,7 @@ Deploy:   Docker + K8s
 
 ---
 
-## 10. Próximos Passos
+## 11. Próximos Passos
 
 1. ✅ **Revisar PRD** com stakeholders
 2. ⏳ **Configurar variáveis** no Streamlit Cloud
@@ -236,7 +311,7 @@ Deploy:   Docker + K8s
 
 ---
 
-## 11. Referências
+## 12. Referências
 
 - **Repositório:** https://github.com/suporteshownerd-arch/CentralDeComandoAPP
 - **Documento Original:** `DPSP_CentralDeComando_Documentacao.docx`
@@ -246,4 +321,4 @@ Deploy:   Docker + K8s
 ---
 
 *Documento criado para planejamento de melhorias contínuas.*  
-*Versão 1.4 — 03/04/2026*
+*Versão 1.5 — 03/04/2026*
