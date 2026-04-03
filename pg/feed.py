@@ -82,7 +82,7 @@ def render_page(loader, lojas):
         for i, img in enumerate(imagens_pagina):
             idx = idx_inicio + i
             with cols[i]:
-try:
+                try:
                     if img["tipo"] == "upload":
                         img_data = Image.open(img["dados"])
                     else:
