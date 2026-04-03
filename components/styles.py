@@ -76,30 +76,177 @@ def get_base_css() -> str:
     section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
         gap: 0 !important;
     }
-
-    /* ── Logo ── */
-    .sb-logo {
-        display: flex; align-items: center; gap: 14px;
-        padding: 24px 20px 20px 20px;
-        background: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(168,85,247,0.08) 100%);
-        border-bottom: 1px solid var(--border);
-        margin-bottom: 8px;
+    
+    /* ── Sidebar Header ── */
+    .sb-header {
+        padding: 0;
+        margin-bottom: 0;
     }
-    .sb-logo-icon {
-        width: 48px; height: 48px; flex-shrink: 0;
-        background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
-        border-radius: 14px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 22px;
-        box-shadow: 0 4px 20px rgba(99,102,241,0.4);
-    }
-    .sb-logo-title {
-        font-family: 'Outfit', sans-serif !important;
-        font-weight: 700; font-size: 18px; color: var(--text); letter-spacing: -0.02em;
-    }
-    .sb-logo-sub {
+    
+    /* ── Section Labels ── */
+    .sb-section-label {
         font-family: 'JetBrains Mono', monospace !important;
-        font-size: 11px; color: var(--text3); letter-spacing: .05em; margin-top: 2px;
+        font-size: 10px !important;
+        color: var(--text3) !important;
+        text-transform: uppercase;
+        letter-spacing: .2em;
+        padding: 16px 20px 8px 20px;
+        font-weight: 600;
+    }
+    .sb-subsection-label {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 12px;
+        color: var(--text2);
+        padding: 8px 20px 6px 20px;
+        font-weight: 500;
+    }
+
+    /* ── KPI Cards ── */
+    .sb-kpi-card {
+        text-align: center;
+        padding: 12px 8px;
+        border-radius: 12px;
+        margin: 4px 8px;
+        transition: all 0.2s ease;
+    }
+    .sb-kpi-card:hover { transform: translateY(-2px); }
+    .sb-kpi-card.green { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); }
+    .sb-kpi-card.red { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); }
+    .sb-kpi-card.accent { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); }
+    .sb-kpi-card .sb-kpi-value {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+    }
+    .sb-kpi-card.green .sb-kpi-value { color: var(--green-light); }
+    .sb-kpi-card.red .sb-kpi-value { color: var(--red-light); }
+    .sb-kpi-card.accent .sb-kpi-value { color: var(--accent-light); }
+    .sb-kpi-card .sb-kpi-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        color: var(--text3);
+        text-transform: uppercase;
+        margin-top: 4px;
+    }
+
+    /* ── Progress Bar ── */
+    .sb-progress-container {
+        padding: 8px 20px 16px 20px;
+    }
+    .sb-progress-bar {
+        height: 8px;
+        background: var(--surface);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .sb-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--green) 0%, var(--accent) 100%);
+        border-radius: 8px;
+        transition: width 0.5s ease;
+    }
+    .sb-progress-text {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--text2);
+        margin-top: 6px;
+        text-align: center;
+    }
+
+    /* ── Distribution Items ── */
+    .sb-dist-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 8px 20px;
+    }
+    .sb-dist-dot {
+        width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .sb-dist-icon {
+        font-size: 14px; width: 20px; text-align: center;
+    }
+    .sb-dist-name {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 13px;
+        color: var(--text);
+        flex: 1;
+        min-width: 50px;
+    }
+    .sb-dist-bar {
+        flex: 2;
+        height: 6px;
+        background: var(--surface);
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    .sb-dist-fill {
+        height: 100%;
+        border-radius: 6px;
+        transition: width 0.3s ease;
+    }
+    .sb-dist-pct {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--text2);
+        min-width: 40px;
+        text-align: right;
+    }
+
+    /* ── Connectivity Grid ── */
+    .sb-connect-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding: 8px 20px;
+    }
+    .sb-connect-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 14px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+    .sb-connect-item:hover {
+        border-color: var(--accent);
+        background: var(--surface);
+    }
+    .sb-connect-icon {
+        font-size: 24px;
+    }
+    .sb-connect-info {
+        display: flex; flex-direction: column;
+    }
+    .sb-connect-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        color: var(--text3);
+        text-transform: uppercase;
+    }
+    .sb-connect-value {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+    }
+    .sb-connect-bar {
+        padding: 8px 20px 16px 20px;
+    }
+    .sb-connect-bar span {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--text2);
+    }
+    .sb-connect-progress {
+        height: 4px;
+        background: var(--surface);
+        border-radius: 4px;
+        margin-top: 6px;
+        overflow: hidden;
+    }
+    .sb-connect-progress div {
+        height: 100%;
+        background: linear-gradient(90deg, var(--green) 0%, var(--accent) 100%);
+        border-radius: 4px;
     }
 
     /* ── Status ── */

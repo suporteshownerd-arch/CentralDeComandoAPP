@@ -1,6 +1,6 @@
 """
 Módulo de navegação e sidebar
-Central de Comando DPSP v4.3
+Central de Comando DPSP v4.4
 """
 
 import streamlit as st
@@ -20,20 +20,22 @@ _MENU = [
 _PAGE_DEFAULT = "Consulta de Lojas"
 
 
-def _format_number(num: int) -> str:
-    """Formata número com sufixos"""
-    if num >= 1000:
-        return f"{num/1000:.1f}k"
-    return str(num)
-
-
 def _get_status_emoji(status: str) -> str:
-    """Retorna emoji basedo no status"""
+    """Retorna emoji baseado no status"""
     if status == "open":
         return "🟢"
     elif status == "pending":
         return "🟡"
     return "🔴"
+
+
+def _get_status_color(status: str) -> str:
+    """Retorna cor baseada no status"""
+    if status == "open":
+        return "#10b981"
+    elif status == "pending":
+        return "#f59e0b"
+    return "#ef4444"
 
 
 def _calculate_metrics(lojas: List[dict]) -> Dict:
@@ -46,27 +48,23 @@ def _calculate_metrics(lojas: List[dict]) -> Dict:
     inativas = total - ativas
     pending = sum(1 for l in lojas if l.get("status") == "pending")
     
-    # Por estado
-    estados = {}
-    for l in lojas:
-        e = l.get("estado", "Outros")
-        estados[e] = estados.get(e, 0) + 1
-    
-    # Por bandeira
     bandeiras = {}
     for l in lojas:
         b = l.get("bandeira", "Outros")
         bandeiras[b] = bandeiras.get(b, 0) + 1
     
-    # Com circuitos
     com_mpls = sum(1 for l in lojas if l.get("mpls"))
     com_inn = sum(1 for l in lojas if l.get("inn"))
     
-    # Por região
     regioes = {}
     for l in lojas:
         r = l.get("regiao", "Outros")
         regioes[r] = regioes.get(r, 0) + 1
+    
+    estados = {}
+    for l in lojas:
+        e = l.get("estado", "Outros")
+        estados[e] = estados.get(e, 0) + 1
     
     return {
         "total": total,
@@ -74,9 +72,9 @@ def _calculate_metrics(lojas: List[dict]) -> Dict:
         "inativas": inativas,
         "pending": pending,
         "pct_ativas": round(ativas / total * 100) if total else 0,
-        "estados": estados,
         "bandeiras": bandeiras,
         "regioes": regioes,
+        "estados": estados,
         "com_mpls": com_mpls,
         "com_inn": com_inn,
     }
@@ -88,28 +86,32 @@ def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
             st.session_state.nav_page = _PAGE_DEFAULT
 
         pagina_atual = st.session_state.nav_page
-        
         metrics = _calculate_metrics(lojas)
+        
         total = metrics.get("total", 0)
         ativas = metrics.get("ativas", 0)
         inativas = metrics.get("inativas", 0)
         pct = metrics.get("pct_ativas", 0)
 
-        # ── Logo com versão ─────────────────────────────────────────────────────────
+        # ═══════════════════════════════════════════════════════════════════════
+        # 1. HEADER - Logo e Status
+        # ═══════════════════════════════════════════════════════════════════════
         st.markdown(
             """
-            <div class="sb-logo">
-                <div class="sb-logo-icon">🛡️</div>
-                <div>
-                    <div class="sb-logo-title">Central de Comando</div>
-                    <div class="sb-logo-sub">DPSP T.I. · v4.3</div>
+            <div class="sb-header">
+                <div class="sb-logo">
+                    <div class="sb-logo-icon">🛡️</div>
+                    <div>
+                        <div class="sb-logo-title">Central de Comando</div>
+                        <div class="sb-logo-sub">DPSP T.I. · v4.4</div>
+                    </div>
                 </div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-        # ── Status Indicator ─────────────────────────────────────────────────────────
+        # Status com horário
         now = datetime.now()
         hora_atual = now.strftime("%H:%M")
         dia_semana = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"][now.weekday()]
@@ -126,94 +128,143 @@ def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
             ''',
             unsafe_allow_html=True,
         )
-        st.markdown("<div class='sb-divider'></div>", unsafe_allow_html=True)
-
-        # ── KPIs Principal ───────────────────────────────────────────────────────────
-        st.markdown("<div class='sb-section-label'>📊 Visão Geral</div>", unsafe_allow_html=True)
+        
+        # ═══════════════════════════════════════════════════════════════════════
+        # 2. VISÃO GERAL - KPIs
+        # ═══════════════════════════════════════════════════════════════════════
+        st.markdown("<div class='sb-section-label'>📊 VISÃO GERAL</div>", unsafe_allow_html=True)
+        
+        # KPI Cards em linha
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.markdown(
+                f"""<div class="sb-kpi-card green"><div class="sb-kpi-value">{ativas}</div><div class="sb-kpi-label">Ativas</div></div>""",
+                unsafe_allow_html=True,
+            )
+        with col2:
+            st.markdown(
+                f"""<div class="sb-kpi-card red"><div class="sb-kpi-value">{inativas}</div><div class="sb-kpi-label">Inativas</div></div>""",
+                unsafe_allow_html=True,
+            )
+        with col3:
+            st.markdown(
+                f"""<div class="sb-kpi-card accent"><div class="sb-kpi-value">{total}</div><div class="sb-kpi-label">Total</div></div>""",
+                unsafe_allow_html=True,
+            )
+        
+        # Barra de progresso
         st.markdown(
             f"""
-            <div class="sb-kpi-main">
-                <div class="sb-kpi-main-value">{total:,}</div>
-                <div class="sb-kpi-main-label">Total de Lojas</div>
+            <div class="sb-progress-container">
+                <div class="sb-progress-bar">
+                    <div class="sb-progress-fill" style="width:{pct}%"></div>
+                </div>
+                <div class="sb-progress-text">{pct}% das lojas ativas</div>
             </div>
             """,
             unsafe_allow_html=True,
         )
         
-        # Barras de progresso
-        st.markdown(
-            f"""
-            <div class="sb-bar-wrap">
-                <div class="sb-bar-fill" style="width:{pct}%"></div>
-            </div>
-            <div class="sb-bar-legend">
-                <span class="green">● Ativas: {ativas} ({pct}%)</span>
-                <span class="red">● Inativas: {inativas}</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        st.markdown("<div class='sb-divider-light'></div>", unsafe_allow_html=True)
+        st.markdown("<div class='sb-divider'></div>", unsafe_allow_html=True)
 
-        # ── Estatísticas por Bandeira ───────────────────────────────────────────────
+        # ═══════════════════════════════════════════════════════════════════════
+        # 3. DISTRIBUIÇÃO
+        # ═══════════════════════════════════════════════════════════════════════
+        st.markdown("<div class='sb-section-label'>📈 DISTRIBUIÇÃO</div>", unsafe_allow_html=True)
+        
+        # Por Bandeira
         bandeiras = metrics.get("bandeiras", {})
         if bandeiras:
-            st.markdown("<div class='sb-section-label'>🏷️ Por Bandeira</div>", unsafe_allow_html=True)
-            
-            cores_bandeira = {
-                "DSP": "#6366f1",
-                "D1": "#10b981", 
-                "DPR": "#f59e0b",
-                "P": "#a855f7",
-            }
+            st.markdown("<div class='sb-subsection-label'>Por Bandeira</div>", unsafe_allow_html=True)
+            cores_bandeira = {"DSP": "#6366f1", "D1": "#10b981", "DPR": "#f59e0b", "P": "#a855f7"}
             
             for band, qtd in sorted(bandeiras.items(), key=lambda x: x[1], reverse=True)[:4]:
                 pct_b = round(qtd/total*100) if total else 0
                 cor = cores_bandeira.get(band, "#a0a0b0")
                 st.markdown(
                     f'''
-                    <div class="sb-stat-item">
-                        <div class="sb-stat-header">
-                            <span class="sb-stat-dot" style="background:{cor}"></span>
-                            <span class="sb-stat-name">{band}</span>
-                        </div>
-                        <div class="sb-stat-values">
-                            <span class="sb-stat-qtd">{qtd}</span>
-                            <span class="sb-stat-pct">({pct_b}%)</span>
-                        </div>
+                    <div class="sb-dist-item">
+                        <span class="sb-dist-dot" style="background:{cor}"></span>
+                        <span class="sb-dist-name">{band}</span>
+                        <div class="sb-dist-bar"><div class="sb-dist-fill" style="width:{pct_b}%;background:{cor}"></div></div>
+                        <span class="sb-dist-pct">{pct_b}%</span>
                     </div>
                     ''',
                     unsafe_allow_html=True,
                 )
         
-        st.markdown("<div class='sb-divider-light'></div>", unsafe_allow_html=True)
+        # Por Estado (Top 5)
+        estados = metrics.get("estados", {})
+        if estados and len(estados) > 1:
+            st.markdown("<div class='sb-subsection-label'>Por Estado (Top 5)</div>", unsafe_allow_html=True)
+            
+            top_estados = sorted(estados.items(), key=lambda x: x[1], reverse=True)[:5]
+            for est, qtd in top_estados:
+                pct_e = round(qtd/total*100) if total else 0
+                st.markdown(
+                    f'''
+                    <div class="sb-dist-item">
+                        <span class="sb-dist-icon">🗺️</span>
+                        <span class="sb-dist-name">{est}</span>
+                        <div class="sb-dist-bar"><div class="sb-dist-fill" style="width:{pct_e}%;background:var(--accent)"></div></div>
+                        <span class="sb-dist-pct">{qtd}</span>
+                    </div>
+                    ''',
+                    unsafe_allow_html=True,
+                )
+        
+        st.markdown("<div class='sb-divider'></div>", unsafe_allow_html=True)
 
-        # ── Circuitos ───────────────────────────────────────────────────────────────
+        # ═══════════════════════════════════════════════════════════════════════
+        # 4. CONECTIVIDADE
+        # ═══════════════════════════════════════════════════════════════════════
+        st.markdown("<div class='sb-section-label'>🌐 CONECTIVIDADE</div>", unsafe_allow_html=True)
+        
         com_mpls = metrics.get("com_mpls", 0)
         com_inn = metrics.get("com_inn", 0)
+        pct_mpls = round(com_mpls/total*100) if total else 0
+        pct_inn = round(com_inn/total*100) if total else 0
         
-        st.markdown("<div class='sb-section-label'>🌐 Circuitos</div>", unsafe_allow_html=True)
         st.markdown(
-            f"""
-            <div class="sb-circuit-stats">
-                <div class="sb-circuit-item">
-                    <span class="sb-circuit-icon">📡</span>
-                    <span class="sb-circuit-label">MPLS</span>
-                    <span class="sb-circuit-value">{com_mpls}</span>
+            f'''
+            <div class="sb-connect-grid">
+                <div class="sb-connect-item">
+                    <div class="sb-connect-icon">📡</div>
+                    <div class="sb-connect-info">
+                        <span class="sb-connect-label">MPLS</span>
+                        <span class="sb-connect-value">{com_mpls} ({pct_mpls}%)</span>
+                    </div>
                 </div>
-                <div class="sb-circuit-item">
-                    <span class="sb-circuit-icon">🔗</span>
-                    <span class="sb-circuit-label">INN</span>
-                    <span class="sb-circuit-value">{com_inn}</span>
+                <div class="sb-connect-item">
+                    <div class="sb-connect-icon">🔗</div>
+                    <div class="sb-connect-info">
+                        <span class="sb-connect-label">INN</span>
+                        <span class="sb-connect-value">{com_inn} ({pct_inn}%)</span>
+                    </div>
                 </div>
             </div>
-            """,
+            ''',
             unsafe_allow_html=True,
         )
-        st.markdown("<div class='sb-divider-light'></div>", unsafe_allow_html=True)
+        
+        # Barra de conectividade total
+        pct_conectado = round((com_mpls + com_inn)/total*100) if total else 0
+        st.markdown(
+            f'''
+            <div class="sb-connect-bar">
+                <span>Total conectados: {pct_conectado}%</span>
+                <div class="sb-connect-progress"><div style="width:{pct_conectado}%"></div></div>
+            </div>
+            ''',
+            unsafe_allow_html=True,
+        )
+        
+        st.markdown("<div class='sb-divider'></div>", unsafe_allow_html=True)
 
-        # ── Navegação ───────────────────────────────────────────────────────────────
-        st.markdown("<div class='sb-section-label'>📌 Menu</div>", unsafe_allow_html=True)
+        # ═══════════════════════════════════════════════════════════════════════
+        # 5. NAVEGAÇÃO
+        # ═══════════════════════════════════════════════════════════════════════
+        st.markdown("<div class='sb-section-label'>📌 NAVEGAÇÃO</div>", unsafe_allow_html=True)
 
         for icon, nome, cor in _MENU:
             ativo = pagina_atual == nome
@@ -227,54 +278,53 @@ def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
 
         st.markdown("<div class='sb-divider'></div>", unsafe_allow_html=True)
 
-        # ── Favoritos ────────────────────────────────────────────────────────────────
+        # ═══════════════════════════════════════════════════════════════════════
+        # 6. FAVORITOS
+        # ═══════════════════════════════════════════════════════════════════════
         if favoritos:
-            st.markdown("<div class='sb-section-label'>⭐ Favoritos</div>", unsafe_allow_html=True)
+            st.markdown("<div class='sb-section-label'>⭐ FAVORITOS</div>", unsafe_allow_html=True)
             idx = {l.get("vd"): l for l in lojas} if lojas else {}
             
             for vd in favoritos[:5]:
                 loja = idx.get(vd)
                 if loja:
-                    nome_curto = loja.get("nome", "")[:18] + "…" if len(loja.get("nome", "")) > 18 else loja.get("nome", "")
+                    nome_curto = loja.get("nome", "")[:20] + "…" if len(loja.get("nome", "")) > 20 else loja.get("nome", "")
                     status = loja.get("status", "closed")
+                    status_cor = _get_status_color(status)
                     
                     st.markdown(
                         f'''
                         <div class="sb-fav-item">
                             <span class="sb-fav-vd">{vd}</span>
                             <span class="sb-fav-nome">{nome_curto}</span>
-                            <span class="sb-fav-status">{_get_status_emoji(status)}</span>
+                            <span class="sb-fav-status" style="color:{status_cor}">●</span>
                         </div>
                         ''',
                         unsafe_allow_html=True,
                     )
-            st.markdown("<div class='sb-divider-light'></div>", unsafe_allow_html=True)
+            st.markdown("<div class='sb-divider'></div>", unsafe_allow_html=True)
 
-        # ── Contatos Rápidos ───────────────────────────────────────────────────────
-        st.markdown("<div class='sb-section-label'>📞 Contatos</div>", unsafe_allow_html=True)
+        # ═══════════════════════════════════════════════════════════════════════
+        # 7. CONTATOS
+        # ═══════════════════════════════════════════════════════════════════════
+        st.markdown("<div class='sb-section-label'>📞 CONTATOS</div>", unsafe_allow_html=True)
         st.markdown(
             """
             <div class="sb-contacts">
                 <a href="https://wa.me/551132747527" target="_blank" class="sb-contact-item">
                     <div class="sb-contact-icon">🎛️</div>
-                    <div>
-                        <div class="sb-contact-name">Central de Comando</div>
-                        <div class="sb-contact-tel">(11) 3274-7527</div>
-                    </div>
+                    <div><div class="sb-contact-name">Central de Comando</div>
+                    <div class="sb-contact-tel">(11) 3274-7527</div></div>
                 </a>
                 <a href="https://wa.me/551155296003" target="_blank" class="sb-contact-item">
                     <div class="sb-contact-icon">💻</div>
-                    <div>
-                        <div class="sb-contact-name">T.I. DPSP</div>
-                        <div class="sb-contact-tel">(11) 5529-6003</div>
-                    </div>
+                    <div><div class="sb-contact-name">T.I. DPSP</div>
+                    <div class="sb-contact-tel">(11) 5529-6003</div></div>
                 </a>
                 <a href="#" class="sb-contact-item">
                     <div class="sb-contact-icon">🚨</div>
-                    <div>
-                        <div class="sb-contact-name">Emergências</div>
-                        <div class="sb-contact-tel">24 horas</div>
-                    </div>
+                    <div><div class="sb-contact-name">Emergências</div>
+                    <div class="sb-contact-tel">24 horas</div></div>
                 </a>
             </div>
             """,
