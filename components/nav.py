@@ -1,6 +1,6 @@
 """
 Módulo de navegação e sidebar
-Central de Comando DPSP v3.0
+Central de Comando DPSP v3.1
 """
 
 import streamlit as st
@@ -8,12 +8,12 @@ from typing import List
 
 
 _MENU = [
-    ("🏪", "Consulta de Lojas"),
-    ("🚨", "Gestão de Crises"),
-    ("📞", "Abertura de Chamados"),
-    ("📋", "Histórico"),
-    ("📈", "Dashboard"),
-    ("❓", "Ajuda"),
+    ("🏪", "Consulta de Lojas",     "#5b8def"),
+    ("🚨", "Gestão de Crises",      "#f87171"),
+    ("📞", "Abertura de Chamados",  "#34d399"),
+    ("📋", "Histórico",             "#a78bfa"),
+    ("📈", "Dashboard",             "#fbbf24"),
+    ("❓", "Ajuda",                 "#9094a6"),
 ]
 
 _PAGE_DEFAULT = "Consulta de Lojas"
@@ -21,12 +21,14 @@ _PAGE_DEFAULT = "Consulta de Lojas"
 
 def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
     total    = len(lojas) if lojas else 0
-    ativas   = sum(1 for l in lojas if l.get("status") == "open") if lojas else 0
+    ativas   = sum(1 for l in lojas if l.get("status") == "open")   if lojas else 0
     inativas = sum(1 for l in lojas if l.get("status") == "closed") if lojas else 0
     pct      = round(ativas / total * 100) if total else 0
 
     if "nav_page" not in st.session_state:
         st.session_state.nav_page = _PAGE_DEFAULT
+
+    pagina_atual = st.session_state.nav_page
 
     # ── Logo ─────────────────────────────────────────────────────────────────
     st.markdown(
@@ -35,7 +37,7 @@ def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
             <div class="sb-logo-icon">🛡️</div>
             <div>
                 <div class="sb-logo-title">Central de Comando</div>
-                <div class="sb-logo-sub">DPSP T.I. · v3.0</div>
+                <div class="sb-logo-sub">DPSP T.I. · v3.1</div>
             </div>
         </div>
         """,
@@ -44,8 +46,10 @@ def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
 
     # ── Status ────────────────────────────────────────────────────────────────
     st.markdown(
-        '<div class="sb-status"><div class="sb-status-dot"></div>'
-        '<span>Sistema Operacional</span></div>',
+        '<div class="sb-status">'
+        '<div class="sb-status-dot"></div>'
+        '<span>Sistema Operacional</span>'
+        '</div>',
         unsafe_allow_html=True,
     )
     st.markdown("<div class='sb-divider'></div>", unsafe_allow_html=True)
@@ -83,21 +87,21 @@ def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
     st.markdown("<div class='sb-divider'></div>", unsafe_allow_html=True)
 
     # ── Navegação ─────────────────────────────────────────────────────────────
-    # Técnica: insere <div class="nav-active"> ANTES do botão ativo.
-    # CSS usa seletor "+ [data-testid='stButton'] > button" para estilizar
-    # o botão seguinte ao marcador.
-    st.markdown("<div class='sb-section-label'>Navegação</div>", unsafe_allow_html=True)
-    st.markdown('<div class="sb-nav-wrap">', unsafe_allow_html=True)
+    st.markdown("<div class='sb-section-label'>Menu</div>", unsafe_allow_html=True)
 
-    for icon, nome in _MENU:
-        ativo = st.session_state.nav_page == nome
+    for icon, nome, cor in _MENU:
+        ativo = pagina_atual == nome
         if ativo:
             st.markdown('<div class="nav-active-marker"></div>', unsafe_allow_html=True)
+        # Ícone colorido inline antes do texto
+        st.markdown(
+            f"<div class='nav-icon-hint' style='--nav-cor:{cor}'></div>",
+            unsafe_allow_html=True,
+        )
         if st.button(f"{icon}  {nome}", key=f"navbtn_{nome}", use_container_width=True):
             st.session_state.nav_page = nome
             st.rerun()
 
-    st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("<div class='sb-divider'></div>", unsafe_allow_html=True)
 
     # ── Favoritos ─────────────────────────────────────────────────────────────
@@ -107,7 +111,7 @@ def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
         items = ""
         for vd in favoritos[:5]:
             nome_loja = idx.get(vd, f"VD {vd}")
-            curto = nome_loja[:20] + "…" if len(nome_loja) > 20 else nome_loja
+            curto = nome_loja[:22] + "…" if len(nome_loja) > 22 else nome_loja
             items += (
                 f'<div class="sb-fav-item">'
                 f'<span class="sb-fav-vd">{vd}</span>'
@@ -118,38 +122,30 @@ def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
         st.markdown("<div class='sb-divider'></div>", unsafe_allow_html=True)
 
     # ── Contatos ──────────────────────────────────────────────────────────────
-    st.markdown("<div class='sb-section-label'>Contatos</div>", unsafe_allow_html=True)
+    st.markdown("<div class='sb-section-label'>Contatos Rápidos</div>", unsafe_allow_html=True)
     st.markdown(
         """
         <div class="sb-contacts">
-            <div class="sb-contact-item">
+            <a href="https://wa.me/551132747527" target="_blank" class="sb-contact-item">
                 <div class="sb-contact-icon">🎛️</div>
                 <div>
                     <div class="sb-contact-name">Central de Comando</div>
                     <div class="sb-contact-tel">(11) 3274-7527</div>
                 </div>
-            </div>
-            <div class="sb-contact-item">
+            </a>
+            <a href="https://wa.me/551155296003" target="_blank" class="sb-contact-item">
                 <div class="sb-contact-icon">💻</div>
                 <div>
                     <div class="sb-contact-name">T.I. DPSP</div>
                     <div class="sb-contact-tel">(11) 5529-6003</div>
                 </div>
-            </div>
+            </a>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    return st.session_state.nav_page
-
-
-def render_page_header(title: str, subtitle: str = None, icon: str = None):
-    if icon:
-        title = f"{icon} {title}"
-    st.markdown(f"## {title}")
-    if subtitle:
-        st.markdown(f"*{subtitle}*")
+    return pagina_atual
 
 
 def render_footer():
@@ -182,3 +178,11 @@ def setup_page_config():
         layout="wide",
         initial_sidebar_state="expanded",
     )
+
+
+def render_page_header(title: str, subtitle: str = None, icon: str = None):
+    if icon:
+        title = f"{icon} {title}"
+    st.markdown(f"## {title}")
+    if subtitle:
+        st.markdown(f"*{subtitle}*")

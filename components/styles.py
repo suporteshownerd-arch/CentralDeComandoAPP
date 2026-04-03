@@ -38,19 +38,29 @@ def get_base_css() -> str:
     section[data-testid="stSidebar"] > div:first-child {
         background: var(--bg2) !important;
     }
-    section[data-testid="stSidebar"] { border-right: 1px solid var(--border) !important; }
+    section[data-testid="stSidebar"] {
+        border-right: 1px solid var(--border) !important;
+    }
+    /* Remove padding extra do Streamlit dentro da sidebar */
+    section[data-testid="stSidebar"] .block-container {
+        padding: 0 !important;
+    }
+    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        gap: 0 !important;
+    }
 
-    /* ── Sidebar logo ── */
+    /* ── Logo ── */
     .sb-logo {
         display: flex; align-items: center; gap: 12px;
-        padding: 20px 16px 16px 16px;
+        padding: 20px 16px 14px 16px;
     }
     .sb-logo-icon {
-        width: 38px; height: 38px; flex-shrink: 0;
+        width: 40px; height: 40px; flex-shrink: 0;
         background: linear-gradient(135deg,#5b8def 0%,#7c3aed 100%);
-        border-radius: 10px;
+        border-radius: 11px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 18px;
+        font-size: 19px;
+        box-shadow: 0 4px 14px rgba(91,141,239,.35);
     }
     .sb-logo-title {
         font-family: 'Syne', sans-serif !important;
@@ -61,13 +71,13 @@ def get_base_css() -> str:
         font-size: 10px; color: #5c6370; letter-spacing: .06em; margin-top: 2px;
     }
 
-    /* ── Sidebar status badge ── */
+    /* ── Status ── */
     .sb-status {
         display: flex; align-items: center; gap: 8px;
-        margin: 0 12px 4px 12px;
+        margin: 0 12px 0 12px;
         padding: 7px 12px;
-        background: rgba(52,211,153,.08);
-        border: 1px solid rgba(52,211,153,.2);
+        background: rgba(52,211,153,.07);
+        border: 1px solid rgba(52,211,153,.18);
         border-radius: 8px;
     }
     .sb-status span {
@@ -78,35 +88,39 @@ def get_base_css() -> str:
         width: 7px; height: 7px; background: #34d399; border-radius: 50%;
         animation: sb-pulse 2s infinite; flex-shrink: 0;
     }
-    @keyframes sb-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    @keyframes sb-pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
 
     /* ── Dividers ── */
     .sb-divider {
-        border-top: 1px solid rgba(255,255,255,.06);
-        margin: 12px 0;
+        height: 1px;
+        background: rgba(255,255,255,.06);
+        margin: 14px 0;
     }
 
     /* ── Section labels ── */
     .sb-section-label {
         font-family: 'DM Mono', monospace !important;
         font-size: 9px !important; color: #5c6370 !important;
-        text-transform: uppercase; letter-spacing: .14em;
-        padding: 0 16px; margin-bottom: 8px;
+        text-transform: uppercase; letter-spacing: .16em;
+        padding: 0 16px; margin-bottom: 6px;
     }
 
     /* ── KPI row ── */
     .sb-kpi-row {
-        display: flex; align-items: center;
-        margin: 0 12px 10px 12px;
+        display: flex; align-items: stretch;
+        margin: 0 12px 8px 12px;
         background: var(--bg3);
         border: 1px solid var(--border);
         border-radius: 10px;
-        padding: 10px 0;
+        overflow: hidden;
     }
-    .sb-kpi { flex: 1; text-align: center; }
+    .sb-kpi {
+        flex: 1; text-align: center;
+        padding: 10px 4px;
+    }
     .sb-kpi-value {
         font-family: 'Syne', sans-serif !important;
-        font-size: 20px !important; font-weight: 700; line-height: 1;
+        font-size: 19px !important; font-weight: 700; line-height: 1;
     }
     .sb-kpi-value.accent { color: #5b8def; }
     .sb-kpi-value.green  { color: #34d399; }
@@ -114,23 +128,26 @@ def get_base_css() -> str:
     .sb-kpi-label {
         font-family: 'DM Mono', monospace !important;
         font-size: 9px !important; color: #5c6370 !important;
-        text-transform: uppercase; margin-top: 3px;
+        text-transform: uppercase; margin-top: 4px;
     }
     .sb-kpi-sep {
-        width: 1px; height: 28px;
-        background: rgba(255,255,255,.07); flex-shrink: 0;
+        width: 1px;
+        background: rgba(255,255,255,.06); flex-shrink: 0;
+        align-self: stretch;
     }
 
     /* ── Progress bar ── */
     .sb-bar-wrap {
         margin: 0 12px 4px 12px;
-        height: 5px; border-radius: 4px;
-        background: rgba(248,113,113,.2);
+        height: 4px; border-radius: 4px;
+        background: rgba(248,113,113,.18);
         overflow: hidden;
     }
     .sb-bar-fill {
-        height: 100%; background: #34d399; border-radius: 4px;
-        transition: width .5s ease;
+        height: 100%;
+        background: linear-gradient(90deg, #34d399, #5b8def);
+        border-radius: 4px;
+        transition: width .6s ease;
     }
     .sb-bar-legend {
         display: flex; justify-content: space-between;
@@ -141,12 +158,59 @@ def get_base_css() -> str:
     .sb-bar-legend .green { color: #34d399; }
     .sb-bar-legend .red   { color: #f87171; }
 
+    /* ── Navegação ── */
+    section[data-testid="stSidebar"] .stButton > button {
+        background: transparent !important;
+        border: none !important;
+        border-radius: 8px !important;
+        text-align: left !important;
+        padding: 9px 14px 9px 16px !important;
+        color: #9094a6 !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        width: 100% !important;
+        transition: background .15s, color .15s !important;
+        box-shadow: none !important;
+        letter-spacing: 0 !important;
+        margin: 1px 0 !important;
+    }
+    section[data-testid="stSidebar"] .stButton > button:hover {
+        background: rgba(255,255,255,.05) !important;
+        color: #eaecf0 !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+    section[data-testid="stSidebar"] .stButton > button:focus:not(:active) {
+        box-shadow: none !important; outline: none !important;
+    }
+    section[data-testid="stSidebar"] .stButton > button p {
+        font-size: 13px !important; color: inherit !important; text-align: left !important;
+    }
+
+    /* ── Nav active marker ── */
+    .nav-icon-hint { display: none; height: 0; }
+    .nav-active-marker { display: none; height: 0; margin: 0; padding: 0; }
+
+    /* Botão logo após o marker → ativo */
+    .nav-active-marker + div + div[data-testid="stButton"] > button,
+    .nav-active-marker + div[data-testid="stButton"] > button,
+    .nav-active-marker ~ div[data-testid="stButton"]:first-of-type > button {
+        background: rgba(91,141,239,.13) !important;
+        color: #5b8def !important;
+        font-weight: 600 !important;
+        border-left: 3px solid #5b8def !important;
+        padding-left: 13px !important;
+    }
+    .nav-active-marker + div + div[data-testid="stButton"] > button:hover,
+    .nav-active-marker + div[data-testid="stButton"] > button:hover {
+        background: rgba(91,141,239,.2) !important;
+    }
+
     /* ── Favorites ── */
     .sb-fav-item {
         display: flex; align-items: center; gap: 8px;
-        padding: 5px 12px;
-        margin: 0 4px 2px 4px;
-        border-radius: 7px;
+        padding: 5px 12px; margin: 0 4px 2px 4px;
+        border-radius: 7px; cursor: default;
     }
     .sb-fav-item:hover { background: rgba(91,141,239,.07); }
     .sb-fav-vd {
@@ -170,10 +234,14 @@ def get_base_css() -> str:
     }
     .sb-contact-item {
         display: flex; align-items: center; gap: 10px;
-        padding: 9px 12px;
+        padding: 10px 12px;
         border-bottom: 1px solid rgba(255,255,255,.05);
+        text-decoration: none !important;
+        transition: background .15s;
     }
     .sb-contact-item:last-child { border-bottom: none; }
+    .sb-contact-item:hover { background: rgba(91,141,239,.07) !important; }
+    .sb-contact-icon { font-size: 16px; flex-shrink: 0; }
     .sb-contact-name {
         font-size: 12px !important; color: #eaecf0 !important;
         font-weight: 600; line-height: 1.2;
@@ -181,61 +249,6 @@ def get_base_css() -> str:
     .sb-contact-tel {
         font-family: 'DM Mono', monospace !important;
         font-size: 11px !important; color: #5c6370;
-    }
-
-    /* ── Navegação: botões como nav links ── */
-    /* Wrapper da nav */
-    .sb-nav-wrap { padding: 0 8px; }
-
-    /* Todos os botões dentro do sidebar → estilo nav link */
-    section[data-testid="stSidebar"] .stButton > button {
-        background: transparent !important;
-        border: 1px solid transparent !important;
-        border-radius: 8px !important;
-        text-align: left !important;
-        padding: 9px 14px !important;
-        color: #9094a6 !important;
-        font-size: 13px !important;
-        font-weight: 500 !important;
-        width: 100% !important;
-        transition: background .15s, color .15s !important;
-        box-shadow: none !important;
-        letter-spacing: 0 !important;
-    }
-    section[data-testid="stSidebar"] .stButton > button:hover {
-        background: rgba(91,141,239,.08) !important;
-        color: #eaecf0 !important;
-        border-color: transparent !important;
-        transform: none !important;
-        box-shadow: none !important;
-    }
-    section[data-testid="stSidebar"] .stButton > button:focus:not(:active) {
-        box-shadow: none !important;
-        outline: none !important;
-    }
-    section[data-testid="stSidebar"] .stButton > button p {
-        font-size: 13px !important;
-        color: inherit !important;
-        text-align: left !important;
-    }
-    /* Marcador antes do botão ativo → irmão seguinte fica em destaque */
-    .nav-active-marker {
-        display: none;
-        height: 0;
-        margin: 0;
-        padding: 0;
-    }
-    .nav-active-marker + div[data-testid="stButton"] > button,
-    .nav-active-marker + div > div[data-testid="stButton"] > button {
-        background: rgba(91,141,239,.12) !important;
-        color: #5b8def !important;
-        border-color: rgba(91,141,239,.22) !important;
-        font-weight: 600 !important;
-    }
-    .nav-active-marker + div[data-testid="stButton"] > button:hover,
-    .nav-active-marker + div > div[data-testid="stButton"] > button:hover {
-        background: rgba(91,141,239,.18) !important;
-        color: #5b8def !important;
     }
 
     /* ── Headings ── */
