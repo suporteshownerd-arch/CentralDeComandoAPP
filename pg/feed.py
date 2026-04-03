@@ -76,10 +76,10 @@ def render_page(loader, lojas):
                 else:
                     img_data = Image.open(BytesIO(requests.get(img["dados"]).content))
                 
-                img_data = img_data.resize((350, 200), Image.Resampling.LANCZOS)
+                img_data = img_data.resize((400, 250), Image.Resampling.LANCZOS)
                 buf = BytesIO()
                 img_data.save(buf, format="PNG")
-                st.image(buf.getvalue(), width=350)
+                st.image(buf.getvalue(), width=400)
             except Exception as e:
                 st.image(img["dados"], width=600)
             
