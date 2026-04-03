@@ -80,6 +80,14 @@ def render_page(loader, lojas):
         
         st.markdown("""
     <style>
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
         .img-card {
             background: var(--surface);
             border: 2px solid var(--border);
@@ -87,11 +95,13 @@ def render_page(loader, lojas):
             padding: 12px;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: zoomIn 0.5s ease-out;
         }
         .img-card:hover {
-            transform: scale(1.02);
+            transform: scale(1.03);
             box-shadow: 0 8px 25px rgba(0,0,0,0.5);
             border-color: var(--accent);
+            animation: pulse 1s infinite;
         }
     </style>
     """, unsafe_allow_html=True)
