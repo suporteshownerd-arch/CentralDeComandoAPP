@@ -22,25 +22,36 @@ def render_page(loader, lojas):
     st.markdown("""
     <style>
         .metric-card {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 24px;
+            padding: 24px 16px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+        .metric-card:hover {
+            border-color: var(--border2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
         .metric-value {
-            font-size: 42px;
-            font-weight: bold;
-            color: white;
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .metric-label {
-            font-size: 14px;
-            color: #888;
+            font-size: 12px;
+            color: var(--text3);
             margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'JetBrains Mono', monospace;
         }
         .metric-delta {
-            font-size: 12px;
+            font-size: 11px;
             margin-top: 4px;
+            font-family: 'JetBrains Mono', monospace;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -59,9 +70,9 @@ def render_page(loader, lojas):
         pct_ativas = round(ativas/total*100) if total > 0 else 0
         st.markdown(f"""
         <div class="metric-card">
-            <div class="metric-value" style="color: #22c55e;">✅ {ativas}</div>
+            <div class="metric-value" style="color: var(--green-light);">✅ {ativas}</div>
             <div class="metric-label">Lojas Ativas</div>
-            <div class="metric-delta" style="color: #22c55e;">{pct_ativas}% do total</div>
+            <div class="metric-delta" style="color: var(--green-light);">{pct_ativas}% do total</div>
         </div>
         """, unsafe_allow_html=True)
     
@@ -69,9 +80,9 @@ def render_page(loader, lojas):
         pct_inativas = round(inativas/total*100) if total > 0 else 0
         st.markdown(f"""
         <div class="metric-card">
-            <div class="metric-value" style="color: #ef4444;">❌ {inativas}</div>
+            <div class="metric-value" style="color: var(--red-light);">❌ {inativas}</div>
             <div class="metric-label">Lojas Inativas</div>
-            <div class="metric-delta" style="color: #ef4444;">{pct_inativas}% do total</div>
+            <div class="metric-delta" style="color: var(--red-light);">{pct_inativas}% do total</div>
         </div>
         """, unsafe_allow_html=True)
     
@@ -97,23 +108,28 @@ def render_page(loader, lojas):
             for loja in alertas[:8]:
                 st.markdown(f"""
                 <div style="
-                    background: rgba(239, 68, 68, 0.1);
-                    border-left: 4px solid #ef4444;
-                    padding: 12px;
-                    border-radius: 8px;
+                    background: var(--surface);
+                    border: 1px solid rgba(239,68,68,0.2);
+                    border-left: 4px solid var(--red-light);
+                    padding: 14px;
+                    border-radius: 10px;
                     margin-bottom: 8px;
+                    transition: all 0.2s ease;
                 ">
-                    <strong>{loja.get('nome', 'Loja')}</strong><br>
-                    <small style="color: #888;">{loja.get('cidade', '')}/{loja.get('estado', '')}</small>
+                    <div style="font-weight: 600; color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif;">{loja.get('nome', 'Loja')}</div>
+                    <small style="color: var(--text2); font-family: 'Plus Jakarta Sans', sans-serif;">{loja.get('cidade', '')}/{loja.get('estado', '')}</small>
                 </div>
                 """, unsafe_allow_html=True)
         else:
             st.markdown("""
             <div style="
-                background: rgba(34, 197, 94, 0.1);
-                border-left: 4px solid #22c55e;
+                background: rgba(16,185,129,0.1);
+                border: 1px solid rgba(16,185,129,0.2);
+                border-left: 4px solid var(--green-light);
                 padding: 16px;
-                border-radius: 8px;
+                border-radius: 10px;
+                color: var(--green-light);
+                font-family: 'Plus Jakarta Sans', sans-serif;
             ">
                 ✅ Nenhuma loja com problemas!
             </div>
@@ -124,23 +140,25 @@ def render_page(loader, lojas):
         
         for i, loja in enumerate(lojas[:8]):
             status = loja.get("status", "open")
-            status_color = "#22c55e" if status == "open" else "#ef4444"
+            status_color = "var(--green-light)" if status == "open" else "var(--red-light)"
             status_emoji = "✅" if status == "open" else "❌"
             
             st.markdown(f"""
             <div style="
-                background: rgba(255,255,255,0.03);
-                border-radius: 8px;
-                padding: 12px;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                padding: 14px;
                 margin-bottom: 8px;
                 display: flex;
                 align-items: center;
-                gap: 10px;
+                gap: 12px;
+                transition: all 0.2s ease;
             ">
-                <span style="color: {status_color}; font-size: 18px;">{status_emoji}</span>
+                <span style="font-size: 18px;">{status_emoji}</span>
                 <div>
-                    <strong>{loja.get('nome', 'Loja')}</strong><br>
-                    <small style="color: #888;">{loja.get('cidade', '')}/{loja.get('estado', '')}</small>
+                    <div style="font-weight: 600; color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif;">{loja.get('nome', 'Loja')}</div>
+                    <small style="color: var(--text2); font-family: 'Plus Jakarta Sans', sans-serif;">{loja.get('cidade', '')}/{loja.get('estado', '')}</small>
                 </div>
             </div>
             """, unsafe_allow_html=True)
