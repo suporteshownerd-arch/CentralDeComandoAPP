@@ -87,10 +87,10 @@ def render_page(loader, lojas):
                         img_data = Image.open(img["dados"])
                     else:
                         img_data = Image.open(BytesIO(requests.get(img["dados"]).content))
-                    img_data = img_data.resize((400, 250), Image.Resampling.LANCZOS)
-                    buf = BytesIO()
-                    img_data.save(buf, format="PNG")
-                    st.image(buf.getvalue(), width=400)
+img_data = img_data.resize((600, 350), Image.Resampling.LANCZOS)
+                buf = BytesIO()
+                img_data.save(buf, format="PNG")
+                st.image(buf.getvalue(), width=600)
                 except:
                     st.image(img["dados"], width=400)
                 st.markdown(f"📤 **{img['usuario']}** • {img['data']}")
