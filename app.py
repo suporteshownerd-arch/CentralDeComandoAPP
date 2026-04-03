@@ -68,98 +68,6 @@ def load_lojas_data(loader: DataLoader):
     return loader.get_lojas()
 
 
-def render_home_page(lojas):
-    """Página inicial com logo, feed e menu"""
-    
-    # ═══════════════════════════════════════════════════════════════════════
-    # HEADER COM LOGO
-    # ═══════════════════════════════════════════════════════════════════════
-    st.markdown("""
-    <div style="
-        text-align: center;
-        padding: 40px 20px;
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        border-radius: 20px;
-        margin-bottom: 30px;
-    ">
-        <div style="font-size: 80px; margin-bottom: 20px;">🛡️</div>
-        <div style="
-            font-size: 36px;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 10px;
-        ">Central de Comando</div>
-        <div style="
-            font-size: 16px;
-            color: #888;
-        ">DPSP T.I. • Sistema de Gestão de Lojas</div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # ═══════════════════════════════════════════════════════════════════════
-    # FEED / ESTATÍSTICAS
-    # ═══════════════════════════════════════════════════════════════════════
-    if lojas:
-        total = len(lojas)
-        ativas = sum(1 for l in lojas if l.get("status") == "open")
-        inativas = total - ativas
-        
-        col1, col2, col3, col4 = st.columns(4)
-        
-        with col1:
-            st.metric("🏪 Total de Lojas", total)
-        with col2:
-            st.metric("✅ Lojas Ativas", ativas, f"{round(ativas/total*100)}%")
-        with col3:
-            st.metric("❌ Lojas Inativas", inativas, f"{round(inativas/total*100)}%")
-        with col4:
-            estados = len({l.get("estado") for l in lojas if l.get("estado")})
-            st.metric("🗺️ Estados", estados)
-    
-    st.markdown("---")
-    
-    # ═══════════════════════════════════════════════════════════════════════
-    # MENU DE PÁGINAS
-    # ═══════════════════════════════════════════════════════════════════════
-    st.markdown("### 📌 O que você quer fazer?")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        if st.button("🏪 Consulta de Lojas", use_container_width=True, type="primary"):
-            st.session_state.nav_page = "🏪 Buscar uma loja"
-            st.rerun()
-        
-        if st.button("🚨 Gestão de Crises", use_container_width=True):
-            st.session_state.nav_page = "🚨 Registrar uma crise"
-            st.rerun()
-        
-        if st.button("📞 Abertura de Chamados", use_container_width=True):
-            st.session_state.nav_page = "📞 Abrir chamado na Vivo/Claro"
-            st.rerun()
-    
-    with col2:
-        if st.button("📋 Histórico", use_container_width=True):
-            st.session_state.nav_page = "📋 Ver histórico de alertas"
-            st.rerun()
-        
-        if st.button("📈 Dashboard", use_container_width=True):
-            st.session_state.nav_page = "📈 Ver gráficos do parque"
-            st.rerun()
-        
-        if st.button("❓ Ajuda", use_container_width=True):
-            st.session_state.nav_page = "❓ Ajuda e manual"
-            st.rerun()
-    
-    st.markdown("---")
-    
-    # ═══════════════════════════════════════════════════════════════════════
-    # CONTATO
-    # ═══════════════════════════════════════════════════════════════════════
-    st.markdown("### 📞 Precisa de ajuda?")
-    st.info("📞 Ligue: (11) 3274-7527")
-
-
 def main():
     setup_page_config()
     render_styles()
@@ -184,28 +92,43 @@ def main():
     
     lojas = st.session_state.get("lojas", [])
     
-    # Renderiza página inicial
-    render_home_page(lojas)
+    # Sidebar
+    with st.sidebar:
+        try:
+            pagina = render_sidebar(
+                lojas=lojas,
+                favoritos=st.session_state.get("favoritos", []),
+            )
+        except Exception as e:
+            logger.error(f"Erro na sidebar: {e}")
+            pagina = "🏪 Buscar uma loja"
     
     # Processa navegação se mudou
-    pagina = st.session_state.get("nav_page", "")
+    if not pagina:
+        pagina = st.session_state.get("nav_page", "")
     
-    try:
-        if "🏪" in pagina:
-            pg_consulta.render_page(loader, lojas)
-        elif "🚨" in pagina:
-            pg_crises.render_page(sheets, lojas)
-        elif "📞" in pagina:
-            pg_chamados.render_page(lojas)
-        elif "📋" in pagina:
-            pg_historico.render_page(sheets)
-        elif "📈" in pagina:
-            pg_dashboard.render_page(loader, lojas)
-        elif "❓" in pagina:
-            pg_ajuda.render_page()
-    except Exception as e:
-        logger.error(f"Erro ao renderizar página: {e}")
-        render_error_page("generic")
+    # Se nenhuma página definida, mostra home
+    if not pagina:
+        render_home_page(lojas)
+    else:
+        try:
+            if "🏪" in pagina:
+                pg_consulta.render_page(loader, lojas)
+            elif "🚨" in pagina:
+                pg_crises.render_page(sheets, lojas)
+            elif "📞" in pagina:
+                pg_chamados.render_page(lojas)
+            elif "📋" in pagina:
+                pg_historico.render_page(sheets)
+            elif "📈" in pagina:
+                pg_dashboard.render_page(loader, lojas)
+            elif "❓" in pagina:
+                pg_ajuda.render_page()
+            else:
+                render_home_page(lojas)
+        except Exception as e:
+            logger.error(f"Erro ao renderizar página: {e}")
+            render_error_page("generic")
     
     try:
         render_footer()
