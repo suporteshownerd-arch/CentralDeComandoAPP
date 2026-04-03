@@ -15,6 +15,8 @@ def render_page(loader, lojas):
         st.session_state.feed_imagens = []
     if "feed_uploaded_images" not in st.session_state:
         st.session_state.feed_uploaded_images = []
+    if "feed_page" not in st.session_state:
+        st.session_state.feed_page = 0
     
     # Botão sutil para adicionar imagem
     with st.popover("➕ Imagem"):
@@ -30,82 +32,82 @@ def render_page(loader, lojas):
     
     st.markdown("---")
     
-    # Exibir imagens do PC
-    if st.session_state.feed_uploaded_images:
-        if len(st.session_state.feed_uploaded_images) == 1:
-            st.image(st.session_state.feed_uploaded_images[0], width=320)
-            col_ex, _ = st.columns([1, 4])
-            with col_ex:
-                if st.button("🗑️ Excluir", key="excluir_pc_0"):
-                    st.session_state.feed_uploaded_images.pop(0)
-                    st.rerun()
-        else:
-            idx = st.session_state.get("feed_idx", 0)
-            
-            # Setas e imagem
-            col_prev, col_img, col_next = st.columns([1, 6, 1])
-            with col_prev:
-                if st.button("◀"): st.session_state.feed_idx = (idx - 1) % len(st.session_state.feed_uploaded_images); st.rerun()
-            with col_img:
-                st.image(st.session_state.feed_uploaded_images[idx], width=320)
-                if st.button("🗑️ Excluir", key=f"excluir_pc_{idx}"): 
-                    st.session_state.feed_uploaded_images.pop(idx)
-                    st.rerun()
-            with col_next:
-                if st.button("▶"): st.session_state.feed_idx = (idx + 1) % len(st.session_state.feed_uploaded_images); st.rerun()
-            
-            # Pontos de navegação
-            st.markdown("""
-            <style>
-                .nav-dots { display: flex; justify-content: center; gap: 8px; margin-top: 8px; }
-                .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--surface2); cursor: pointer; }
-                .dot.active { background: var(--accent); }
-            </style>
-            """, unsafe_allow_html=True)
-            
-            dots_html = '<div class="nav-dots">'
-            for i in range(len(st.session_state.feed_uploaded_images)):
-                active = "active" if i == idx else ""
-                dots_html += f'<div class="dot {active}" onclick=""></div>'
-            dots_html += '</div>'
-            st.markdown(dots_html, unsafe_allow_html=True)
-            
-            st.caption(f"{idx + 1} / {len(st.session_state.feed_uploaded_images)}")
+    QTD_POR_PAGINA = 3
     
-    # Exibir imagens URL
+    # Exibir imagens do PC (3 por vez)
+    if st.session_state.feed_uploaded_images:
+        total = len(st.session_state.feed_uploaded_images)
+        pagina = st.session_state.get("feed_page", 0)
+        inicio = pagina * QTD_POR_PAGINA
+        fim = min(inicio + QTD_POR_PAGINA, total)
+        imagens_pagina = st.session_state.feed_uploaded_images[inicio:fim]
+        
+        if len(imagens_pagina) == 1:
+            st.image(imagens_pagina[0], width=320)
+            if st.button("🗑️ Excluir", key=f"excluir_pc_{inicio}"):
+                st.session_state.feed_uploaded_images.pop(inicio)
+                st.rerun()
+        else:
+            cols = st.columns(3)
+            for i, img in enumerate(imagens_pagina):
+                with cols[i]:
+                    st.image(img, width=320)
+                    if st.button(f"🗑️", key=f"excluir_pc_{inicio + i}"):
+                        st.session_state.feed_uploaded_images.pop(inicio + i)
+                        st.rerun()
+        
+        # Navegação
+        total_paginas = (total + QTD_POR_PAGINA - 1) // QTD_POR_PAGINA
+        if total_paginas > 1:
+            col_nav = st.columns([1, 2, 1])
+            with col_nav[0]:
+                if st.button("◀ Anterior") and pagina > 0:
+                    st.session_state.feed_page = pagina - 1
+                    st.rerun()
+            with col_nav[1]:
+                st.caption(f"Página {pagina + 1} de {total_paginas} ({total} imagens)")
+            with col_nav[2]:
+                if st.button("Próxima ▶") and pagina < total_paginas - 1:
+                    st.session_state.feed_page = pagina + 1
+                    st.rerun()
+    
+    # Exibir imagens URL (3 por vez)
     if st.session_state.feed_imagens:
         if st.session_state.feed_uploaded_images: st.markdown("---")
         
-        if len(st.session_state.feed_imagens) == 1:
-            st.image(st.session_state.feed_imagens[0], width=320)
-            col_ex, _ = st.columns([1, 4])
-            with col_ex:
-                if st.button("🗑️ Excluir", key="excluir_url_0"): 
-                    st.session_state.feed_imagens.pop(0)
-                    st.rerun()
+        total = len(st.session_state.feed_imagens)
+        pagina = st.session_state.get("feed_url_page", 0)
+        inicio = pagina * QTD_POR_PAGINA
+        fim = min(inicio + QTD_POR_PAGINA, total)
+        imagens_pagina = st.session_state.feed_imagens[inicio:fim]
+        
+        if len(imagens_pagina) == 1:
+            st.image(imagens_pagina[0], width=320)
+            if st.button("🗑️ Excluir", key=f"excluir_url_{inicio}"):
+                st.session_state.feed_imagens.pop(inicio)
+                st.rerun()
         else:
-            idx = st.session_state.get("feed_url_idx", 0)
-            
-            col_prev, col_img, col_next = st.columns([1, 6, 1])
-            with col_prev:
-                if st.button("◀", key="prev_url"): st.session_state.feed_url_idx = (idx - 1) % len(st.session_state.feed_imagens); st.rerun()
-            with col_img:
-                st.image(st.session_state.feed_imagens[idx], width=320)
-                if st.button("🗑️ Excluir", key=f"excluir_url_{idx}"): 
-                    st.session_state.feed_imagens.pop(idx)
+            cols = st.columns(3)
+            for i, img in enumerate(imagens_pagina):
+                with cols[i]:
+                    st.image(img, width=320)
+                    if st.button(f"🗑️", key=f"excluir_url_{inicio + i}"):
+                        st.session_state.feed_imagens.pop(inicio + i)
+                        st.rerun()
+        
+        total_paginas = (total + QTD_POR_PAGINA - 1) // QTD_POR_PAGINA
+        if total_paginas > 1:
+            col_nav = st.columns([1, 2, 1])
+            with col_nav[0]:
+                if st.button("◀ Anterior", key="prev_url") and pagina > 0:
+                    st.session_state.feed_url_page = pagina - 1
                     st.rerun()
-            with col_next:
-                if st.button("▶", key="next_url"): st.session_state.feed_url_idx = (idx + 1) % len(st.session_state.feed_imagens); st.rerun()
-            
-            # Pontos de navegação
-            dots_html = '<div class="nav-dots">'
-            for i in range(len(st.session_state.feed_imagens)):
-                active = "active" if i == idx else ""
-                dots_html += f'<div class="dot {active}"></div>'
-            dots_html += '</div>'
-            st.markdown(dots_html, unsafe_allow_html=True)
-            
-            st.caption(f"{idx + 1} / {len(st.session_state.feed_imagens)}")
+            with col_nav[1]:
+                st.caption(f"Página {pagina + 1} de {total_paginas} ({total} imagens)")
+            with col_nav[2]:
+                if st.button("Próxima ▶", key="next_url") and pagina < total_paginas - 1:
+                    st.session_state.feed_url_page = pagina + 1
+                    st.rerun()
     
     st.markdown("---")
     
