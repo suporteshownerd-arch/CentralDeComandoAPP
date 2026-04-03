@@ -1,73 +1,44 @@
 """
-Sidebar de Navegação - Super Simples
+Sidebar - Apenas o necessário
 """
 
 import streamlit as st
-from typing import List
 
 
-_PAGINAS = [
-    "🏪 Consulta de Lojas",
-    "🚨 Gestão de Crises", 
-    "📞 Abertura de Chamados",
-    "📋 Histórico",
-    "📈 Dashboard",
-    "❓ Ajuda",
-]
-
-_DEFAULT = "🏪 Consulta de Lojas"
-
-
-def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
-    # Pegar ou criar página atual
-    if "nav_page" not in st.session_state:
-        st.session_state.nav_page = _DEFAULT
-
-    # ═══════════════════════════════════════════════════════════════════════
-    # TÍTULO DO APP
-    # ═══════════════════════════════════════════════════════════════════════
-    st.title("🛡️ Central de Comando")
-    st.divider()
+def render_sidebar(lojas, favoritos):
+    st.markdown("### 🛡️ Central de Comando")
     
-    # ═══════════════════════════════════════════════════════════════════════
-    # SELETOR DE PÁGINA (st.selectbox)
-    # ═══════════════════════════════════════════════════════════════════════
-    st.header("Navegação")
+    # Lista de páginas
+    opcoes = [
+        "🏪 Consulta de Lojas",
+        "🚨 Gestão de Crises", 
+        "📞 Abertura de Chamados",
+        "📋 Histórico",
+        "📈 Dashboard",
+        "❓ Ajuda"
+    ]
     
-    # Selectbox para mudar de página
-    pagina_selecionada = st.selectbox(
-        "Escolha uma página:",
-        _PAGINAS,
-        index=_PAGINAS.index(st.session_state.nav_page) if st.session_state.nav_page in _PAGINAS else 0,
-        label_visibility="collapsed"
-    )
+    # Pega página atual ou默认值
+    atual = st.session_state.get("nav_page", opcoes[0])
     
-    # Se mudou, atualizar
-    if pagina_selecionada != st.session_state.nav_page:
-        st.session_state.nav_page = pagina_selecionada
+    # Menu de seleção
+    pagina = st.selectbox("Ir para:", opcoes, index=opcoes.index(atual))
+    
+    # Atualiza se mudou
+    if pagina != atual:
+        st.session_state.nav_page = pagina
         st.rerun()
     
-    st.divider()
+    st.markdown("---")
     
-    # ═══════════════════════════════════════════════════════════════════════
-    # INFO DO PARQUE
-    # ═══════════════════════════════════════════════════════════════════════
+    # Stats simples
     if lojas:
-        total = len(lojas)
-        ativas = sum(1 for l in lojas if l.get("status") == "open")
-        st.metric("Total de Lojas", total)
-        st.metric("Lojas Ativas", ativas)
-    else:
-        st.info("Nenhuma loja carregada")
+        st.metric("Total", len(lojas))
     
-    st.divider()
+    st.markdown("---")
+    st.caption("📞 (11) 3274-7527")
     
-    # ═══════════════════════════════════════════════════════════════════════
-    # CONTATO
-    # ═══════════════════════════════════════════════════════════════════════
-    st.caption("📞 Central: (11) 3274-7527")
-
-    return st.session_state.nav_page
+    return pagina
 
 
 def render_footer():
