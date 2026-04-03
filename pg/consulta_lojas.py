@@ -249,12 +249,47 @@ def _render_card(loja: dict, key_suffix: str = ""):
                 unsafe_allow_html=True,
             )
 
-        # Chips
+        # Chips de circuito + contatos visíveis na mesma linha
+        info_html = ""
+        contato_principal = cel or tel
+        if contato_principal:
+            digits = _re.sub(r"\D", "", contato_principal)
+            wa_href = f"https://wa.me/55{digits}" if len(digits) >= 10 else ""
+            if wa_href:
+                info_html += (
+                    f"<a href='{wa_href}' target='_blank' style='color:#34d399;"
+                    f"font-size:12px;text-decoration:none;margin-right:12px'>"
+                    f"📱 {contato_principal}</a>"
+                )
+            else:
+                info_html += f"<span style='color:#9094a6;font-size:12px;margin-right:12px'>📞 {contato_principal}</span>"
+        if ggl:
+            info_html += f"<span style='color:#9094a6;font-size:12px;margin-right:4px'>GGL:</span>"
+            if ggl_tel:
+                digits_ggl = _re.sub(r"\D", "", ggl_tel)
+                wa_ggl = f"https://wa.me/55{digits_ggl}" if len(digits_ggl) >= 10 else ""
+                if wa_ggl:
+                    info_html += (
+                        f"<a href='{wa_ggl}' target='_blank' style='color:#5b8def;"
+                        f"font-size:12px;text-decoration:none;margin-right:12px'>"
+                        f"{ggl} 📱</a>"
+                    )
+                else:
+                    info_html += f"<span style='color:#9094a6;font-size:12px;margin-right:12px'>{ggl}</span>"
+            else:
+                info_html += f"<span style='color:#9094a6;font-size:12px;margin-right:12px'>{ggl}</span>"
+
+        row2_html = ""
         if chips:
-            st.markdown(f"<div style='margin-bottom:4px'>{chips}</div>", unsafe_allow_html=True)
+            row2_html += chips
+        if info_html:
+            row2_html += f"<span style='margin-left:6px'>{info_html}</span>" if chips else info_html
+
+        if row2_html:
+            st.markdown(f"<div style='margin:4px 0 6px 0;display:flex;flex-wrap:wrap;align-items:center;gap:4px'>{row2_html}</div>", unsafe_allow_html=True)
 
         # Detalhes expandíveis
-        with st.expander("Ver detalhes"):
+        with st.expander("Ver mais detalhes"):
             d1, d2, d3 = st.columns(3)
 
             with d1:
