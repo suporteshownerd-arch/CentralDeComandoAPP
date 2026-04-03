@@ -9,138 +9,146 @@ def render_sidebar(lojas, favoritos):
     # CSS global para o sidebar
     st.markdown("""
     <style>
-        /* Logo */
+        /* Logo - mais elegante */
         .sidebar-logo {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 16px;
-            padding: 28px 16px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            border-radius: 20px;
+            padding: 32px 20px;
             text-align: center;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35);
+            margin-bottom: 24px;
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.15);
         }
         .logo-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
+            font-size: 48px;
+            margin-bottom: 12px;
             display: block;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
         }
         .logo-title {
-            font-size: 15px;
-            font-weight: 700;
+            font-size: 17px;
+            font-weight: 800;
             color: white;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             display: block;
-            margin-bottom: 4px;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin-bottom: 6px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .logo-subtitle {
-            font-size: 9px;
-            color: rgba(255,255,255,0.75);
-            font-family: 'Consolas', 'Monaco', monospace;
-            letter-spacing: 2px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.8);
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+            letter-spacing: 3px;
             display: block;
+            font-weight: 500;
         }
         
-        /* Status */
+        /* Status - mais destacado */
         .status-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            background: rgba(34, 197, 94, 0.12);
-            border: 1px solid rgba(34, 197, 94, 0.25);
-            border-radius: 24px;
-            padding: 10px 16px;
-            margin-bottom: 24px;
+            gap: 12px;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 30px;
+            padding: 12px 20px;
+            margin-bottom: 28px;
         }
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             background: #22c55e;
             border-radius: 50%;
             animation: pulse 2s infinite;
-            box-shadow: 0 0 10px #22c55e;
+            box-shadow: 0 0 16px #22c55e, 0 0 32px rgba(34, 197, 94, 0.4);
         }
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(0.9); }
+            50% { opacity: 0.7; transform: scale(0.85); }
         }
         .status-text {
-            font-size: 10px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 700;
             color: #22c55e;
-            letter-spacing: 1px;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            letter-spacing: 1.5px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
         /* Menu */
         .menu-label {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 600;
-            color: #666;
+            color: #555;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 14px;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
             text-align: center;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
-        /* Item ativo */
+        /* Item ativo - mais impactante */
         .nav-active {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.2) 100%);
-            border: 1px solid rgba(102, 126, 234, 0.4);
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 6px;
-            color: #a5b4fc !important;
-            font-weight: 600;
-            font-size: 13px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.25) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.5);
+            border-radius: 14px;
+            padding: 16px 18px;
+            margin-bottom: 8px;
+            color: #c4b5fd !important;
+            font-weight: 700;
+            font-size: 14px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            gap: 14px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
         }
         
-        /* Usuário */
+        /* Usuário - mais sofisticado */
         .user-container {
-            background: linear-gradient(145deg, #1a1a2e 0%, #0f0f1a 100%);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 24px 16px;
+            background: linear-gradient(180deg, #12121a 0%, #0a0a0f 100%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px;
+            padding: 28px 20px;
             text-align: center;
-            margin-top: 24px;
+            margin-top: 28px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
         }
         .user-avatar {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 14px;
-            font-size: 32px;
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
+            margin: 0 auto 16px;
+            font-size: 36px;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4), inset 0 2px 0 rgba(255,255,255,0.15);
+            border: 3px solid rgba(255,255,255,0.1);
         }
         .user-name {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 700;
             color: white;
-            margin-bottom: 4px;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin-bottom: 6px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         .user-role {
-            font-size: 11px;
-            color: #888;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-size: 12px;
+            color: #666;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-weight: 500;
         }
         .version {
-            font-size: 9px;
-            color: #444;
+            font-size: 10px;
+            color: #333;
             text-align: center;
-            margin-top: 18px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            letter-spacing: 1px;
+            margin-top: 20px;
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+            letter-spacing: 2px;
+            font-weight: 600;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -180,10 +188,10 @@ def render_sidebar(lojas, favoritos):
     
     for icon, label, page_value in menu_itens:
         is_active = current_page == page_value
-        full_label = f"{icon}  {label}"
+        full_label = f"{icon}   {label}"
         
         if is_active:
-            st.markdown(f'<div class="nav-active">{icon}  {label}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="nav-active">{icon}   {label}</div>', unsafe_allow_html=True)
         else:
             if st.button(full_label, key=f"nav_{page_value}", use_container_width=True):
                 st.session_state.nav_page = page_value
@@ -196,7 +204,7 @@ def render_sidebar(lojas, favoritos):
         <div class="user-name">Enzo Maranho</div>
         <div class="user-role">Analista T.I.</div>
     </div>
-    <div class="version">Jarvis v5.0 • T.I. DPSP</div>
+    <div class="version">JARVIS v5.0 • T.I. DPSP</div>
     """, unsafe_allow_html=True)
 
 
