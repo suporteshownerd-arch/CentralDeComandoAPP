@@ -26,6 +26,8 @@ import pg.abertura_chamados as pg_chamados
 import pg.historico as pg_historico
 import pg.dashboard as pg_dashboard
 import pg.ajuda as pg_ajuda
+import pg.feed as pg_feed
+import pg.home as pg_home
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -105,11 +107,15 @@ def main():
     
     # Processa navegação se mudou
     if not pagina:
-        pagina = st.session_state.get("nav_page", "🏪 Buscar uma loja")
+        pagina = st.session_state.get("nav_page", "🏠 Início")
     
     # Renderiza a página selecionada
     try:
-        if "🏪" in pagina:
+        if "🏠" in pagina:
+            pg_home.render_page()
+        elif "📊" in pagina:
+            pg_feed.render_page(loader, lojas)
+        elif "🏪" in pagina:
             pg_consulta.render_page(loader, lojas)
         elif "🚨" in pagina:
             pg_crises.render_page(sheets, lojas)
@@ -122,7 +128,7 @@ def main():
         elif "❓" in pagina:
             pg_ajuda.render_page()
         else:
-            pg_consulta.render_page(loader, lojas)
+            pg_home.render_page()
     except Exception as e:
         logger.error(f"Erro ao renderizar página: {e}")
         render_error_page("generic")

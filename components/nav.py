@@ -1,31 +1,21 @@
 """
-Sidebar - Claro e objective
+Sidebar - Apenas para direcionar
 """
 
 import streamlit as st
 
 
 def render_sidebar(lojas, favoritos):
-    # Logo
+    # Logo simples
     st.markdown("**🛡️ CENTRAL DE COMANDO**")
     st.caption("DPSP • T.I. v5.0")
     
     st.markdown("---")
     
-    # Feed
-    st.markdown("**📊 Feed**")
-    if lojas:
-        total = len(lojas)
-        ativas = sum(1 for l in lojas if l.get("status") == "open")
-        st.metric("Total Lojas", total)
-        st.metric("Ativas", ativas)
-    
-    st.markdown("---")
-    
-    # Menu
-    st.markdown("**📌 Menu**")
-    
+    # Menu de navegação
     menu_itens = [
+        ("🏠 Início", "🏠 Início"),
+        ("📊 Feed", "📊 Feed"),
         ("📈 Dashboard", "📈 Dashboard"),
         ("🏪 Busca de Lojas", "🏪 Buscar uma loja"),
         ("🚨 Registro de Crises", "🚨 Registrar uma crise"),
@@ -34,7 +24,7 @@ def render_sidebar(lojas, favoritos):
         ("❓ Ajuda", "❓ Ajuda e manual"),
     ]
     
-    current_page = st.session_state.get("nav_page", "🏪 Buscar uma loja")
+    current_page = st.session_state.get("nav_page", "🏠 Início")
     
     for emoji_label, page_value in menu_itens:
         if st.button(emoji_label, key=f"nav_{page_value}", use_container_width=True):
@@ -43,9 +33,8 @@ def render_sidebar(lojas, favoritos):
     
     st.markdown("---")
     
-    # Footer usuário
-    st.markdown("**👤 Usuário**")
-    st.caption("Enzo Maranho")
+    # Usuário
+    st.caption("👤 Enzo Maranho")
     st.caption("Analista T.I.")
 
 
@@ -55,7 +44,7 @@ def render_footer():
 
 def init_session_state():
     if "nav_page" not in st.session_state:
-        st.session_state.nav_page = "🏪 Buscar uma loja"
+        st.session_state.nav_page = "🏠 Início"
 
 
 def setup_page_config():
