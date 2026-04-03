@@ -8,126 +8,141 @@ import streamlit as st
 def render_sidebar(lojas, favoritos):
     st.markdown("""
     <style>
-        .sidebar-logo {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            border-radius: 16px; padding: 20px 16px;
-            text-align: center; margin-bottom: 16px;
-            box-shadow: 0 6px 24px rgba(99, 102, 241, 0.35);
-        }
-        .logo-icon { font-size: 32px; margin-bottom: 8px; display: block; }
-        .logo-title {
-            font-size: 13px; font-weight: 700; color: white; letter-spacing: 1px;
-            display: block; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-        .logo-subtitle {
-            font-size: 8px; color: rgba(255,255,255,0.75);
-            font-family: 'Consolas', monospace; letter-spacing: 2px;
-            display: block; margin-top: 4px;
+        :root {
+            --bg: #0a0a0f;
+            --bg2: #12121a;
+            --bg3: #1a1a24;
+            --surface: #222230;
+            --surface2: #2a2a3a;
+            --border: rgba(255,255,255,0.06);
+            --border2: rgba(255,255,255,0.12);
+            --text: #f0f0f5;
+            --text2: #a0a0b0;
+            --text3: #606070;
+            --accent: #6366f1;
+            --accent-light: #818cf8;
+            --accent-glow: rgba(99,102,241,0.25);
+            --green: #10b981;
+            --green-light: #34d399;
+            --purple: #a855f7;
         }
         
+        /* Logo */
+        .sidebar-logo {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+            border-radius: 12px; padding: 16px;
+            text-align: center; margin-bottom: 12px;
+            box-shadow: 0 4px 16px var(--accent-glow);
+        }
+        .logo-icon { font-size: 28px; margin-bottom: 6px; display: block; }
+        .logo-title {
+            font-size: 12px; font-weight: 700; color: white; letter-spacing: 0.5px;
+            display: block; font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .logo-subtitle {
+            font-size: 7px; color: rgba(255,255,255,0.7);
+            font-family: 'JetBrains Mono', monospace; letter-spacing: 2px;
+            display: block; margin-top: 3px;
+        }
+        
+        /* Status */
         .status-container {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.25);
-            border-radius: 20px; padding: 8px 14px; margin-bottom: 16px;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 16px; padding: 6px 10px; margin-bottom: 12px;
         }
         .status-dot {
-            width: 8px; height: 8px; background: #22c55e; border-radius: 50%;
-            animation: pulse 2s infinite; box-shadow: 0 0 8px #22c55e;
+            width: 6px; height: 6px; background: var(--green-light); border-radius: 50%;
+            animation: pulse 2s infinite; box-shadow: 0 0 6px var(--green);
         }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .status-text {
-            font-size: 10px; font-weight: 600; color: #22c55e; letter-spacing: 1px;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 9px; font-weight: 600; color: var(--green-light); letter-spacing: 0.5px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         
         .menu-label {
-            font-size: 10px; font-weight: 600; color: #555;
-            text-transform: uppercase; letter-spacing: 1.5px;
-            margin-bottom: 12px; text-align: center;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 9px; font-weight: 600; color: var(--text3);
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 10px; text-align: center;
+            font-family: 'JetBrains Mono', monospace;
         }
         
-        /* Card ATIVO - Roxo vibrante */
+        /* Card - mesmo estilo do app */
         .nav-card {
-            display: flex; align-items: center; gap: 14px;
-            padding: 16px; margin-bottom: 10px;
-            border-radius: 16px;
-            transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px; margin-bottom: 6px;
+            border-radius: 10px;
+            background: var(--surface); border: 1px solid var(--border);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .nav-card:hover {
+            background: var(--surface2); border-color: var(--border2);
+            transform: translateX(2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         
         /* ATIVO */
         .nav-card.active {
-            background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 8px 32px rgba(124, 58, 237, 0.5), 0 0 30px rgba(147, 51, 234, 0.3);
-            transform: scale(1.02);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: 0 4px 16px var(--accent-glow);
         }
-        
-        /* INATIVO - Verde elegante! */
-        .nav-card {
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-            border: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 4px 16px rgba(5, 150, 105, 0.3);
-        }
-        .nav-card:hover {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border-color: rgba(255,255,255,0.25);
-            transform: translateX(4px) scale(1.02);
-            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+        .nav-card.active:hover {
+            transform: translateX(2px) scale(1.01);
         }
         
         .nav-icon {
-            width: 44px; height: 44px;
-            border-radius: 12px;
+            width: 32px; height: 32px;
+            border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 22px; flex-shrink: 0;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 16px; flex-shrink: 0;
+            background: var(--bg3); border: 1px solid var(--border);
         }
         .nav-card.active .nav-icon {
-            background: rgba(255,255,255,0.25);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.2);
         }
         
         .nav-text { flex: 1; min-width: 0; }
         .nav-title {
-            font-size: 14px; font-weight: 600; color: white;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            margin-bottom: 3px;
+            font-size: 12px; font-weight: 500; color: var(--text2);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin-bottom: 2px;
         }
-        .nav-card.active .nav-title { font-weight: 700; }
+        .nav-card:hover .nav-title { color: var(--text); }
+        .nav-card.active .nav-title { color: white; font-weight: 600; }
         
         .nav-desc {
-            font-size: 11px; color: rgba(255,255,255,0.7);
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 9px; color: var(--text3);
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
+        .nav-card.active .nav-desc { color: rgba(255,255,255,0.7); }
         
+        /* Usuário */
         .user-container {
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 16px; padding: 18px; text-align: center; margin-top: 24px;
-            box-shadow: 0 4px 20px rgba(5, 150, 105, 0.3);
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 14px; text-align: center; margin-top: 16px;
         }
         .user-avatar {
-            width: 56px; height: 56px;
-            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 12px; font-size: 28px;
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-            border: 2px solid rgba(255,255,255,0.2);
+            margin: 0 auto 10px; font-size: 20px;
+            box-shadow: 0 4px 12px var(--accent-glow);
         }
         .user-name {
-            font-size: 14px; font-weight: 600; color: white;
-            margin-bottom: 3px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 12px; font-weight: 600; color: var(--text);
+            margin-bottom: 2px; font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .user-role {
-            font-size: 11px; color: rgba(255,255,255,0.7);
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 10px; color: var(--text3);
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .version {
-            font-size: 9px; color: rgba(255,255,255,0.5); text-align: center;
-            margin-top: 14px; font-family: 'Consolas', monospace;
-            letter-spacing: 1.5px; font-weight: 600;
+            font-size: 8px; color: var(--text3); text-align: center;
+            margin-top: 10px; font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 1px;
         }
     </style>
     """, unsafe_allow_html=True)
