@@ -18,217 +18,138 @@ def render_sidebar(lojas, favoritos):
             margin-bottom: 16px;
             box-shadow: 0 6px 24px rgba(99, 102, 241, 0.35);
         }
-        .logo-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-            display: block;
-        }
+        .logo-icon { font-size: 32px; margin-bottom: 8px; display: block; }
         .logo-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: white;
-            letter-spacing: 1px;
-            display: block;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 13px; font-weight: 700; color: white; letter-spacing: 1px;
+            display: block; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         .logo-subtitle {
-            font-size: 8px;
-            color: rgba(255,255,255,0.75);
-            font-family: 'Consolas', monospace;
-            letter-spacing: 2px;
-            display: block;
-            margin-top: 4px;
+            font-size: 8px; color: rgba(255,255,255,0.75);
+            font-family: 'Consolas', monospace; letter-spacing: 2px;
+            display: block; margin-top: 4px;
         }
         
         /* Status */
         .status-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: rgba(34, 197, 94, 0.12);
-            border: 1px solid rgba(34, 197, 94, 0.25);
-            border-radius: 20px;
-            padding: 8px 14px;
-            margin-bottom: 16px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.25);
+            border-radius: 20px; padding: 8px 14px; margin-bottom: 16px;
         }
         .status-dot {
-            width: 8px;
-            height: 8px;
-            background: #22c55e;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-            box-shadow: 0 0 8px #22c55e;
+            width: 8px; height: 8px; background: #22c55e; border-radius: 50%;
+            animation: pulse 2s infinite; box-shadow: 0 0 8px #22c55e;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .status-text {
-            font-size: 10px;
-            font-weight: 600;
-            color: #22c55e;
-            letter-spacing: 1px;
+            font-size: 10px; font-weight: 600; color: #22c55e; letter-spacing: 1px;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
         /* Menu label */
         .menu-label {
-            font-size: 10px;
-            font-weight: 600;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 12px;
-            text-align: center;
+            font-size: 10px; font-weight: 600; color: #555;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            margin-bottom: 12px; text-align: center;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
-        /* Card de navegação - selaluaktif */
-        .nav-card {
-            background: linear-gradient(135deg, #2a2a3a 0%, #1e1e2a 100%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 12px 14px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            position: relative;
-        }
-        .nav-card::after {
-            content: '';
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            transition: all 0.25s ease;
-        }
-        .nav-card:hover {
-            background: linear-gradient(135deg, #35354a 0%, #2a2a3a 100%);
-            border-color: rgba(139, 92, 246, 0.4);
-            transform: translateX(4px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-        }
-        .nav-card:hover::after {
-            background: #8b5cf6;
-            box-shadow: 0 0 8px #8b5cf6;
+        /* Card navegação - todos os estados bonitaos */
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px; margin-bottom: 10px;
+            border-radius: 14px; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative; overflow: hidden;
         }
         
-        .nav-card.active {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(139, 92, 246, 0.2) 100%);
+        /* Estado inativo - visual bonito */
+        .nav-item {
+            background: linear-gradient(135deg, #3d3d52 0%, #2d2d40 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .nav-item:hover {
+            background: linear-gradient(135deg, #4a4a65 0%, #3a3a52 100%);
             border-color: rgba(139, 92, 246, 0.5);
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
-        }
-        .nav-card.active::after {
-            background: #a78bfa;
-            box-shadow: 0 0 12px #a78bfa;
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35), 0 0 20px rgba(139, 92, 246, 0.15);
         }
         
-        .nav-card-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255,255,255,0.06);
-            transition: all 0.25s ease;
+        /* Estado ativo - ainda mais bonito */
+        .nav-item.active {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            border-color: rgba(255,255,255,0.25);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.5), 0 0 40px rgba(139, 92, 246, 0.3);
+            transform: scale(1.02);
         }
-        .nav-card:hover .nav-card-icon {
-            background: rgba(139, 92, 246, 0.2);
-            border-color: rgba(139, 92, 246, 0.3);
-            transform: scale(1.05);
-        }
-        .nav-card.active .nav-card-icon {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255,255,255, 0.2);
-            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        .nav-item.active:hover {
+            transform: scale(1.03);
         }
         
-        .nav-card-info {
-            flex: 1;
-            min-width: 0;
+        /* Ícone */
+        .nav-icon {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
         }
-        .nav-card-title {
-            font-size: 13px;
-            font-weight: 500;
-            color: #c8c8d0;
+        .nav-item:hover .nav-icon {
+            background: rgba(139, 92, 246, 0.3);
+            transform: rotate(5deg) scale(1.1);
+        }
+        .nav-item.active .nav-icon {
+            background: rgba(255,255,255,0.25);
+            border-color: rgba(255,255,255,0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        /* Texto */
+        .nav-text { flex: 1; min-width: 0; }
+        .nav-title {
+            font-size: 14px; font-weight: 600; color: #e0e0e8;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            margin-bottom: 2px;
-            transition: color 0.25s ease;
+            margin-bottom: 3px; transition: color 0.3s;
         }
-        .nav-card:hover .nav-card-title {
-            color: white;
-        }
-        .nav-card.active .nav-card-title {
-            color: #c4b5fd;
-            font-weight: 600;
-        }
-        .nav-card-desc {
-            font-size: 10px;
-            color: #6a6a7a;
+        .nav-item:hover .nav-title { color: white; }
+        .nav-item.active .nav-title { color: white; font-weight: 700; }
+        
+        .nav-desc {
+            font-size: 11px; color: #8a8a9a;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            transition: color 0.25s ease;
         }
-        .nav-card:hover .nav-card-desc {
-            color: #8a8a9a;
-        }
-        .nav-card.active .nav-card-desc {
-            color: #a5a5b8;
-        }
+        .nav-item:hover .nav-desc { color: #aaaabc; }
+        .nav-item.active .nav-desc { color: rgba(255,255,255,0.8); }
         
         /* Usuário */
         .user-container {
-            background: linear-gradient(180deg, #252530 0%, #1a1a24 100%);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 14px;
-            padding: 16px;
-            text-align: center;
-            margin-top: 20px;
+            background: linear-gradient(180deg, #2d2d40 0%, #1e1e28 100%);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px; padding: 18px; text-align: center; margin-top: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
         }
         .user-avatar {
-            width: 48px;
-            height: 48px;
+            width: 52px; height: 52px;
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 10px;
-            font-size: 24px;
-            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
-            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 12px; font-size: 26px;
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            border: 2px solid rgba(255,255,255,0.15);
         }
         .user-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: white;
-            margin-bottom: 3px;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 14px; font-weight: 600; color: white;
+            margin-bottom: 3px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         .user-role {
-            font-size: 10px;
-            color: #777;
+            font-size: 11px; color: #888;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         .version {
-            font-size: 8px;
-            color: #444;
-            text-align: center;
-            margin-top: 14px;
-            font-family: 'Consolas', monospace;
-            letter-spacing: 1.5px;
-            font-weight: 600;
+            font-size: 9px; color: #555; text-align: center;
+            margin-top: 14px; font-family: 'Consolas', monospace;
+            letter-spacing: 1.5px; font-weight: 600;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -252,7 +173,7 @@ def render_sidebar(lojas, favoritos):
     
     st.markdown('<div class="menu-label">Navegação</div>', unsafe_allow_html=True)
     
-    # Menu de navegação com cards
+    # Menu
     menu_itens = [
         ("🏠", "Início", "Página inicial", "🏠 Início"),
         ("📊", "Feed", "Visão geral", "📊 Feed"),
@@ -271,11 +192,11 @@ def render_sidebar(lojas, favoritos):
         
         if is_active:
             st.markdown(f'''
-            <div class="nav-card active">
-                <div class="nav-card-icon">{icon}</div>
-                <div class="nav-card-info">
-                    <div class="nav-card-title">{title}</div>
-                    <div class="nav-card-desc">{desc}</div>
+            <div class="nav-item active">
+                <div class="nav-icon">{icon}</div>
+                <div class="nav-text">
+                    <div class="nav-title">{title}</div>
+                    <div class="nav-desc">{desc}</div>
                 </div>
             </div>
             ''', unsafe_allow_html=True)
@@ -305,16 +226,10 @@ def init_session_state():
 
 
 def setup_page_config():
-    st.set_page_config(
-        page_title="Central de Comando",
-        page_icon="🛡️",
-        layout="wide",
-    )
+    st.set_page_config(page_title="Central de Comando", page_icon="🛡️", layout="wide")
 
 
 def render_page_header(title, subtitle=None, icon=None):
-    if icon:
-        title = f"{icon} {title}"
+    if icon: title = f"{icon} {title}"
     st.markdown(f"## {title}")
-    if subtitle:
-        st.markdown(f"*{subtitle}*")
+    if subtitle: st.markdown(f"*{subtitle}*")
