@@ -155,7 +155,7 @@ def render_page_header(title: str, subtitle: str = None, icon: str = None):
 def render_footer():
     st.markdown(
         """<div class="footer">
-            <b>🛡️ Central de Comando DPSP v3.0</b><br>
+            <b>🛡️ Central de Comando DPSP v3.1</b><br>
             Desenvolvido por Enzo Maranho — T.I. DPSP · Uso Interno
         </div>""",
         unsafe_allow_html=True,
