@@ -21,6 +21,8 @@ def render_page(loader, lojas):
         ]
     if "feed_idx" not in st.session_state:
         st.session_state.feed_idx = 0
+    if "feed_page" not in st.session_state:
+        st.session_state.feed_page = 0
     
     # Botão discreto para adicionar
     with st.popover("➕ Imagem"):
@@ -54,48 +56,49 @@ def render_page(loader, lojas):
     
     st.markdown("---")
     
-# Carousel de imagens
+# Carousel de imagens - 3 por página
     if not st.session_state.feed_imagens:
         st.info("📷 Adicione imagens usando o botão ➕ acima")
     else:
         total = len(st.session_state.feed_imagens)
+        imgs_por_pagina = 3
+        total_paginas = (total + imgs_por_pagina - 1) // imgs_por_pagina
         
-        col_prev, col_img, col_next = st.columns([1, 6, 1])
+        idx_inicio = st.session_state.feed_page * imgs_por_pagina
+        idx_fim = min(idx_inicio + imgs_por_pagina, total)
+        imagens_pagina = st.session_state.feed_imagens[idx_inicio:idx_fim]
         
+        col_prev, col_next = st.columns([1, 1])
         with col_prev:
-            if st.button("◀"):
-                st.session_state.feed_idx = (st.session_state.feed_idx - 1) % total
+            if st.button("◀ Página anterior"):
+                st.session_state.feed_page = (st.session_state.feed_page - 1) % total_paginas
                 st.rerun()
-        
-        with col_img:
-            img = st.session_state.feed_imagens[st.session_state.feed_idx]
-            
-            try:
-                if img["tipo"] == "upload":
-                    img_data = Image.open(img["dados"])
-                else:
-                    img_data = Image.open(BytesIO(requests.get(img["dados"]).content))
-                
-                img_data = img_data.resize((400, 250), Image.Resampling.LANCZOS)
-                buf = BytesIO()
-                img_data.save(buf, format="PNG")
-                st.image(buf.getvalue(), width=400)
-            except Exception as e:
-                st.image(img["dados"], width=600)
-            
-            st.markdown(f"📤 **{img['usuario']}** • {img['data']}")
-            if st.button("🗑️ Excluir", key="del_" + str(st.session_state.feed_idx)):
-                st.session_state.feed_imagens.pop(st.session_state.feed_idx)
-                if st.session_state.feed_idx >= len(st.session_state.feed_imagens):
-                    st.session_state.feed_idx = 0
-                st.rerun()
-        
         with col_next:
-            if st.button("▶"):
-                st.session_state.feed_idx = (st.session_state.feed_idx + 1) % total
+            if st.button("Próxima página ▶"):
+                st.session_state.feed_page = (st.session_state.feed_page + 1) % total_paginas
                 st.rerun()
         
-        st.markdown(f"<div style='text-align: center; color: #888; margin-top: 10px;'>{'●' * (st.session_state.feed_idx + 1)}{'○' * (total - st.session_state.feed_idx - 1)} <br><small>{st.session_state.feed_idx + 1} / {total}</small></div>", unsafe_allow_html=True)
+        cols = st.columns(len(imagens_pagina))
+        for i, img in enumerate(imagens_pagina):
+            idx = idx_inicio + i
+            with cols[i]:
+                try:
+                    if img["tipo"] == "upload":
+                        img_data = Image.open(img["dados"])
+                    else:
+                        img_data = Image.open(BytesIO(requests.get(img["dados"]).content))
+                    img_data = img_data.resize((400, 250), Image.Resampling.LANCZOS)
+                    buf = BytesIO()
+                    img_data.save(buf, format="PNG")
+                    st.image(buf.getvalue(), width=400)
+                except:
+                    st.image(img["dados"], width=400)
+                st.markdown(f"📤 **{img['usuario']}** • {img['data']}")
+                if st.button("🗑️", key="del_" + str(idx)):
+                    st.session_state.feed_imagens.pop(idx)
+                    st.rerun()
+        
+        st.markdown(f"<div style='text-align: center; color: #888; margin-top: 10px;'>Página {st.session_state.feed_page + 1} de {total_paginas}</div>", unsafe_allow_html=True)
     
     st.markdown("---")
     
