@@ -1,11 +1,10 @@
 """
 Módulo de navegação e sidebar
-Central de Comando DPSP v5.0 - Minimalista
+Central de Comando DPSP v5.1 - Super Simples
 """
 
 import streamlit as st
 from typing import List
-from datetime import datetime
 
 
 _MENU = [
@@ -21,97 +20,33 @@ _PAGE_DEFAULT = "Consulta de Lojas"
 
 
 def render_sidebar(lojas: List[dict], favoritos: List[str], **_) -> str:
-    try:
-        if "nav_page" not in st.session_state:
-            st.session_state.nav_page = _PAGE_DEFAULT
+    if "nav_page" not in st.session_state:
+        st.session_state.nav_page = _PAGE_DEFAULT
 
-        pagina_atual = st.session_state.nav_page
-        total = len(lojas) if lojas else 0
+    pagina_atual = st.session_state.nav_page
+    
+    # ── Logo ─────────────────────────────────────────────────────────────────
+    st.markdown("### 🛡️ Central de Comando")
+    st.markdown("---")
+    
+    # ── Menu ──────────────────────────────────────────────────────────────────
+    for icon, nome in _MENU:
+        if st.button(f"{icon} {nome}", key=f"nav_{nome}", use_container_width=True):
+            st.session_state.nav_page = nome
+            st.rerun()
+    
+    st.markdown("---")
+    
+    # ── Total ─────────────────────────────────────────────────────────────────
+    total = len(lojas) if lojas else 0
+    if total > 0:
+        st.metric("Total Lojas", total)
+    
+    # ── Contato ───────────────────────────────────────────────────────────────
+    st.markdown("### 📞 Ajuda")
+    st.markdown("Central: (11) 3274-7527")
 
-        # ═══════════════════════════════════════════════════════════════════════
-        # HEADER SIMPLES
-        # ═══════════════════════════════════════════════════════════════════════
-        st.markdown("""
-        <div class="sb-simple-header">
-            <div class="sb-simple-logo">🛡️</div>
-            <div class="sb-simple-title">Central de Comando</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("<div class='sb-simple-divider'></div>", unsafe_allow_html=True)
-
-        # ═══════════════════════════════════════════════════════════════════════
-        # NAVEGAÇÃO PRINCIPAL
-        # ═══════════════════════════════════════════════════════════════════════
-        st.markdown("<div class='sb-simple-label'>PÁGINAS</div>", unsafe_allow_html=True)
-
-        for icon, nome in _MENU:
-            ativo = pagina_atual == nome
-            
-            btn_key = f"navbtn_{nome}"
-            
-            # Botão com estilo diferente se ativo
-            if st.button(
-                f"{icon}  {nome}", 
-                key=btn_key, 
-                use_container_width=True,
-                type="primary" if ativo else "secondary"
-            ):
-                st.session_state.nav_page = nome
-                st.rerun()
-
-        st.markdown("<div class='sb-simple-divider'></div>", unsafe_allow_html=True)
-
-        # ═══════════════════════════════════════════════════════════════════════
-        # RESUMO RÁPIDO (apenas número total)
-        # ═══════════════════════════════════════════════════════════════════════
-        if total > 0:
-            ativas = sum(1 for l in lojas if l.get("status") == "open")
-            pct = round(ativas / total * 100)
-            
-            st.markdown(f"""
-            <div class="sb-simple-stats">
-                <span class="sb-simple-stat-label">Total de lojas</span>
-                <span class="sb-simple-stat-value">{total}</span>
-            </div>
-            """, unsafe_allow_html=True)
-
-        st.markdown("<div class='sb-simple-divider'></div>", unsafe_allow_html=True)
-
-        # ═══════════════════════════════════════════════════════════════════════
-        # FAVORITOS (apenas se existirem)
-        # ═══════════════════════════════════════════════════════════════════════
-        if favoritos:
-            st.markdown("<div class='sb-simple-label'>⭐ FAVORITOS</div>", unsafe_allow_html=True)
-            
-            idx = {l.get("vd"): l.get("nome", "") for l in lojas} if lojas else {}
-            
-            for vd in favoritos:
-                nome = idx.get(vd, f"VD {vd}")
-                nome_curto = nome[:20] + "..." if len(nome) > 20 else nome
-                
-                st.markdown(
-                    f'<div class="sb-simple-fav">🏷️ {vd} - {nome_curto}</div>',
-                    unsafe_allow_html=True,
-                )
-            
-            st.markdown("<div class='sb-simple-divider'></div>", unsafe_allow_html=True)
-
-        # ═══════════════════════════════════════════════════════════════════════
-        # CONTATO ÚNICO
-        # ═══════════════════════════════════════════════════════════════════════
-        st.markdown("<div class='sb-simple-label'>📞 AJUDA</div>", unsafe_allow_html=True)
-        st.markdown("""
-        <div class="sb-simple-contact">
-            <span>🎛️ Central: (11) 3274-7527</span>
-        </div>
-        """, unsafe_allow_html=True)
-
-        return pagina_atual
-        
-    except Exception as e:
-        st.error(f"Erro: {str(e)}")
-        return _PAGE_DEFAULT
+    return pagina_atual
 
 
 def render_footer():
