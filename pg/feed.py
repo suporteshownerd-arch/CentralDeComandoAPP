@@ -68,29 +68,60 @@ def render_page(loader, lojas):
         idx_fim = min(idx_inicio + imgs_por_pagina, total)
         imagens_pagina = st.session_state.feed_imagens[idx_inicio:idx_fim]
         
-        col_prev, col_next = st.columns([1, 1])
+        st.markdown(f"""
+        <style>
+            .nav-btn {
+                background: var(--accent);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 10px 20px;
+                font-size: 18px;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            .nav-btn:hover { background: var(--purple); transform: scale(1.05); }
+            .img-wrapper { 
+                position: relative; 
+                overflow: hidden; 
+                border-radius: 16px; 
+                display: inline-block;
+            }
+            .img-wrapper img { 
+                transition: transform 0.3s ease; 
+                display: block;
+            }
+            .img-wrapper:hover img { 
+                transform: scale(1.1); 
+            }
+            .zoom-overlay {
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                background: rgba(0,0,0,0.3);
+                transition: opacity 0.3s;
+            }
+            .img-wrapper:hover .zoom-overlay { opacity: 1; }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        col_prev, _, col_next = st.columns([1, 2, 1])
         with col_prev:
-            if st.button("◀ Página anterior"):
+            if st.button("◀", key="prev_pg"):
                 st.session_state.feed_page = (st.session_state.feed_page - 1) % total_paginas
                 st.rerun()
         with col_next:
-            if st.button("Próxima página ▶"):
+            if st.button("▶", key="next_pg"):
                 st.session_state.feed_page = (st.session_state.feed_page + 1) % total_paginas
                 st.rerun()
         
-        st.markdown("""
-    <style>
-        .img-container { overflow: hidden; border-radius: 16px; cursor: pointer; }
-        .img-container img { transition: transform 0.3s ease; }
-        .img-container:hover img { transform: scale(1.1); }
-    </style>
-    """, unsafe_allow_html=True)
-    
-    cols = st.columns(len(imagens_pagina))
+        cols = st.columns(len(imagens_pagina))
     for i, img in enumerate(imagens_pagina):
         idx = idx_inicio + i
         with cols[i]:
-            st.markdown('<div class="img-container">', unsafe_allow_html=True)
             try:
                 if img["tipo"] == "upload":
                     img_data = Image.open(img["dados"])
@@ -107,7 +138,6 @@ def render_page(loader, lojas):
                 st.image(buf.getvalue(), width=560)
             except:
                 st.image(img["dados"], width=540)
-            st.markdown('</div>', unsafe_allow_html=True)
             st.markdown(f"📤 **{img['usuario']}** • {img['data']}")
             if st.button("🗑️", key="del_" + str(idx)):
                 st.session_state.feed_imagens.pop(idx)
