@@ -1,75 +1,74 @@
 """
 Página de Consulta de Lojas
-Central de Comando DPSP v3.0
+Central de Comando DPSP v3.1
 """
 
 import re as _re
 import streamlit as st
 
+_POR_PAGINA = 10
+
 
 def _wa_link(phone: str, label: str) -> str:
-    """Retorna link WhatsApp se o número tiver ≥ 10 dígitos, senão texto simples."""
     digits = _re.sub(r"\D", "", phone)
     if len(digits) >= 10:
         return f"[{label}](https://wa.me/55{digits})"
     return label
 
-_POR_PAGINA = 10
-
 
 def render_page(data_loader, lojas):
+
     # ── Header ────────────────────────────────────────────────────────────────
     st.markdown(
         """
-        <div style="margin-bottom:24px">
-            <h2 style="margin:0;font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:#eaecf0">
-                🏪 Consulta de Lojas
-            </h2>
-            <p style="margin:4px 0 0 0;font-size:14px;color:#5c6370">
-                Busque qualquer loja do parque DPSP por VD, nome, endereço ou circuito
-            </p>
-            <span style="font-size:11px;color:#5b8def">v3.1 — 03/04/2026</span>
+        <div class="page-header">
+            <div class="page-header-icon">🏪</div>
+            <div>
+                <h2 class="page-title">Consulta de Lojas</h2>
+                <p class="page-sub">Busque por VD, nome, endereço ou circuito MPLS/INN</p>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
     # ── KPIs ──────────────────────────────────────────────────────────────────
-    total   = len(lojas) if lojas else 0
-    ativas  = sum(1 for l in lojas if l.get("status") == "open") if lojas else 0
-    estados = len({l.get("estado") for l in lojas if l.get("estado")}) if lojas else 0
+    total    = len(lojas) if lojas else 0
+    ativas   = sum(1 for l in lojas if l.get("status") == "open")   if lojas else 0
+    inativas = sum(1 for l in lojas if l.get("status") == "closed") if lojas else 0
+    estados  = len({l.get("estado") for l in lojas if l.get("estado")}) if lojas else 0
 
-    k1, k2, k3 = st.columns(3)
-    k1.metric("Total de Lojas", f"{total:,}")
-    k2.metric("Lojas Ativas",   f"{ativas:,}")
-    k3.metric("Estados",        estados)
-
-    st.markdown("<div style='margin:20px 0 0 0'></div>", unsafe_allow_html=True)
+    k1, k2, k3, k4 = st.columns(4)
+    k1.metric("Total",    f"{total:,}")
+    k2.metric("Ativas",   f"{ativas:,}")
+    k3.metric("Inativas", f"{inativas:,}")
+    k4.metric("Estados",  estados)
 
     # ── Busca ─────────────────────────────────────────────────────────────────
-    col_busca, col_modo = st.columns([4, 1])
-    with col_busca:
-        termo = st.text_input(
-            "Buscar loja",
-            placeholder="🔍  VD, nome, cidade, circuito MPLS/INN...",
-            key="consulta_termo",
-            label_visibility="collapsed",
-        )
-    with col_modo:
-        modo = st.selectbox(
-            "Modo",
-            ["VD / Designação", "Nome de Loja", "Endereço", "Outra Informação"],
-            key="consulta_modo",
-            label_visibility="collapsed",
-        )
+    st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+
+    termo = st.text_input(
+        "Buscar",
+        placeholder="🔍  Digite VD, nome da loja, cidade, designação MPLS/INN...",
+        key="consulta_termo",
+        label_visibility="collapsed",
+    )
+
+    modo = st.radio(
+        "Modo de busca",
+        ["VD / Designação", "Nome de Loja", "Endereço", "Outra Informação"],
+        key="consulta_modo",
+        horizontal=True,
+        label_visibility="collapsed",
+    )
 
     # ── Filtros ───────────────────────────────────────────────────────────────
-    with st.expander("Filtros avançados", expanded=False):
+    with st.expander("⚙️  Filtros avançados", expanded=False):
         fc1, fc2, fc3 = st.columns(3)
         with fc1:
             filtro_estado = st.selectbox("Estado", ["Todos"] + data_loader.get_estados(), key="f_estado")
         with fc2:
-            filtro_regiao = st.selectbox("Região", ["Todas"] + data_loader.get_regioes(), key="f_regiao")
+            filtro_regiao = st.selectbox("Região GGL", ["Todas"] + data_loader.get_regioes(), key="f_regiao")
         with fc3:
             filtro_status = st.selectbox("Status", ["Todos", "Ativa", "Inativa"], key="f_status")
 
@@ -90,10 +89,14 @@ def render_page(data_loader, lojas):
     if favs and not termo:
         lojas_fav = [l for l in lojas if l.get("vd") in favs]
         if lojas_fav:
-            st.markdown("### ⭐ Favoritos")
+            st.markdown(
+                "<p class='section-label'>⭐ Favoritos</p>",
+                unsafe_allow_html=True,
+            )
             for loja in lojas_fav:
                 _render_card(loja, key_suffix="fav")
-            st.markdown("---")
+            st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+            st.divider()
 
     # ── Resultado e paginação ─────────────────────────────────────────────────
     filtros_ativos = (
@@ -111,11 +114,11 @@ def render_page(data_loader, lojas):
             st.info("Use a busca acima para encontrar lojas.")
         return
 
-    st.markdown(
-        f"<p style='font-size:13px;color:#5c6370;margin:8px 0 12px 0'>"
-        f"<b style='color:#eaecf0'>{total_res:,}</b> loja(s) encontrada(s)</p>",
-        unsafe_allow_html=True,
-    )
+    if termo or filtros_ativos:
+        st.markdown(
+            f"<p class='result-count'><b>{total_res:,}</b> loja(s) encontrada(s)</p>",
+            unsafe_allow_html=True,
+        )
 
     # Paginação
     paginas = max(1, -(-total_res // _POR_PAGINA))
@@ -135,10 +138,10 @@ def render_page(data_loader, lojas):
 
     # Navegação de páginas
     if paginas > 1:
-        st.markdown("<div style='margin-top:16px'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
         nav1, nav2, nav3 = st.columns([1, 2, 1])
         with nav1:
-            if pag > 1 and st.button("← Anterior", key="pg_prev"):
+            if pag > 1 and st.button("← Anterior", key="pg_prev", use_container_width=True):
                 st.session_state.consulta_pagina -= 1
                 st.rerun()
         with nav2:
@@ -148,162 +151,143 @@ def render_page(data_loader, lojas):
                 unsafe_allow_html=True,
             )
         with nav3:
-            if pag < paginas and st.button("Próxima →", key="pg_next"):
+            if pag < paginas and st.button("Próxima →", key="pg_next", use_container_width=True):
                 st.session_state.consulta_pagina += 1
                 st.rerun()
 
 
 def _render_card(loja: dict, key_suffix: str = ""):
-    vd       = loja.get("vd", "")
-    nome     = loja.get("nome", "—")
-    bandeira = loja.get("bandeira", "")
-    status   = loja.get("status", "open")
-    end      = loja.get("endereco", "")
-    bairro   = loja.get("bairro", "")
-    cidade   = loja.get("cidade", "")
-    estado   = loja.get("estado", "")
-    cep      = loja.get("cep", "")
-    mpls     = loja.get("mpls", "")
-    inn      = loja.get("inn", "")
-    tel      = loja.get("tel", "")
-    tel2     = loja.get("tel2", "")
-    cel      = loja.get("cel", "")
-    email    = loja.get("email", "")
-    horario  = loja.get("horario", "")
-    ggl      = loja.get("ggl", "")
-    ggl_tel  = loja.get("ggl_tel", "")
-    gr       = loja.get("gr", "")
-    gr_tel   = loja.get("gr_tel", "")
+    vd        = loja.get("vd", "")
+    nome      = loja.get("nome", "—")
+    bandeira  = loja.get("bandeira", "")
+    status    = loja.get("status", "open")
+    end       = loja.get("endereco", "")
+    bairro    = loja.get("bairro", "")
+    cidade    = loja.get("cidade", "")
+    estado    = loja.get("estado", "")
+    cep       = loja.get("cep", "")
+    mpls      = loja.get("mpls", "")
+    inn       = loja.get("inn", "")
+    tel       = loja.get("tel", "")
+    tel2      = loja.get("tel2", "")
+    cel       = loja.get("cel", "")
+    email     = loja.get("email", "")
+    horario   = loja.get("horario", "")
+    ggl       = loja.get("ggl", "")
+    ggl_tel   = loja.get("ggl_tel", "")
+    gr        = loja.get("gr", "")
+    gr_tel    = loja.get("gr_tel", "")
     circuitos = loja.get("circuitos", [])
+    regiao    = loja.get("regiao", "")
 
+    # Status
     if status == "open":
-        status_color = "#34d399"
-        status_label = "Ativa"
-        status_bg    = "rgba(52,211,153,.1)"
+        s_color, s_bg, s_label = "#34d399", "rgba(52,211,153,.12)", "Ativa"
     elif status == "pending":
-        status_color = "#fbbf24"
-        status_label = "A Inaugurar"
-        status_bg    = "rgba(251,191,36,.1)"
+        s_color, s_bg, s_label = "#fbbf24", "rgba(251,191,36,.12)", "A Inaugurar"
     else:
-        status_color = "#f87171"
-        status_label = "Inativa"
-        status_bg    = "rgba(248,113,113,.1)"
+        s_color, s_bg, s_label = "#f87171", "rgba(248,113,113,.12)", "Inativa"
 
-    addr_parts = [p for p in [end, bairro] if p]
-    loc_parts  = [p for p in [cidade, estado] if p]
-    addr_line  = ", ".join(addr_parts)
-    loc_line   = "/".join(loc_parts)
-    if cep:
-        loc_line += f" · CEP {cep}"
+    # Endereço
+    parts = [p for p in [end, bairro, cidade] if p]
+    addr  = ", ".join(parts)
+    if estado: addr += f" · {estado}"
+    if cep:    addr += f" · CEP {cep}"
 
     # Chips de circuito
-    chips = ""
+    chips_html = ""
     if mpls:
-        chips += (
-            f"<span style='background:rgba(52,211,153,.1);color:#34d399;"
-            f"border:1px solid rgba(52,211,153,.2);padding:2px 9px;border-radius:10px;"
-            f"font-size:11px;font-family:monospace;margin-right:5px'>MPLS {mpls}</span>"
-        )
+        chips_html += f"<span class='chip chip-green'>MPLS&nbsp;{mpls}</span>"
     if inn:
-        chips += (
-            f"<span style='background:rgba(167,139,250,.1);color:#a78bfa;"
-            f"border:1px solid rgba(167,139,250,.2);padding:2px 9px;border-radius:10px;"
-            f"font-size:11px;font-family:monospace;margin-right:5px'>INN {inn}</span>"
-        )
+        chips_html += f"<span class='chip chip-purple'>INN&nbsp;{inn}</span>"
     outros = [c for c in circuitos if c.get("des") not in (mpls, inn) and c.get("des")]
     for c in outros:
-        chips += (
-            f"<span style='background:rgba(34,211,238,.08);color:#22d3ee;"
-            f"border:1px solid rgba(34,211,238,.18);padding:2px 9px;border-radius:10px;"
-            f"font-size:11px;font-family:monospace;margin-right:5px'>"
-            f"{c.get('op','')} {c.get('des','')}</span>"
-        )
+        chips_html += f"<span class='chip chip-cyan'>{c.get('op','')} {c.get('des','')}</span>"
 
-    with st.container(border=True):
-        # Linha de título
-        col_title, col_status = st.columns([6, 1])
-        with col_title:
-            band_html = f" <span style='font-size:11px;color:#5c6370'>· {bandeira}</span>" if bandeira else ""
-            st.markdown(
-                f"<div style='display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:2px 0'>"
-                f"<code style='background:rgba(91,141,239,.15);color:#5b8def;"
-                f"padding:3px 10px;border-radius:6px;font-size:13px;font-weight:600;"
-                f"border:1px solid rgba(91,141,239,.2)'>VD {vd}</code>"
-                f"<span style='font-weight:700;font-size:16px;color:#eaecf0'>{nome}</span>"
-                f"{band_html}</div>",
-                unsafe_allow_html=True,
+    # Contato rápido visível
+    contato_principal = cel or tel
+    contato_html = ""
+    if contato_principal:
+        digs = _re.sub(r"\D", "", contato_principal)
+        if len(digs) >= 10:
+            contato_html = (
+                f"<a href='https://wa.me/55{digs}' target='_blank' class='quick-contact green'>"
+                f"📱 {contato_principal}</a>"
             )
-        with col_status:
-            st.markdown(
-                f"<div style='text-align:right;margin-top:6px'>"
-                f"<span style='background:{status_bg};color:{status_color};"
-                f"font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px'>"
-                f"● {status_label}</span></div>",
-                unsafe_allow_html=True,
-            )
+        else:
+            contato_html = f"<span class='quick-contact muted'>📞 {contato_principal}</span>"
 
-        # Endereço
-        if addr_line or loc_line:
-            full_addr = f"{addr_line} · {loc_line}" if addr_line and loc_line else addr_line or loc_line
-            st.markdown(
-                f"<p style='color:#9094a6;font-size:13px;margin:4px 0 6px 0'>📍 {full_addr}</p>",
-                unsafe_allow_html=True,
-            )
-
-        # Chips de circuito + contatos visíveis na mesma linha
-        info_html = ""
-        contato_principal = cel or tel
-        if contato_principal:
-            digits = _re.sub(r"\D", "", contato_principal)
-            wa_href = f"https://wa.me/55{digits}" if len(digits) >= 10 else ""
-            if wa_href:
-                info_html += (
-                    f"<a href='{wa_href}' target='_blank' style='color:#34d399;"
-                    f"font-size:12px;text-decoration:none;margin-right:12px'>"
-                    f"📱 {contato_principal}</a>"
+    ggl_html = ""
+    if ggl:
+        if ggl_tel:
+            digs_g = _re.sub(r"\D", "", ggl_tel)
+            if len(digs_g) >= 10:
+                ggl_html = (
+                    f"<a href='https://wa.me/55{digs_g}' target='_blank' class='quick-contact accent'>"
+                    f"👤 {ggl}</a>"
                 )
             else:
-                info_html += f"<span style='color:#9094a6;font-size:12px;margin-right:12px'>📞 {contato_principal}</span>"
-        if ggl:
-            info_html += f"<span style='color:#9094a6;font-size:12px;margin-right:4px'>GGL:</span>"
-            if ggl_tel:
-                digits_ggl = _re.sub(r"\D", "", ggl_tel)
-                wa_ggl = f"https://wa.me/55{digits_ggl}" if len(digits_ggl) >= 10 else ""
-                if wa_ggl:
-                    info_html += (
-                        f"<a href='{wa_ggl}' target='_blank' style='color:#5b8def;"
-                        f"font-size:12px;text-decoration:none;margin-right:12px'>"
-                        f"{ggl} 📱</a>"
-                    )
-                else:
-                    info_html += f"<span style='color:#9094a6;font-size:12px;margin-right:12px'>{ggl}</span>"
-            else:
-                info_html += f"<span style='color:#9094a6;font-size:12px;margin-right:12px'>{ggl}</span>"
+                ggl_html = f"<span class='quick-contact muted'>👤 {ggl}</span>"
+        else:
+            ggl_html = f"<span class='quick-contact muted'>👤 {ggl}</span>"
 
-        row2_html = ""
-        if chips:
-            row2_html += chips
-        if info_html:
-            row2_html += f"<span style='margin-left:6px'>{info_html}</span>" if chips else info_html
+    with st.container(border=True):
+        # ── Cabeçalho do card ──────────────────────────────────────────────
+        col_info, col_badge = st.columns([7, 1])
+        with col_info:
+            band_tag = f"<span class='card-bandeira'>{bandeira}</span>" if bandeira else ""
+            st.markdown(
+                f"<div class='card-header'>"
+                f"<span class='card-vd'>VD {vd}</span>"
+                f"<span class='card-nome'>{nome}</span>"
+                f"{band_tag}"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+        with col_badge:
+            st.markdown(
+                f"<div style='text-align:right;padding-top:4px'>"
+                f"<span style='background:{s_bg};color:{s_color};"
+                f"font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;"
+                f"white-space:nowrap'>● {s_label}</span></div>",
+                unsafe_allow_html=True,
+            )
 
-        if row2_html:
-            st.markdown(f"<div style='margin:4px 0 6px 0;display:flex;flex-wrap:wrap;align-items:center;gap:4px'>{row2_html}</div>", unsafe_allow_html=True)
+        # ── Endereço + Região ──────────────────────────────────────────────
+        meta_parts = []
+        if addr:    meta_parts.append(f"📍 {addr}")
+        if regiao:  meta_parts.append(f"🗺 {regiao}")
+        if meta_parts:
+            st.markdown(
+                "<p class='card-meta'>" + "&emsp;·&emsp;".join(meta_parts) + "</p>",
+                unsafe_allow_html=True,
+            )
 
-        # Detalhes expandíveis
+        # ── Chips + contatos rápidos ───────────────────────────────────────
+        row_html = ""
+        if chips_html:   row_html += chips_html
+        if contato_html: row_html += contato_html
+        if ggl_html:     row_html += ggl_html
+        if row_html:
+            st.markdown(
+                f"<div class='card-row'>{row_html}</div>",
+                unsafe_allow_html=True,
+            )
+
+        # ── Detalhes expandíveis ───────────────────────────────────────────
         with st.expander("Ver mais detalhes"):
             d1, d2, d3 = st.columns(3)
 
             with d1:
                 st.markdown("**📞 Contato**")
-                if tel:   st.markdown(_wa_link(tel,  f"📞 {tel}"))
-                if tel2:  st.markdown(_wa_link(tel2, f"📞 {tel2}"))
-                if cel:   st.markdown(_wa_link(cel,  f"📱 {cel}"))
-                if email: st.caption(f"✉️ {email}")
+                if tel:    st.markdown(_wa_link(tel,   f"📞 {tel}"))
+                if tel2:   st.markdown(_wa_link(tel2,  f"📞 {tel2}"))
+                if cel:    st.markdown(_wa_link(cel,   f"📱 {cel}"))
+                if email:  st.caption(f"✉️ {email}")
                 if horario:
                     st.markdown("**🕐 Horário**")
                     for h in horario.split(" | "):
-                        if h:
-                            st.caption(h)
+                        if h: st.caption(h)
 
             with d2:
                 st.markdown("**👥 Gestão**")
@@ -312,14 +296,14 @@ def _render_card(loja: dict, key_suffix: str = ""):
                     if ggl_tel: st.markdown(_wa_link(ggl_tel, f"📱 {ggl_tel}"))
                 if gr:
                     st.caption(f"GR: {gr}")
-                    if gr_tel: st.markdown(_wa_link(gr_tel, f"📱 {gr_tel}"))
+                    if gr_tel:  st.markdown(_wa_link(gr_tel,  f"📱 {gr_tel}"))
 
             with d3:
                 st.markdown("**⚡ Ações**")
-                favs = st.session_state.get("favoritos", [])
+                favs   = st.session_state.get("favoritos", [])
                 is_fav = vd in favs
                 if st.button(
-                    "★ Remover dos favoritos" if is_fav else "☆ Favoritar",
+                    "★ Remover" if is_fav else "☆ Favoritar",
                     key=f"fav_{vd}_{key_suffix}",
                     use_container_width=True,
                 ):

@@ -264,6 +264,154 @@ def get_base_css() -> str:
 
     /* ── Footer ── */
     .footer { text-align: center; color: var(--text3); font-size: 12px; padding: 24px; border-top: 1px solid var(--border); margin-top: 48px; }
+
+    /* ── Page header ── */
+    .page-header {
+        display: flex; align-items: center; gap: 14px;
+        margin-bottom: 24px;
+    }
+    .page-header-icon {
+        width: 44px; height: 44px; flex-shrink: 0;
+        background: linear-gradient(135deg,rgba(91,141,239,.25) 0%,rgba(124,58,237,.25) 100%);
+        border: 1px solid rgba(91,141,239,.2);
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px;
+    }
+    .page-title {
+        font-family: 'Syne', sans-serif !important;
+        font-size: 22px !important; font-weight: 700 !important;
+        color: #eaecf0 !important; margin: 0 !important; line-height: 1.2;
+    }
+    .page-sub {
+        font-size: 13px !important; color: #5c6370 !important;
+        margin: 3px 0 0 0 !important;
+    }
+
+    /* ── Card containers (st.container border=True) ── */
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        background: var(--bg2) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 14px !important;
+        margin-bottom: 10px !important;
+        transition: border-color .2s, box-shadow .2s !important;
+    }
+    [data-testid="stVerticalBlockBorderWrapper"]:hover {
+        border-color: rgba(91,141,239,.3) !important;
+        box-shadow: 0 4px 24px rgba(0,0,0,.3) !important;
+    }
+
+    /* ── Card elements ── */
+    .card-header {
+        display: flex; align-items: center; gap: 10px;
+        flex-wrap: wrap; padding: 2px 0;
+    }
+    .card-vd {
+        font-family: 'DM Mono', monospace;
+        font-size: 12px; font-weight: 600;
+        color: #5b8def;
+        background: rgba(91,141,239,.12);
+        border: 1px solid rgba(91,141,239,.22);
+        padding: 3px 10px; border-radius: 6px;
+        flex-shrink: 0;
+    }
+    .card-nome {
+        font-family: 'Syne', sans-serif;
+        font-size: 15px; font-weight: 700; color: #eaecf0;
+    }
+    .card-bandeira {
+        font-size: 10px; color: #5c6370;
+        background: var(--surface);
+        padding: 2px 7px; border-radius: 4px;
+    }
+    .card-meta {
+        font-size: 12px; color: #9094a6;
+        margin: 4px 0 6px 0 !important;
+        line-height: 1.5;
+    }
+    .card-row {
+        display: flex; flex-wrap: wrap;
+        align-items: center; gap: 6px;
+        margin: 4px 0 6px 0;
+    }
+
+    /* ── Circuit chips ── */
+    .chip {
+        font-family: 'DM Mono', monospace;
+        font-size: 11px; padding: 3px 9px;
+        border-radius: 20px; white-space: nowrap;
+        border: 1px solid transparent;
+    }
+    .chip-green  { background: rgba(52,211,153,.1);  color: #34d399; border-color: rgba(52,211,153,.22); }
+    .chip-purple { background: rgba(167,139,250,.1); color: #a78bfa; border-color: rgba(167,139,250,.22); }
+    .chip-cyan   { background: rgba(34,211,238,.08); color: #22d3ee; border-color: rgba(34,211,238,.18); }
+
+    /* ── Quick contacts ── */
+    .quick-contact {
+        font-size: 12px; padding: 3px 10px;
+        border-radius: 20px; text-decoration: none !important;
+        white-space: nowrap;
+    }
+    .quick-contact.green  { color: #34d399; background: rgba(52,211,153,.08); border: 1px solid rgba(52,211,153,.18); }
+    .quick-contact.accent { color: #5b8def; background: rgba(91,141,239,.08);  border: 1px solid rgba(91,141,239,.18); }
+    .quick-contact.muted  { color: #9094a6; background: var(--surface); border: 1px solid var(--border); }
+
+    /* ── Section / result labels ── */
+    .section-label {
+        font-family: 'DM Mono', monospace !important;
+        font-size: 10px !important; color: #5c6370 !important;
+        text-transform: uppercase; letter-spacing: .12em;
+        margin: 16px 0 8px 0 !important;
+    }
+    .result-count {
+        font-size: 13px; color: #5c6370;
+        margin: 8px 0 12px 0 !important;
+    }
+    .result-count b { color: #eaecf0; }
+
+    /* ── Radio como pills (modo de busca) ── */
+    [data-testid="stRadio"] > div {
+        display: flex; flex-wrap: wrap; gap: 6px !important;
+        margin-top: 8px !important;
+    }
+    [data-testid="stRadio"] label {
+        background: var(--surface) !important;
+        border: 1px solid var(--border2) !important;
+        border-radius: 20px !important;
+        padding: 5px 14px !important;
+        font-size: 12px !important; font-weight: 500 !important;
+        color: var(--text2) !important;
+        cursor: pointer !important;
+        transition: all .15s !important;
+        line-height: 1.4 !important;
+    }
+    [data-testid="stRadio"] label:hover {
+        border-color: var(--accent) !important;
+        color: var(--text) !important;
+    }
+    [data-testid="stRadio"] label:has(input:checked) {
+        background: rgba(91,141,239,.15) !important;
+        border-color: var(--accent) !important;
+        color: var(--accent) !important;
+        font-weight: 600 !important;
+    }
+    [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
+        display: none !important;
+    }
+    [data-testid="stRadio"] > div > div:first-child {
+        display: none !important;
+    }
+
+    /* ── Expander ── */
+    [data-testid="stExpander"] {
+        background: var(--surface) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 10px !important;
+    }
+    [data-testid="stExpander"] summary {
+        font-size: 13px !important;
+        color: var(--text2) !important;
+    }
 """
 
 
