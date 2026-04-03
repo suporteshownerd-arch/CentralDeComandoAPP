@@ -16,21 +16,21 @@ def render_page(loader, lojas):
     if "feed_uploaded_images" not in st.session_state:
         st.session_state.feed_uploaded_images = []
     
-    # Seção de Imagens (sutil)
-    with st.expander("🖼️ Adicionar Imagem"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
+    # Botão sutil para adicionar imagem
+    col_bt1, col_bt2 = st.columns([1, 1])
+    with col_bt1:
+        with st.popover("➕ Imagem"):
             uploaded_file = st.file_uploader("Do PC", type=['png', 'jpg', 'jpeg', 'gif', 'webp'], key="feed_upload")
             if uploaded_file and uploaded_file not in st.session_state.feed_uploaded_images:
                 st.session_state.feed_uploaded_images.append(uploaded_file)
                 st.rerun()
-        
-        with col2:
+            
             nova_url = st.text_input("URL", placeholder="https://...", key="feed_url")
             if st.button("Adicionar") and nova_url:
                 st.session_state.feed_imagens.append(nova_url)
                 st.rerun()
+    
+    st.markdown("---")
     
     # Exibir imagens do PC
     if st.session_state.feed_uploaded_images:
