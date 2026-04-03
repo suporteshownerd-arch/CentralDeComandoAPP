@@ -201,7 +201,7 @@ def render_sidebar(lojas, favoritos):
     st.markdown("""
     <div class="user-container">
         <div class="user-avatar">👤</div>
-        <div class="user-name">Enzo Maranho</div>
+        <div class="user-name">Joao Carlos</div>
         <div class="user-role">Analista T.I.</div>
     </div>
     <div class="version">JARVIS v5.0 • T.I. DPSP</div>
