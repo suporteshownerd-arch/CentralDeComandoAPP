@@ -40,22 +40,42 @@ def render_page(loader, lojas):
                     st.session_state.feed_uploaded_images.pop(0)
                     st.rerun()
         else:
-            col_prev, col_img, col_next = st.columns([1, 6, 1])
             idx = st.session_state.get("feed_idx", 0)
+            
+            # Setas e imagem
+            col_prev, col_img, col_next = st.columns([1, 6, 1])
             with col_prev:
                 if st.button("◀"): st.session_state.feed_idx = (idx - 1) % len(st.session_state.feed_uploaded_images); st.rerun()
             with col_img:
                 st.image(st.session_state.feed_uploaded_images[idx], width=320)
-                st.caption(f"{idx + 1}/{len(st.session_state.feed_uploaded_images)}")
                 if st.button("🗑️ Excluir", key=f"excluir_pc_{idx}"): 
                     st.session_state.feed_uploaded_images.pop(idx)
                     st.rerun()
             with col_next:
                 if st.button("▶"): st.session_state.feed_idx = (idx + 1) % len(st.session_state.feed_uploaded_images); st.rerun()
+            
+            # Pontos de navegação
+            st.markdown("""
+            <style>
+                .nav-dots { display: flex; justify-content: center; gap: 8px; margin-top: 8px; }
+                .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--surface2); cursor: pointer; }
+                .dot.active { background: var(--accent); }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            dots_html = '<div class="nav-dots">'
+            for i in range(len(st.session_state.feed_uploaded_images)):
+                active = "active" if i == idx else ""
+                dots_html += f'<div class="dot {active}" onclick=""></div>'
+            dots_html += '</div>'
+            st.markdown(dots_html, unsafe_allow_html=True)
+            
+            st.caption(f"{idx + 1} / {len(st.session_state.feed_uploaded_images)}")
     
     # Exibir imagens URL
     if st.session_state.feed_imagens:
         if st.session_state.feed_uploaded_images: st.markdown("---")
+        
         if len(st.session_state.feed_imagens) == 1:
             st.image(st.session_state.feed_imagens[0], width=320)
             col_ex, _ = st.columns([1, 4])
@@ -64,18 +84,28 @@ def render_page(loader, lojas):
                     st.session_state.feed_imagens.pop(0)
                     st.rerun()
         else:
-            col_prev, col_img, col_next = st.columns([1, 6, 1])
             idx = st.session_state.get("feed_url_idx", 0)
+            
+            col_prev, col_img, col_next = st.columns([1, 6, 1])
             with col_prev:
                 if st.button("◀", key="prev_url"): st.session_state.feed_url_idx = (idx - 1) % len(st.session_state.feed_imagens); st.rerun()
             with col_img:
                 st.image(st.session_state.feed_imagens[idx], width=320)
-                st.caption(f"{idx + 1}/{len(st.session_state.feed_imagens)}")
                 if st.button("🗑️ Excluir", key=f"excluir_url_{idx}"): 
                     st.session_state.feed_imagens.pop(idx)
                     st.rerun()
             with col_next:
                 if st.button("▶", key="next_url"): st.session_state.feed_url_idx = (idx + 1) % len(st.session_state.feed_imagens); st.rerun()
+            
+            # Pontos de navegação
+            dots_html = '<div class="nav-dots">'
+            for i in range(len(st.session_state.feed_imagens)):
+                active = "active" if i == idx else ""
+                dots_html += f'<div class="dot {active}"></div>'
+            dots_html += '</div>'
+            st.markdown(dots_html, unsafe_allow_html=True)
+            
+            st.caption(f"{idx + 1} / {len(st.session_state.feed_imagens)}")
     
     st.markdown("---")
     
