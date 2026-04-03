@@ -33,7 +33,7 @@ def render_page(loader, lojas):
     # Exibir imagens do PC
     if st.session_state.feed_uploaded_images:
         if len(st.session_state.feed_uploaded_images) == 1:
-            st.image(st.session_state.feed_uploaded_images[0], width=250)
+            st.image(st.session_state.feed_uploaded_images[0], width=320)
             col_ex, _ = st.columns([1, 4])
             with col_ex:
                 if st.button("🗑️ Excluir", key="excluir_pc_0"):
@@ -45,7 +45,7 @@ def render_page(loader, lojas):
             with col_prev:
                 if st.button("◀"): st.session_state.feed_idx = (idx - 1) % len(st.session_state.feed_uploaded_images); st.rerun()
             with col_img:
-                st.image(st.session_state.feed_uploaded_images[idx], width=250)
+                st.image(st.session_state.feed_uploaded_images[idx], width=320)
                 st.caption(f"{idx + 1}/{len(st.session_state.feed_uploaded_images)}")
                 if st.button("🗑️ Excluir", key=f"excluir_pc_{idx}"): 
                     st.session_state.feed_uploaded_images.pop(idx)
@@ -57,7 +57,7 @@ def render_page(loader, lojas):
     if st.session_state.feed_imagens:
         if st.session_state.feed_uploaded_images: st.markdown("---")
         if len(st.session_state.feed_imagens) == 1:
-            st.image(st.session_state.feed_imagens[0], width=250)
+            st.image(st.session_state.feed_imagens[0], width=320)
             col_ex, _ = st.columns([1, 4])
             with col_ex:
                 if st.button("🗑️ Excluir", key="excluir_url_0"): 
@@ -69,7 +69,7 @@ def render_page(loader, lojas):
             with col_prev:
                 if st.button("◀", key="prev_url"): st.session_state.feed_url_idx = (idx - 1) % len(st.session_state.feed_imagens); st.rerun()
             with col_img:
-                st.image(st.session_state.feed_imagens[idx], width=250)
+                st.image(st.session_state.feed_imagens[idx], width=320)
                 st.caption(f"{idx + 1}/{len(st.session_state.feed_imagens)}")
                 if st.button("🗑️ Excluir", key=f"excluir_url_{idx}"): 
                     st.session_state.feed_imagens.pop(idx)
