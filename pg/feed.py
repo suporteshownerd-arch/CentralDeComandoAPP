@@ -78,30 +78,40 @@ def render_page(loader, lojas):
                 st.session_state.feed_page = (st.session_state.feed_page + 1) % total_paginas
                 st.rerun()
         
-        cols = st.columns(len(imagens_pagina))
-        for i, img in enumerate(imagens_pagina):
-            idx = idx_inicio + i
-            with cols[i]:
-                try:
-                    if img["tipo"] == "upload":
-                        img_data = Image.open(img["dados"])
-                    else:
-                        img_data = Image.open(BytesIO(requests.get(img["dados"]).content))
-                    img_data = img_data.resize((540, 720), Image.Resampling.LANCZOS)
-                    
-                    from PIL import ImageOps
-                    bordered = ImageOps.expand(img_data, border=6, fill='#6366f1')
-                    bordered = ImageOps.expand(bordered, border=4, fill='#1e1e2e')
-                    
-                    buf = BytesIO()
-                    bordered.save(buf, format="PNG")
-                    st.image(buf.getvalue(), width=560)
-                except:
-                    st.image(img["dados"], width=540)
-                st.markdown(f"📤 **{img['usuario']}** • {img['data']}")
-                if st.button("🗑️", key="del_" + str(idx)):
-                    st.session_state.feed_imagens.pop(idx)
-                    st.rerun()
+        st.markdown("""
+    <style>
+        .img-container { overflow: hidden; border-radius: 16px; cursor: pointer; }
+        .img-container img { transition: transform 0.3s ease; }
+        .img-container:hover img { transform: scale(1.1); }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    cols = st.columns(len(imagens_pagina))
+    for i, img in enumerate(imagens_pagina):
+        idx = idx_inicio + i
+        with cols[i]:
+            st.markdown('<div class="img-container">', unsafe_allow_html=True)
+            try:
+                if img["tipo"] == "upload":
+                    img_data = Image.open(img["dados"])
+                else:
+                    img_data = Image.open(BytesIO(requests.get(img["dados"]).content))
+                img_data = img_data.resize((540, 720), Image.Resampling.LANCZOS)
+                
+                from PIL import ImageOps
+                bordered = ImageOps.expand(img_data, border=6, fill='#6366f1')
+                bordered = ImageOps.expand(bordered, border=4, fill='#1e1e2e')
+                
+                buf = BytesIO()
+                bordered.save(buf, format="PNG")
+                st.image(buf.getvalue(), width=560)
+            except:
+                st.image(img["dados"], width=540)
+            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown(f"📤 **{img['usuario']}** • {img['data']}")
+            if st.button("🗑️", key="del_" + str(idx)):
+                st.session_state.feed_imagens.pop(idx)
+                st.rerun()
         
         st.markdown(f"<div style='text-align: center; color: #888; margin-top: 10px;'>Página {st.session_state.feed_page + 1} de {total_paginas}</div>", unsafe_allow_html=True)
     
