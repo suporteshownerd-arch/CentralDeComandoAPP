@@ -22,97 +22,88 @@ def render_page(loader, lojas):
     with st.popover("➕ Imagem"):
         uploaded_file = st.file_uploader("Do PC", type=['png', 'jpg', 'jpeg', 'gif', 'webp'], key="feed_upload")
         if uploaded_file:
-            nome_usuario = st.text_input("Seu nome:", placeholder="Digite seu nome", key="nome_upload")
-            if nome_usuario and st.button("Adicionar"):
+            nome = st.text_input("Seu nome:", key="nome_up")
+            if nome and st.button("Adicionar"):
                 st.session_state.feed_uploaded_images.append({
-                    "imagem": uploaded_file,
-                    "usuario": nome_usuario,
+                    "img": uploaded_file,
+                    "user": nome,
                     "data": datetime.now().strftime("%d/%m/%Y %H:%M")
                 })
                 st.rerun()
         
-        nova_url = st.text_input("URL", placeholder="https://...", key="feed_url")
-        if nova_url:
-            nome_url = st.text_input("Seu nome:", placeholder="Digite seu nome", key="nome_url")
-            if nome_url and st.button("Adicionar URL"):
+        url = st.text_input("URL", key="url_in")
+        if url:
+            nome_url = st.text_input("Seu nome:", key="nome_url")
+            if nome_url and st.button("Add URL"):
                 st.session_state.feed_imagens.append({
-                    "url": nova_url,
-                    "usuario": nome_url,
+                    "url": url,
+                    "user": nome_url,
                     "data": datetime.now().strftime("%d/%m/%Y %H:%M")
                 })
                 st.rerun()
     
     st.markdown("---")
     
-    QTD_POR_PAGINA = 3
-    
-    # Exibir imagens do PC (3 por vez)
+    # Exibir imagens do PC
     if st.session_state.feed_uploaded_images:
         total = len(st.session_state.feed_uploaded_images)
         pagina = st.session_state.get("feed_page", 0)
-        inicio = pagina * QTD_POR_PAGINA
-        fim = min(inicio + QTD_POR_PAGINA, total)
-        imagens_pagina = st.session_state.feed_uploaded_images[inicio:fim]
+        items_por_pagina = 3
+        ini = pagina * items_por_pagina
+        fim = min(ini + items_por_pagina, total)
+        imgs = st.session_state.feed_uploaded_images[ini:fim]
         
-        cols = st.columns(len(imagens_pagina))
-        for i, dados in enumerate(imagens_pagina):
-            with cols[i]:
-                try:
-                    st.image(dados.get("imagem"), width=320)
-                except:
-                    st.error("Imagem não disponível")
-                st.caption(f"📤 {dados.get('usuario', 'Anónimo')} • {dados.get('data', '')}")
-                if st.button(f"🗑️", key=f"excluir_pc_{inicio + i}"):
-                    st.session_state.feed_uploaded_images.pop(inicio + i)
-                    st.rerun()
+        for i, d in enumerate(imgs):
+            st.image(d["img"], width=320)
+            st.caption(f"📤 {d['user']} • {d['data']}")
+            if st.button(f"🗑️", key=f"del_pc_{ini+i}"):
+                st.session_state.feed_uploaded_images.pop(ini+i)
+                st.rerun()
         
-        total_paginas = (total + QTD_POR_PAGINA - 1) // QTD_POR_PAGINA
-        if total_paginas > 1:
-            col_nav = st.columns([1, 2, 1])
-            with col_nav[0]:
-                if st.button("◀ Anterior") and pagina > 0:
+        total_pags = (total + items_por_pagina - 1) // items_por_pagina
+        if total_pags > 1:
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                if st.button("◀") and pagina > 0:
                     st.session_state.feed_page = pagina - 1
                     st.rerun()
-            with col_nav[1]:
-                st.caption(f"Página {pagina + 1} de {total_paginas} ({total} imagens)")
-            with col_nav[2]:
-                if st.button("Próxima ▶") and pagina < total_paginas - 1:
+            with c2:
+                st.caption(f"{pagina+1}/{total_pags}")
+            with c3:
+                if st.button("▶") and pagina < total_pags - 1:
                     st.session_state.feed_page = pagina + 1
                     st.rerun()
     
-    # Exibir imagens URL (3 por vez)
+    # Exibir imagens URL
     if st.session_state.feed_imagens:
-        if st.session_state.feed_uploaded_images: st.markdown("---")
+        if st.session_state.feed_uploaded_images:
+            st.markdown("---")
         
         total = len(st.session_state.feed_imagens)
         pagina = st.session_state.get("feed_url_page", 0)
-        inicio = pagina * QTD_POR_PAGINA
-        fim = min(inicio + QTD_POR_PAGINA, total)
-        imagens_pagina = st.session_state.feed_imagens[inicio:fim]
+        items_por_pagina = 3
+        ini = pagina * items_por_pagina
+        fim = min(ini + items_por_pagina, total)
+        imgs = st.session_state.feed_imagens[ini:fim]
         
-        cols = st.columns(len(imagens_pagina))
-        for i, dados in enumerate(imagens_pagina):
-            with cols[i]:
-                try:
-                    st.image(dados.get("url"), width=320)
-                except:
-                    st.error("Imagem não disponível")
-                st.caption(f"📤 {dados.get('usuario', 'Anónimo')} • {dados.get('data', '')}")
-                if st.button(f"🗑️", key=f"excluir_url_{inicio + i}"):
-                    st.session_state.feed_imagens.pop(inicio + i)
-                    st.rerun()
+        for i, d in enumerate(imgs):
+            st.image(d["url"], width=320)
+            st.caption(f"📤 {d['user']} • {d['data']}")
+            if st.button(f"🗑️", key=f"del_url_{ini+i}"):
+                st.session_state.feed_imagens.pop(ini+i)
+                st.rerun()
         
-        total_paginas = (total + QTD_POR_PAGINA - 1) // QTD_POR_PAGINA
-        if total_paginas > 1:
-            col_nav = st.columns([1, 2, 1])
-            with col_nav[0]:
-                if st.button("◀ Anterior", key="prev_url") and pagina > 0:
+        total_pags = (total + items_por_pagina - 1) // items_por_pagina
+        if total_pags > 1:
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                if st.button("◀", key="prev") and pagina > 0:
                     st.session_state.feed_url_page = pagina - 1
                     st.rerun()
-            with col_nav[1]:
-                st.caption(f"Página {pagina + 1} de {total_paginas} ({total} imagens)")
-            with col_nav[2]:
-                if st.button("Próxima ▶", key="next_url") and pagina < total_paginas - 1:
+            with c2:
+                st.caption(f"{pagina+1}/{total_pags}")
+            with c3:
+                if st.button("▶", key="next") and pagina < total_pags - 1:
                     st.session_state.feed_url_page = pagina + 1
                     st.rerun()
     
@@ -123,20 +114,20 @@ def render_page(loader, lojas):
     
     st.markdown("""
     <style>
-        .comunicado-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
-        .comunicado-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .comunicado-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), var(--purple)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .comunicado-title { font-size: 15px; font-weight: 600; color: var(--text); }
-        .comunicado-date { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
-        .comunicado-body { font-size: 13px; color: var(--text2); line-height: 1.6; }
-        .comunicado-tag { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin-top: 12px; }
-        .tag-aviso { background: rgba(245,158,11,0.15); color: var(--amber-light); }
-        .tag-info { background: rgba(59,130,246,0.15); color: var(--blue); }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+        .hdr { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .icn { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), var(--purple)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .ttl { font-size: 15px; font-weight: 600; color: var(--text); }
+        .dta { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+        .bod { font-size: 13px; color: var(--text2); line-height: 1.6; }
+        .tag { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin-top: 12px; }
+        .aviso { background: rgba(245,158,11,0.15); color: var(--amber-light); }
+        .info { background: rgba(59,130,246,0.15); color: var(--blue); }
     </style>
     """, unsafe_allow_html=True)
     
-    for com in [
+    for c in [
         {"icon": "🔧", "title": "Manutenção Programada", "date": datetime.now().strftime("%d/%m/%Y"), "body": "Manutenção preventiva neste sábado das 02h às 06h.", "tag": "aviso", "tag_text": "AVISO"},
         {"icon": "📱", "title": "Nova Versão Disponível", "date": datetime.now().strftime("%d/%m/%Y"), "body": "Versão 5.1 disponível com melhorias.", "tag": "info", "tag_text": "INFO"}
     ]:
-        st.markdown(f'''<div class="comunicado-card"><div class="comunicado-header"><div class="comunicado-icon">{com["icon"]}</div><div><div class="comunicado-title">{com["title"]}</div><div class="comunicado-date">{com["date"]}</div></div></div><div class="comunicado-body">{com["body"]}</div><span class="comunicado-tag tag-{com["tag"]}">{com["tag_text"]}</span></div>''', unsafe_allow_html=True)
+        st.markdown(f'''<div class="card"><div class="hdr"><div class="icn">{c["icon"]}</div><div><div class="ttl">{c["title"]}</div><div class="dta">{c["date"]}</div></div></div><div class="bod">{c["body"]}</div><span class="tag {c["tag"]}">{c["tag_text"]}</span></div>''', unsafe_allow_html=True)
