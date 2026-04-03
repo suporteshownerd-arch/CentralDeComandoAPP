@@ -78,318 +78,70 @@ def get_base_css() -> str:
     }
     
     /* ═══════════════════════════════════════════════════════════════════════
-       SIDEBAR PREMIUM v4.5
+       SIDEBAR MINIMALISTA v5.0
        ═══════════════════════════════════════════════════════════════════════ */
     
-    /* Header Premium */
-    .sb-header-premium {
-        background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
-        padding: 20px;
-        border-bottom: 1px solid var(--border);
+    /* Header Simples */
+    .sb-simple-header {
+        display: flex; align-items: center; gap: 12px;
+        padding: 16px 20px;
     }
-    .sb-logo-premium {
-        display: flex; align-items: center; gap: 14px;
-        margin-bottom: 16px;
-    }
-    .sb-logo-icon-premium {
-        width: 52px; height: 52px;
+    .sb-simple-logo {
+        width: 40px; height: 40px;
         background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
-        border-radius: 16px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 24px;
-        box-shadow: 0 6px 24px var(--accent-glow);
-    }
-    .sb-logo-text { flex: 1; }
-    .sb-logo-title-premium {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 20px; font-weight: 700; color: var(--text);
-    }
-    .sb-logo-sub-premium {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px; color: var(--text3);
-        margin-top: 2px;
-    }
-    
-    .sb-status-premium {
-        display: flex; align-items: center; gap: 12px;
-        padding: 12px 16px;
-        background: linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(6,182,212,0.08) 100%);
-        border: 1px solid rgba(16,185,129,0.3);
-        border-radius: 12px;
-    }
-    .sb-status-dot-premium {
-        width: 10px; height: 10px;
-        background: var(--green-light);
-        border-radius: 50%;
-        box-shadow: 0 0 12px var(--green);
-        animation: pulse-premium 2s infinite;
-    }
-    @keyframes pulse-premium { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(0.9)} }
-    .sb-status-title-premium {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 13px; font-weight: 600; color: var(--green-light);
-    }
-    .sb-status-time-premium {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px; color: var(--text3);
-    }
-    
-    /* Dividers */
-    .sb-divider-premium {
-        height: 1px;
-        background: linear-gradient(90deg, transparent 0%, var(--border) 50%, transparent 100%);
-        margin: 16px 0;
-    }
-    .sb-divider-premium-light {
-        height: 1px;
-        background: var(--border);
-        margin: 12px 0;
-        opacity: 0.5;
-    }
-    
-    /* Hero KPI */
-    .sb-hero-kpi {
-        text-align: center;
-        padding: 24px 20px;
-        background: linear-gradient(135deg, var(--bg3) 0%, var(--surface) 100%);
-        border: 1px solid var(--border);
-        margin: 0 16px 16px 16px;
-        border-radius: 16px;
-    }
-    .sb-hero-label {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 10px; color: var(--accent-light);
-        text-transform: uppercase;
-        letter-spacing: 0.2em;
-        margin-bottom: 8px;
-    }
-    .sb-hero-value {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 56px;
-        font-weight: 700;
-        background: linear-gradient(135deg, var(--accent-light) 0%, var(--purple-light) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        line-height: 1;
-    }
-    .sb-hero-sub {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 14px; color: var(--text2);
-        margin-top: 4px;
-    }
-    .sb-hero-progress {
-        margin-top: 16px;
-    }
-    .sb-hero-bar {
-        height: 8px;
-        background: var(--surface);
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    .sb-hero-fill {
-        height: 100%;
-        background: linear-gradient(90deg, var(--green) 0%, var(--accent) 100%);
-        border-radius: 8px;
-    }
-    .sb-hero-percent {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 12px; color: var(--text2);
-        margin-top: 8px;
-    }
-    
-    /* Section Premium */
-    .sb-section-premium {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 10px;
-        color: var(--text3);
-        text-transform: uppercase;
-        letter-spacing: 0.22em;
-        padding: 12px 20px 8px 20px;
-        font-weight: 600;
-    }
-    
-    /* KPI Cards */
-    .sb-card-kpi {
-        text-align: center;
-        padding: 16px 12px;
-        margin: 4px 8px;
-        border-radius: 14px;
-        transition: all 0.2s ease;
-    }
-    .sb-card-kpi:hover { transform: translateY(-2px); }
-    .sb-card-kpi.green {
-        background: linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.05) 100%);
-        border: 1px solid rgba(16,185,129,0.25);
-    }
-    .sb-card-kpi.red {
-        background: linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(239,68,68,0.05) 100%);
-        border: 1px solid rgba(239,68,68,0.25);
-    }
-    .sb-card-kpi-icon {
-        font-size: 18px; margin-bottom: 6px;
-    }
-    .sb-card-kpi.green .sb-card-kpi-icon { color: var(--green-light); }
-    .sb-card-kpi.red .sb-card-kpi-icon { color: var(--red-light); }
-    .sb-card-kpi-value {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 28px; font-weight: 700;
-    }
-    .sb-card-kpi.green .sb-card-kpi-value { color: var(--green-light); }
-    .sb-card-kpi.red .sb-card-kpi-value { color: var(--red-light); }
-    .sb-card-kpi-label {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 10px; color: var(--text3);
-        text-transform: uppercase;
-        margin-top: 4px;
-    }
-    
-    /* Bar Items */
-    .sb-bar-item {
-        padding: 8px 20px;
-    }
-    .sb-bar-header {
-        display: flex; align-items: center; gap: 10px;
-        margin-bottom: 6px;
-    }
-    .sb-bar-dot {
-        width: 8px; height: 8px; border-radius: 50%;
-    }
-    .sb-bar-rank {
-        width: 18px; height: 18px;
-        background: var(--surface);
-        border-radius: 50%;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 10px;
-        color: var(--text3);
-        display: flex; align-items: center; justify-content: center;
-    }
-    .sb-bar-name {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 13px; color: var(--text);
-        flex: 1;
-    }
-    .sb-bar-value {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 13px; color: var(--text2);
-    }
-    .sb-bar-track {
-        height: 6px;
-        background: var(--surface);
-        border-radius: 6px;
-        overflow: hidden;
-    }
-    .sb-bar-fill {
-        height: 100%;
-        background: var(--accent);
-        border-radius: 6px;
-    }
-    
-    /* Connectivity Premium */
-    .sb-connect-premium {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        padding: 8px 20px;
-    }
-    .sb-connect-card {
-        display: flex; align-items: center; gap: 12px;
-        padding: 14px;
-        background: var(--bg3);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-    }
-    .sb-connect-icon-premium {
-        font-size: 22px;
-    }
-    .sb-connect-details {
-        display: flex; flex-direction: column;
-    }
-    .sb-connect-name {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 10px; color: var(--text3);
-        text-transform: uppercase;
-    }
-    .sb-connect-num {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 18px; font-weight: 700; color: var(--text);
-    }
-    .sb-connect-pct {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px; color: var(--accent-light);
-    }
-    .sb-connect-total {
-        padding: 8px 20px 16px 20px;
-    }
-    .sb-connect-total span {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 12px; color: var(--text2);
-    }
-    .sb-connect-bar {
-        height: 6px;
-        background: var(--surface);
-        border-radius: 6px;
-        margin-top: 8px;
-        overflow: hidden;
-    }
-    .sb-connect-bar div {
-        height: 100%;
-        background: linear-gradient(90deg, var(--cyan) 0%, var(--accent) 100%);
-        border-radius: 6px;
-    }
-    
-    /* Favoritos Premium */
-    .sb-fav-premium {
-        display: flex; align-items: center; gap: 10px;
-        padding: 10px 20px;
-        margin: 4px 16px;
-        background: var(--bg3);
         border-radius: 10px;
-        transition: all 0.2s ease;
-    }
-    .sb-fav-premium:hover { background: var(--surface); }
-    .sb-fav-vd-premium {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 12px; color: var(--accent-light);
-        background: rgba(99,102,241,0.15);
-        padding: 4px 8px; border-radius: 6px;
-    }
-    .sb-fav-name-premium {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 13px; color: var(--text2);
-        flex: 1;
-    }
-    .sb-fav-status-premium {
-        font-size: 14px;
-    }
-    
-    /* Contacts Premium */
-    .sb-contacts-premium {
-        padding: 8px 16px;
-    }
-    .sb-contact-premium {
-        display: flex; align-items: center; gap: 12px;
-        padding: 12px;
-        margin-bottom: 8px;
-        background: var(--bg3);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        text-decoration: none !important;
-        transition: all 0.2s ease;
-    }
-    .sb-contact-premium:hover {
-        background: var(--surface);
-        border-color: var(--accent);
-    }
-    .sb-contact-icon-premium {
+        display: flex; align-items: center; justify-content: center;
         font-size: 20px;
     }
-    .sb-contact-name-premium {
+    .sb-simple-title {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 13px; font-weight: 600; color: var(--text);
+        font-size: 16px; font-weight: 600; color: var(--text);
     }
-    .sb-contact-tel-premium {
+    
+    .sb-simple-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 8px 20px;
+    }
+    
+    .sb-simple-label {
         font-family: 'JetBrains Mono', monospace;
-        font-size: 11px; color: var(--text3);
+        font-size: 10px; color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        padding: 8px 20px 4px 20px;
+    }
+    
+    /* Stats Simples */
+    .sb-simple-stats {
+        display: flex; justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        margin: 0 12px;
+        background: var(--bg3);
+        border-radius: 8px;
+    }
+    .sb-simple-stat-label {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 12px; color: var(--text2);
+    }
+    .sb-simple-stat-value {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 20px; font-weight: 700; color: var(--accent-light);
+    }
+    
+    /* Favoritos Simples */
+    .sb-simple-fav {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px; color: var(--text2);
+        padding: 8px 20px;
+    }
+    
+    /* Contato Simples */
+    .sb-simple-contact {
+        padding: 8px 20px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px; color: var(--text2);
     }
         padding: 8px 20px 6px 20px;
         font-weight: 500;
