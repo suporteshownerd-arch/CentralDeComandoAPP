@@ -12,35 +12,19 @@ def render_sidebar(lojas, favoritos):
         /* Logo */
         .sidebar-logo {
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            border-radius: 18px;
-            padding: 24px 16px;
+            border-radius: 16px;
+            padding: 20px 16px;
             text-align: center;
             margin-bottom: 16px;
-            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.35);
-            position: relative;
-            overflow: hidden;
-        }
-        .sidebar-logo::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            animation: shimmer 3s infinite;
-        }
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
+            box-shadow: 0 6px 24px rgba(99, 102, 241, 0.35);
         }
         .logo-icon {
-            font-size: 36px;
+            font-size: 32px;
             margin-bottom: 8px;
             display: block;
         }
         .logo-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             color: white;
             letter-spacing: 1px;
@@ -48,7 +32,7 @@ def render_sidebar(lojas, favoritos):
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
         .logo-subtitle {
-            font-size: 9px;
+            font-size: 8px;
             color: rgba(255,255,255,0.75);
             font-family: 'Consolas', monospace;
             letter-spacing: 2px;
@@ -66,7 +50,7 @@ def render_sidebar(lojas, favoritos):
             border: 1px solid rgba(34, 197, 94, 0.25);
             border-radius: 20px;
             padding: 8px 14px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .status-dot {
             width: 8px;
@@ -100,69 +84,74 @@ def render_sidebar(lojas, favoritos):
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
-        /* Card de navegação - estilo Glassmorphism */
+        /* Card de navegação - selaluaktif */
         .nav-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: linear-gradient(135deg, #2a2a3a 0%, #1e1e2a 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
             padding: 12px 14px;
             margin-bottom: 8px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s ease;
             display: flex;
             align-items: center;
             gap: 12px;
             position: relative;
-            overflow: hidden;
         }
-        .nav-card::before {
+        .nav-card::after {
             content: '';
             position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 3px;
-            background: transparent;
-            transition: all 0.3s ease;
-            border-radius: 0 3px 3px 0;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            transition: all 0.25s ease;
         }
         .nav-card:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(139, 92, 246, 0.3);
+            background: linear-gradient(135deg, #35354a 0%, #2a2a3a 100%);
+            border-color: rgba(139, 92, 246, 0.4);
             transform: translateX(4px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         }
-        .nav-card:hover::before {
-            background: linear-gradient(180deg, #6366f1, #8b5cf6);
+        .nav-card:hover::after {
+            background: #8b5cf6;
+            box-shadow: 0 0 8px #8b5cf6;
         }
         
         .nav-card.active {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%);
-            border-color: rgba(139, 92, 246, 0.4);
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
         }
-        .nav-card.active::before {
-            background: linear-gradient(180deg, #818cf8, #a78bfa);
-            width: 4px;
+        .nav-card.active::after {
+            background: #a78bfa;
+            box-shadow: 0 0 12px #a78bfa;
         }
         
         .nav-card-icon {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 18px;
             flex-shrink: 0;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: all 0.25s ease;
+        }
+        .nav-card:hover .nav-card-icon {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: scale(1.05);
         }
         .nav-card.active .nav-card-icon {
             background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255, 0.2);
             box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
         }
         
@@ -173,10 +162,10 @@ def render_sidebar(lojas, favoritos):
         .nav-card-title {
             font-size: 13px;
             font-weight: 500;
-            color: #d0d0d8;
+            color: #c8c8d0;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             margin-bottom: 2px;
-            transition: color 0.3s ease;
+            transition: color 0.25s ease;
         }
         .nav-card:hover .nav-card-title {
             color: white;
@@ -187,12 +176,12 @@ def render_sidebar(lojas, favoritos):
         }
         .nav-card-desc {
             font-size: 10px;
-            color: #5a5a6a;
+            color: #6a6a7a;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            transition: color 0.3s ease;
+            transition: color 0.25s ease;
         }
         .nav-card:hover .nav-card-desc {
-            color: #7a7a8a;
+            color: #8a8a9a;
         }
         .nav-card.active .nav-card-desc {
             color: #a5a5b8;
@@ -200,43 +189,43 @@ def render_sidebar(lojas, favoritos):
         
         /* Usuário */
         .user-container {
-            background: linear-gradient(180deg, rgba(30, 30, 40, 0.8) 0%, rgba(20, 20, 30, 0.9) 100%);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 20px 16px;
+            background: linear-gradient(180deg, #252530 0%, #1a1a24 100%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 16px;
             text-align: center;
-            margin-top: 24px;
+            margin-top: 20px;
         }
         .user-avatar {
-            width: 56px;
-            height: 56px;
+            width: 48px;
+            height: 48px;
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 12px;
-            font-size: 28px;
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+            margin: 0 auto 10px;
+            font-size: 24px;
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
             border: 2px solid rgba(255,255,255,0.1);
         }
         .user-name {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: white;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         .user-role {
-            font-size: 11px;
+            font-size: 10px;
             color: #777;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         .version {
-            font-size: 9px;
+            font-size: 8px;
             color: #444;
             text-align: center;
-            margin-top: 16px;
+            margin-top: 14px;
             font-family: 'Consolas', monospace;
             letter-spacing: 1.5px;
             font-weight: 600;
