@@ -87,80 +87,86 @@ def render_sidebar(lojas, favoritos):
     </div>
     """, unsafe_allow_html=True)
     
-    # Navegação com LABELS CLAROS
-    st.markdown("**O que você quer fazer?**")
-    
-    opcoes = {
-        "Buscar uma loja": "🏪",
-        "Registrar uma crise": "🚨",
-        "Abrir chamado na Vivo/Claro": "📞",
-        "Ver histórico de alertas": "📋",
-        "Ver gráficos do parque": "📈",
-        "Ajuda e manual": "❓"
-    }
-    
-    # Lista de opções com emoji
-    lista = [f"{emoji} {nome}" for nome, emoji in opcoes.items()]
-    
-    # Selectbox para navegar
-    escolha = st.selectbox(
-        "Selecione:",
-        lista,
-        label_visibility="collapsed"
-    )
-    
-    # Atualiza sessão
-    st.session_state.nav_page = escolha
-    
-    st.markdown("---")
-    
-    # Estatísticas com cards
+    # Feed / Estatísticas
+    st.markdown("**📊 Feed**")
     if lojas:
         total = len(lojas)
         ativas = sum(1 for l in lojas if l.get("status") == "open")
-        st.markdown(f"""
+        inativas = total - ativas
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("🏪 Total", total)
+        with col2:
+            st.metric("✅ Ativas", ativas)
+        
+        col3, col4 = st.columns(2)
+        with col3:
+            st.metric("❌ Inativas", inativas)
+        with col4:
+            estados = len({l.get("estado") for l in lojas if l.get("estado")})
+            st.metric("🗺️ Estados", estados)
+    
+    st.markdown("---")
+    
+    # Menu de Navegação
+    st.markdown("**📌 Menu**")
+    
+    menu_itens = [
+        ("📈 Dashboard", "📈 Dashboard"),
+        ("🏪 Busca de Lojas", "🏪 Buscar uma loja"),
+        ("🚨 Registro de Crises", "🚨 Registrar uma crise"),
+        ("📞 Abertura de Chamados", "📞 Abrir chamado na Vivo/Claro"),
+        ("📋 Histórico", "📋 Ver histórico de alertas"),
+        ("❓ Ajuda", "❓ Ajuda e manual"),
+    ]
+    
+    # Get current page
+    current_page = st.session_state.get("nav_page", "🏪 Buscar uma loja")
+    
+    # Render menu buttons
+    for emoji_label, page_value in menu_itens:
+        is_active = current_page == page_value
+        
+        # Custom button styling
+        button_style = """
         <style>
-            .stat-row {
-                display: flex;
-                gap: 12px;
-                margin-bottom: 16px;
-            }
-            .stat-box {
-                flex: 1;
-                background: rgba(255,255,255,0.05);
+            .nav-btn {
+                width: 100%;
+                padding: 10px 12px;
+                margin-bottom: 4px;
+                border: none;
                 border-radius: 8px;
-                padding: 12px;
-                text-align: center;
+                background: rgba(255,255,255,0.05);
+                color: rgba(255,255,255,0.7);
+                font-size: 13px;
+                font-weight: 500;
+                text-align: left;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 10px;
             }
-            .stat-num {
-                font-size: 24px;
-                font-weight: bold;
+            .nav-btn:hover {
+                background: rgba(255,255,255,0.1);
                 color: white;
             }
-            .stat-label {
-                font-size: 10px;
-                color: rgba(255,255,255,0.5);
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
+            .nav-btn.active {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
             }
         </style>
-        <div class="stat-row">
-            <div class="stat-box">
-                <div class="stat-num">{total}</div>
-                <div class="stat-label">Lojas</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-num" style="color: #22c55e;">{ativas}</div>
-                <div class="stat-label">Ativas</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-num" style="color: #f59e0b;">{total - ativas}</div>
-                <div class="stat-label">Inativas</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown("Nenhuma loja carregada")
+        """
+        
+        if is_active:
+            st.markdown(button_style, unsafe_allow_html=True)
+            st.markdown(f'<button class="nav-btn active">{emoji_label}</button>', unsafe_allow_html=True)
+        else:
+            if st.button(emoji_label, key=f"nav_{page_value}", use_container_width=True):
+                st.session_state.nav_page = page_value
+                st.rerun()
     
     st.markdown("---")
     
@@ -173,15 +179,15 @@ def render_sidebar(lojas, favoritos):
     # Footer com usuário
     st.markdown(f"""
     <style>
-        .user-footer {
+        .user-footer {{
             background: rgba(255,255,255,0.05);
             border-radius: 10px;
             padding: 12px;
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-        .user-avatar {
+        }}
+        .user-avatar {{
             width: 36px;
             height: 36px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -190,28 +196,19 @@ def render_sidebar(lojas, favoritos):
             align-items: center;
             justify-content: center;
             font-size: 16px;
-        }
-        .user-info {
+        }}
+        .user-info {{
             flex: 1;
-        }
-        .user-name {
+        }}
+        .user-name {{
             font-size: 13px;
             font-weight: 600;
             color: white;
-        }
-        .user-role {
+        }}
+        .user-role {{
             font-size: 10px;
             color: rgba(255,255,255,0.5);
-        }
-        .logout-btn {
-            background: rgba(239, 68, 68, 0.2);
-            border: none;
-            border-radius: 6px;
-            padding: 6px;
-            cursor: pointer;
-            color: #ef4444;
-            font-size: 14px;
-        }
+        }}
     </style>
     <div class="user-footer">
         <div class="user-avatar">👤</div>
@@ -219,14 +216,13 @@ def render_sidebar(lojas, favoritos):
             <div class="user-name">Enzo Maranho</div>
             <div class="user-role">Analista T.I.</div>
         </div>
-        <button class="logout-btn" title="Sair">🚪</button>
     </div>
     <p style="text-align: center; font-size: 9px; color: rgba(255,255,255,0.3); margin-top: 8px; font-family: monospace;">
         Jarvis v5.0 • T.I. DPSP
     </p>
     """, unsafe_allow_html=True)
     
-    return escolha
+    return st.session_state.get("nav_page", "🏪 Buscar uma loja")
 
 
 def render_footer():

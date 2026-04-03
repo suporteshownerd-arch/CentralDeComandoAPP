@@ -105,30 +105,27 @@ def main():
     
     # Processa navegação se mudou
     if not pagina:
-        pagina = st.session_state.get("nav_page", "")
+        pagina = st.session_state.get("nav_page", "🏪 Buscar uma loja")
     
-    # Se nenhuma página definida, mostra home
-    if not pagina:
-        render_home_page(lojas)
-    else:
-        try:
-            if "🏪" in pagina:
-                pg_consulta.render_page(loader, lojas)
-            elif "🚨" in pagina:
-                pg_crises.render_page(sheets, lojas)
-            elif "📞" in pagina:
-                pg_chamados.render_page(lojas)
-            elif "📋" in pagina:
-                pg_historico.render_page(sheets)
-            elif "📈" in pagina:
-                pg_dashboard.render_page(loader, lojas)
-            elif "❓" in pagina:
-                pg_ajuda.render_page()
-            else:
-                render_home_page(lojas)
-        except Exception as e:
-            logger.error(f"Erro ao renderizar página: {e}")
-            render_error_page("generic")
+    # Renderiza a página selecionada
+    try:
+        if "🏪" in pagina:
+            pg_consulta.render_page(loader, lojas)
+        elif "🚨" in pagina:
+            pg_crises.render_page(sheets, lojas)
+        elif "📞" in pagina:
+            pg_chamados.render_page(lojas)
+        elif "📋" in pagina:
+            pg_historico.render_page(sheets)
+        elif "📈" in pagina:
+            pg_dashboard.render_page(loader, lojas)
+        elif "❓" in pagina:
+            pg_ajuda.render_page()
+        else:
+            pg_consulta.render_page(loader, lojas)
+    except Exception as e:
+        logger.error(f"Erro ao renderizar página: {e}")
+        render_error_page("generic")
     
     try:
         render_footer()
