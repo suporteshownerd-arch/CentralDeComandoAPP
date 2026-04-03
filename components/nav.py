@@ -6,16 +6,13 @@ import streamlit as st
 
 
 def render_sidebar(lojas, favoritos):
-    # CSS global para o sidebar
     st.markdown("""
     <style>
         /* Logo */
         .sidebar-logo {
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            border-radius: 16px;
-            padding: 20px 16px;
-            text-align: center;
-            margin-bottom: 16px;
+            border-radius: 16px; padding: 20px 16px;
+            text-align: center; margin-bottom: 16px;
             box-shadow: 0 6px 24px rgba(99, 102, 241, 0.35);
         }
         .logo-icon { font-size: 32px; margin-bottom: 8px; display: block; }
@@ -45,7 +42,6 @@ def render_sidebar(lojas, favoritos):
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
-        /* Menu label */
         .menu-label {
             font-size: 10px; font-weight: 600; color: #555;
             text-transform: uppercase; letter-spacing: 1.5px;
@@ -53,54 +49,63 @@ def render_sidebar(lojas, favoritos):
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
-        /* Card navegação - todos os estados bonitaos */
-        .nav-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 14px 16px; margin-bottom: 10px;
-            border-radius: 14px; cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative; overflow: hidden;
+        /* Card - Estado INATIVO (bonito!) */
+        .nav-card {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px; margin-bottom: 10px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f2744 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .nav-card::before {
+            content: ''; position: absolute; left: 0; top: 0;
+            width: 4px; height: 100%; border-radius: 16px 0 0 16px;
+            background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+            transition: all 0.3s ease;
+        }
+        .nav-card:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border-color: rgba(96, 165, 250, 0.5);
+            transform: translateX(4px) scale(1.02);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+        }
+        .nav-card:hover::before {
+            width: 6px; background: linear-gradient(180deg, #60a5fa, #3b82f6);
         }
         
-        /* Estado inativo - visual bonito */
-        .nav-item {
-            background: linear-gradient(135deg, #3d3d52 0%, #2d2d40 100%);
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-        .nav-item:hover {
-            background: linear-gradient(135deg, #4a4a65 0%, #3a3a52 100%);
-            border-color: rgba(139, 92, 246, 0.5);
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.35), 0 0 20px rgba(139, 92, 246, 0.15);
-        }
-        
-        /* Estado ativo - ainda mais bonito */
-        .nav-item.active {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-            border-color: rgba(255,255,255,0.25);
-            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.5), 0 0 40px rgba(139, 92, 246, 0.3);
+        /* Card - Estado ATIVO (bonito!) */
+        .nav-card.active {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(124, 58, 237, 0.5), 0 0 40px rgba(167, 139, 250, 0.3);
             transform: scale(1.02);
         }
-        .nav-item.active:hover {
+        .nav-card.active::before {
+            background: linear-gradient(180deg, #c084fc, #a855f7);
+            width: 5px;
+        }
+        .nav-card.active:hover {
             transform: scale(1.03);
         }
         
         /* Ícone */
         .nav-icon {
-            width: 40px; height: 40px;
+            width: 44px; height: 44px;
             border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 20px; flex-shrink: 0;
+            font-size: 22px; flex-shrink: 0;
             background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
             transition: all 0.3s ease;
         }
-        .nav-item:hover .nav-icon {
-            background: rgba(139, 92, 246, 0.3);
-            transform: rotate(5deg) scale(1.1);
+        .nav-card:hover .nav-icon {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.1);
         }
-        .nav-item.active .nav-icon {
+        .nav-card.active .nav-icon {
             background: rgba(255,255,255,0.25);
             border-color: rgba(255,255,255,0.3);
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
@@ -109,32 +114,32 @@ def render_sidebar(lojas, favoritos):
         /* Texto */
         .nav-text { flex: 1; min-width: 0; }
         .nav-title {
-            font-size: 14px; font-weight: 600; color: #e0e0e8;
+            font-size: 14px; font-weight: 600; color: #bfdbfe;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             margin-bottom: 3px; transition: color 0.3s;
         }
-        .nav-item:hover .nav-title { color: white; }
-        .nav-item.active .nav-title { color: white; font-weight: 700; }
+        .nav-card:hover .nav-title { color: white; }
+        .nav-card.active .nav-title { color: white; font-weight: 700; }
         
         .nav-desc {
-            font-size: 11px; color: #8a8a9a;
+            font-size: 11px; color: #64748b;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
-        .nav-item:hover .nav-desc { color: #aaaabc; }
-        .nav-item.active .nav-desc { color: rgba(255,255,255,0.8); }
+        .nav-card:hover .nav-desc { color: #94a3b8; }
+        .nav-card.active .nav-desc { color: rgba(255,255,255,0.8); }
         
         /* Usuário */
         .user-container {
-            background: linear-gradient(180deg, #2d2d40 0%, #1e1e28 100%);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
             border-radius: 16px; padding: 18px; text-align: center; margin-top: 24px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
         .user-avatar {
-            width: 52px; height: 52px;
+            width: 56px; height: 56px;
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 12px; font-size: 26px;
+            margin: 0 auto 12px; font-size: 28px;
             box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
             border: 2px solid rgba(255,255,255,0.15);
         }
@@ -143,28 +148,23 @@ def render_sidebar(lojas, favoritos):
             margin-bottom: 3px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         .user-role {
-            font-size: 11px; color: #888;
+            font-size: 11px; color: #64748b;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         .version {
-            font-size: 9px; color: #555; text-align: center;
+            font-size: 9px; color: #475569; text-align: center;
             margin-top: 14px; font-family: 'Consolas', monospace;
             letter-spacing: 1.5px; font-weight: 600;
         }
     </style>
     """, unsafe_allow_html=True)
     
-    # Logo
     st.markdown("""
     <div class="sidebar-logo">
         <span class="logo-icon">🛡️</span>
         <span class="logo-title">CENTRAL DE COMANDO</span>
         <span class="logo-subtitle">DPSP • T.I. v5.0</span>
     </div>
-    """, unsafe_allow_html=True)
-    
-    # Status
-    st.markdown("""
     <div class="status-container">
         <span class="status-dot"></span>
         <span class="status-text">SISTEMA OPERACIONAL</span>
@@ -173,7 +173,6 @@ def render_sidebar(lojas, favoritos):
     
     st.markdown('<div class="menu-label">Navegação</div>', unsafe_allow_html=True)
     
-    # Menu
     menu_itens = [
         ("🏠", "Início", "Página inicial", "🏠 Início"),
         ("📊", "Feed", "Visão geral", "📊 Feed"),
@@ -192,7 +191,7 @@ def render_sidebar(lojas, favoritos):
         
         if is_active:
             st.markdown(f'''
-            <div class="nav-item active">
+            <div class="nav-card active">
                 <div class="nav-icon">{icon}</div>
                 <div class="nav-text">
                     <div class="nav-title">{title}</div>
@@ -205,7 +204,6 @@ def render_sidebar(lojas, favoritos):
                 st.session_state.nav_page = page_value
                 st.rerun()
     
-    # Footer usuário
     st.markdown("""
     <div class="user-container">
         <div class="user-avatar">👤</div>
