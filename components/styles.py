@@ -104,23 +104,138 @@ def get_base_css() -> str:
 
     /* ── Status ── */
     .sb-status {
-        display: flex; align-items: center; gap: 10px;
+        display: flex; align-items: center; gap: 12px;
         margin: 0 16px 0 16px;
-        padding: 10px 16px;
-        background: rgba(16,185,129,0.08);
-        border: 1px solid rgba(16,185,129,0.2);
-        border-radius: 12px;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(6,182,212,0.05) 100%);
+        border: 1px solid rgba(16,185,129,0.25);
+        border-radius: 14px;
     }
-    .sb-status span {
-        font-size: 12px !important; color: var(--green-light) !important; font-weight: 600;
+    .sb-status-content {
+        display: flex; flex-direction: column; gap: 2px;
+    }
+    .sb-status-title {
+        font-size: 13px !important; color: var(--green-light) !important; font-weight: 600;
         font-family: 'Plus Jakarta Sans', sans-serif !important;
     }
-    .sb-status-dot {
-        width: 8px; height: 8px; background: var(--green-light); border-radius: 50%;
-        animation: sb-pulse 2s infinite; flex-shrink: 0;
-        box-shadow: 0 0 8px var(--green);
+    .sb-status-meta {
+        font-size: 11px !important; color: var(--text3) !important;
+        font-family: 'JetBrains Mono', monospace !important;
     }
-    @keyframes sb-pulse { 0%,100%{opacity:1; transform: scale(1);} 50%{opacity:.5; transform: scale(0.9);} }
+    .sb-status-dot {
+        width: 10px; height: 10px; background: var(--green-light); border-radius: 50%;
+        animation: sb-pulse 2s infinite; flex-shrink: 0;
+        box-shadow: 0 0 12px var(--green);
+    }
+    @keyframes sb-pulse { 0%,100%{opacity:1; transform: scale(1);} 50%{opacity:.6; transform: scale(0.85);} }
+
+    /* ── KPI Principal ── */
+    .sb-kpi-main {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, var(--bg3) 0%, var(--surface) 100%);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        margin: 8px 16px;
+    }
+    .sb-kpi-main-value {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 42px;
+        font-weight: 700;
+        color: var(--accent-light);
+        line-height: 1;
+    }
+    .sb-kpi-main-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-top: 8px;
+    }
+
+    /* ── Divider Light ── */
+    .sb-divider-light {
+        height: 1px;
+        background: var(--border);
+        margin: 12px 16px;
+        opacity: 0.5;
+    }
+
+    /* ── Stat Item (Bandeira) ── */
+    .sb-stat-item {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 10px 16px;
+        margin: 4px 0;
+        background: var(--bg3);
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+    .sb-stat-item:hover {
+        background: var(--surface);
+        transform: translateX(4px);
+    }
+    .sb-stat-header {
+        display: flex; align-items: center; gap: 10px;
+    }
+    .sb-stat-dot {
+        width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .sb-stat-name {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 14px;
+        color: var(--text);
+        font-weight: 500;
+    }
+    .sb-stat-values {
+        display: flex; align-items: center; gap: 6px;
+    }
+    .sb-stat-qtd {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 14px;
+        color: var(--text);
+        font-weight: 600;
+    }
+    .sb-stat-pct {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--text3);
+    }
+
+    /* ── Circuit Stats ── */
+    .sb-circuit-stats {
+        display: flex; gap: 12px;
+        padding: 0 16px;
+        margin: 8px 0;
+    }
+    .sb-circuit-item {
+        flex: 1;
+        display: flex; align-items: center; gap: 10px;
+        padding: 14px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+    .sb-circuit-item:hover {
+        border-color: var(--accent);
+        background: var(--surface);
+    }
+    .sb-circuit-icon {
+        font-size: 20px;
+    }
+    .sb-circuit-label {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 13px;
+        color: var(--text2);
+    }
+    .sb-circuit-value {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 16px;
+        color: var(--accent-light);
+        font-weight: 600;
+        margin-left: auto;
+    }
 
     /* ── Dividers ── */
     .sb-divider {
