@@ -1,12 +1,12 @@
 """
 Página de Consulta de Lojas
-Central de Comando DPSP v3.1
+Central de Comando DPSP v4.1
 """
 
 import re as _re
 import streamlit as st
 
-_POR_PAGINA = 10
+POR_PAGINA = 10
 
 
 def _wa_link(phone: str, label: str) -> str:
@@ -32,38 +32,41 @@ def render_page(data_loader, lojas):
         unsafe_allow_html=True,
     )
 
-    # ── KPIs ──────────────────────────────────────────────────────────────────
+    # ── KPIs com estilo melhorado ───────────────────────────────────────────────
     total    = len(lojas) if lojas else 0
     ativas   = sum(1 for l in lojas if l.get("status") == "open")   if lojas else 0
     inativas = sum(1 for l in lojas if l.get("status") == "closed") if lojas else 0
     estados  = len({l.get("estado") for l in lojas if l.get("estado")}) if lojas else 0
+    regioes  = len({l.get("regiao") for l in lojas if l.get("regiao")}) if lojas else 0
 
-    k1, k2, k3, k4 = st.columns(4)
-    k1.metric("Total",    f"{total:,}")
-    k2.metric("Ativas",   f"{ativas:,}")
-    k3.metric("Inativas", f"{inativas:,}")
-    k4.metric("Estados",  estados)
+    k1, k2, k3, k4, k5 = st.columns(5)
+    k1.metric("🏪 Total",    f"{total:,}")
+    k2.metric("🟢 Ativas",   f"{ativas:,}")
+    k3.metric("🔴 Inativas", f"{inativas:,}")
+    k4.metric("🗺️ Estados",  estados)
+    k5.metric("🗺 Regiões",  regioes)
 
-    # ── Busca ─────────────────────────────────────────────────────────────────
-    st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+    # ── Busca com campo melhorado ─────────────────────────────────────────────
+    st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
 
-    termo = st.text_input(
-        "Buscar",
-        placeholder="🔍  Digite VD, nome da loja, cidade, designação MPLS/INN...",
-        key="consulta_termo",
-        label_visibility="collapsed",
-    )
-
-    modo = st.radio(
-        "Modo de busca",
-        ["VD / Designação", "Nome de Loja", "Endereço", "Outra Informação"],
-        key="consulta_modo",
-        horizontal=True,
-        label_visibility="collapsed",
-    )
+    col_busca, col_modo = st.columns([3, 1])
+    with col_busca:
+        termo = st.text_input(
+            "🔍 Buscar lojas",
+            placeholder="Digite VD, nome da loja, cidade, designação MPLS/INN...",
+            key="consulta_termo",
+            label_visibility="collapsed",
+        )
+    with col_modo:
+        modo = st.selectbox(
+            "Modo",
+            ["VD / Designação", "Nome de Loja", "Endereço", "Outra Informação"],
+            key="consulta_modo",
+            label_visibility="collapsed",
+        )
 
     # ── Filtros ───────────────────────────────────────────────────────────────
-    with st.expander("⚙️  Filtros avançados", expanded=False):
+    with st.expander("⚙️ Filtros avançados", expanded=False):
         fc1, fc2, fc3 = st.columns(3)
         with fc1:
             filtro_estado = st.selectbox("Estado", ["Todos"] + data_loader.get_estados(), key="f_estado")
@@ -121,17 +124,9 @@ def render_page(data_loader, lojas):
         )
 
     # Paginação
-    paginas = max(1, -(-total_res // _POR_PAGINA))
-    filtro_key = (termo, modo, filtro_estado, filtro_regiao, filtro_status)
-    if st.session_state.get("_ultimo_filtro") != filtro_key:
-        st.session_state.consulta_pagina = 1
-        st.session_state["_ultimo_filtro"] = filtro_key
-    if "consulta_pagina" not in st.session_state:
-        st.session_state.consulta_pagina = 1
-
-    pag = st.session_state.consulta_pagina
-    ini = (pag - 1) * _POR_PAGINA
-    fim = ini + _POR_PAGINA
+    paginas = max(1, -(-total_res // POR_PAGINA))
+    ini = (pag - 1) * POR_PAGINA
+    fim = ini + POR_PAGINA
 
     for i, loja in enumerate(resultados[ini:fim]):
         _render_card(loja, key_suffix=f"r{ini+i}")
@@ -166,6 +161,7 @@ def _render_card(loja: dict, key_suffix: str = ""):
     cidade    = loja.get("cidade", "")
     estado    = loja.get("estado", "")
     cep       = loja.get("cep", "")
+    cnpj      = loja.get("cnpj", "")
     mpls      = loja.get("mpls", "")
     inn       = loja.get("inn", "")
     tel       = loja.get("tel", "")
@@ -180,7 +176,7 @@ def _render_card(loja: dict, key_suffix: str = ""):
     circuitos = loja.get("circuitos", [])
     regiao    = loja.get("regiao", "")
 
-    # Status colors - v4.0 design system
+    # Status colors - v4.1 design system
     if status == "open":
         s_color, s_bg, s_label = "#10b981", "rgba(16,185,129,.12)", "Ativa"
     elif status == "pending":
@@ -246,14 +242,16 @@ def _render_card(loja: dict, key_suffix: str = ""):
             )
         with col_badge:
             st.markdown(
-                f"<div style='text-align:right;padding-top:4px'>"
+                f"<div style='text-align:right;padding-top:8px'>"
                 f"<span style='background:{s_bg};color:{s_color};"
-                f"font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;"
-                f"white-space:nowrap'>● {s_label}</span></div>",
+                f"font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;"
+                f"white-space:nowrap;display:inline-flex;align-items:center;gap:4px'>"
+                f"<span style='width:6px;height:6px;background:{s_color};border-radius:50%'></span>"
+                f"{s_label}</span></div>",
                 unsafe_allow_html=True,
             )
 
-        # ── Endereço + Região ──────────────────────────────────────────────
+        # ── Endereço + Região + Cidade ─────────────────────────────────────
         meta_parts = []
         if addr:    meta_parts.append(f"📍 {addr}")
         if regiao:  meta_parts.append(f"🗺 {regiao}")
@@ -263,19 +261,54 @@ def _render_card(loja: dict, key_suffix: str = ""):
                 unsafe_allow_html=True,
             )
 
-        # ── Chips + contatos rápidos ───────────────────────────────────────
-        row_html = ""
-        if chips_html:   row_html += chips_html
-        if contato_html: row_html += contato_html
-        if ggl_html:     row_html += ggl_html
-        if row_html:
+        # ── Linha de informações principais ────────────────────────────────
+        info_row = ""
+        
+        # MPLS/INN chips
+        if chips_html:   
+            info_row += chips_html
+        
+        # Contato principal
+        if contato_html: 
+            info_row += contato_html
+            
+        # GGL
+        if ggl_html:     
+            info_row += ggl_html
+            
+        # CNPJ se disponível
+        if cnpj := loja.get("cnpj"):
+            info_row += f"<span class='quick-contact muted'>🏢 {cnpj}</span>"
+        
+        if info_row:
             st.markdown(
-                f"<div class='card-row'>{row_html}</div>",
+                f"<div class='card-row'>{info_row}</div>",
+                unsafe_allow_html=True,
+            )
+
+        # ── Linha secundária: Gestão +Horário ──────────────────────────────
+        linha2 = ""
+        
+        # GGL e GR
+        if ggl:
+            linha2 += f"<span class='quick-contact accent'>👤 GGL: {ggl[:15]}{'...' if len(ggl)>15 else ''}</span>"
+        if gr:
+            linha2 += f"<span class='quick-contact accent'>👥 GR: {gr[:15]}{'...' if len(gr)>15 else ''}</span>"
+            
+        # Horário
+        if horario:
+            hora_short = horario.split(" | ")[0] if " | " in horario else horario
+            hora_short = hora_short[:25] + "…" if len(hora_short) > 25 else hora_short
+            linha2 += f"<span class='quick-contact muted'>🕐 {hora_short}</span>"
+            
+        if linha2:
+            st.markdown(
+                f"<div class='card-row' style='margin-top:8px'>{linha2}</div>",
                 unsafe_allow_html=True,
             )
 
         # ── Detalhes expandíveis ───────────────────────────────────────────
-        with st.expander("Ver mais detalhes"):
+        with st.expander("🔧 Ver mais detalhes"):
             d1, d2, d3 = st.columns(3)
 
             with d1:

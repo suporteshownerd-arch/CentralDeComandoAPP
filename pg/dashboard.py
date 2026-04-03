@@ -1,6 +1,6 @@
 """
 Página de Dashboard
-Central de Comando DPSP v3.0
+Central de Comando DPSP v4.1
 """
 
 import streamlit as st
@@ -20,6 +20,7 @@ _GREEN      = "#10b981"
 _RED        = "#ef4444"
 _AMBER      = "#f59e0b"
 _PURPLE     = "#a855f7"
+_CYAN       = "#06b6d4"
 
 
 def _pie(labels, values, title, colors):
@@ -78,21 +79,27 @@ def render_page(_data_loader, lojas):
         st.warning("Sem dados de lojas para exibir.")
         return
 
-    # ── KPIs ──────────────────────────────────────────────────────────────────
+    # ── KPIs melhorados ────────────────────────────────────────────────────────
     total    = len(lojas)
     ativas   = sum(1 for l in lojas if l.get("status") == "open")
     inativas = total - ativas
     estados  = len({l.get("estado") for l in lojas if l.get("estado")})
     regioes  = len({l.get("regiao") for l in lojas if l.get("regiao")})
+    
+    # KPIs adicionais
+    com_mpls = sum(1 for l in lojas if l.get("mpls"))
+    com_inn  = sum(1 for l in lojas if l.get("inn"))
+    com_circ = com_mpls + com_inn
+    
+    k1, k2, k3, k4, k5, k6 = st.columns(6)
+    k1.metric("🏪 Total",        f"{total:,}")
+    k2.metric("🟢 Ativas",      ativas,   delta=f"{round(ativas/total*100)}%" if total else None)
+    k3.metric("🔴 Inativas",    inativas, delta=f"-{round(inativas/total*100)}%" if total else None, delta_color="inverse")
+    k4.metric("🗺️ Estados",     estados)
+    k5.metric("🗺 Regiões",     regioes)
+    k6.metric("🌐 Circuits",    com_circ, delta=f"{round(com_circ/total*100)}%" if total else None)
 
-    k1, k2, k3, k4, k5 = st.columns(5)
-    k1.metric("Total de Lojas",   total)
-    k2.metric("Lojas Ativas",     ativas,   delta=f"{round(ativas/total*100)}%" if total else None)
-    k3.metric("Lojas Inativas",   inativas, delta=f"-{round(inativas/total*100)}%" if total else None, delta_color="inverse")
-    k4.metric("Estados",          estados)
-    k5.metric("Regiões",          regioes)
-
-    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
     # ── Gráficos ──────────────────────────────────────────────────────────────
     if not PLOTLY_OK:

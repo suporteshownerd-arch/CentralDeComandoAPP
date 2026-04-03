@@ -129,6 +129,92 @@ def get_base_css() -> str:
         margin: 20px 0;
     }
 
+    /* ── Quick Search ── */
+    .sb-quick-search {
+        padding: 0 16px;
+        margin-bottom: 8px;
+    }
+    .sb-search-input {
+        width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--border2);
+        border-radius: 12px;
+        padding: 12px 16px;
+        color: var(--text);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 13px;
+        outline: none;
+        transition: all 0.2s ease;
+    }
+    .sb-search-input::placeholder { color: var(--text3); }
+    .sb-search-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px var(--accent-glow);
+    }
+    
+    /* ── Stats by Bandeira ── */
+    .sb-stats-box {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        margin: 8px 16px;
+        padding: 12px;
+    }
+    .sb-stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+    }
+    .sb-stat-row:last-child { border-bottom: none; }
+    .sb-stat-label {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 13px;
+        color: var(--text2);
+        font-weight: 500;
+    }
+    .sb-stat-value {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        color: var(--text);
+        font-weight: 600;
+    }
+    .sb-stat-pct {
+        color: var(--text3);
+        font-size: 11px;
+    }
+    
+    /* ── Enhanced Favoritos ── */
+    .sb-fav-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 10px 16px; margin: 0 8px 4px 8px;
+        border-radius: 12px; cursor: default;
+        background: var(--bg3);
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+    }
+    .sb-fav-item:hover { 
+        background: var(--surface); 
+        border-color: var(--border2);
+    }
+    .sb-fav-vd {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px; color: var(--accent-light);
+        background: rgba(99,102,241,0.15);
+        padding: 4px 10px; border-radius: 8px;
+        flex-shrink: 0;
+    }
+    .sb-fav-nome {
+        font-size: 13px !important; color: var(--text2);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        flex: 1;
+    }
+    .sb-fav-status {
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+
     /* ── Section labels ── */
     .sb-section-label {
         font-family: 'JetBrains Mono', monospace !important;
@@ -1180,11 +1266,42 @@ def get_component_css() -> str:
     .footer { 
         text-align: center; 
         color: var(--text3); 
-        font-size: 13px; 
+        font-size: 12px; 
         padding: 32px; 
         border-top: 1px solid var(--border); 
         margin-top: 64px; 
+        background: linear-gradient(180deg, transparent 0%, var(--bg2) 100%);
+    }
+    .footer-logo {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+    .footer-title {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text2);
+        margin-bottom: 4px;
+    }
+    .footer-version {
         font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--accent-light);
+        background: rgba(99,102,241,0.15);
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+    }
+    .footer-dev {
+        font-size: 12px;
+        color: var(--text3);
+        margin-bottom: 8px;
+    }
+    .footer-copy {
+        font-size: 10px;
+        color: var(--text3);
+        opacity: 0.7;
     }
 """
 
