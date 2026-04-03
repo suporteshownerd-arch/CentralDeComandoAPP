@@ -592,48 +592,39 @@ def get_base_css() -> str:
 
     /* ── Navegação ── */
     section[data-testid="stSidebar"] .stButton > button {
-        background: transparent !important;
-        border: none !important;
+        background: var(--surface) !important;
+        border: 1px solid var(--border) !important;
         border-radius: 12px !important;
         text-align: left !important;
-        padding: 12px 16px 12px 18px !important;
+        padding: 12px 16px !important;
         color: var(--text2) !important;
-        font-size: 14px !important;
+        font-size: 13px !important;
         font-weight: 500 !important;
         font-family: 'Plus Jakarta Sans', sans-serif !important;
         width: 100% !important;
         transition: all 0.2s ease !important;
-        box-shadow: none !important;
-        margin: 2px 8px !important;
+        margin: 4px 8px !important;
     }
     section[data-testid="stSidebar"] .stButton > button:hover {
-        background: var(--surface) !important;
+        background: var(--surface2) !important;
+        border-color: var(--accent) !important;
         color: var(--text) !important;
-        transform: none !important;
+        transform: translateX(2px);
     }
     section[data-testid="stSidebar"] .stButton > button:focus:not(:active) {
         box-shadow: none !important; outline: none !important;
     }
     section[data-testid="stSidebar"] .stButton > button p {
-        font-size: 14px !important; color: inherit !important; text-align: left !important;
+        font-size: 13px !important; color: inherit !important; text-align: left !important;
     }
 
-    /* ── Nav active marker → ativo ── */
-    .nav-icon-hint { display: none; height: 0; }
-    .nav-active-marker { display: none; height: 0; margin: 0; padding: 0; }
-
-    .nav-active-marker + div + div[data-testid="stButton"] > button,
-    .nav-active-marker + div[data-testid="stButton"] > button,
-    .nav-active-marker ~ div[data-testid="stButton"]:first-of-type > button {
-        background: linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(168,85,247,0.15) 100%) !important;
-        color: var(--accent-light) !important;
+    /* ── Nav ativo na sidebar ── */
+    section[data-testid="stSidebar"] .stButton > button[data-active="true"] {
+        background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%) !important;
+        border-color: rgba(255,255,255,0.15) !important;
+        color: white !important;
         font-weight: 600 !important;
-        border-left: 3px solid var(--accent) !important;
-        box-shadow: 0 0 20px var(--accent-glow) !important;
-    }
-    .nav-active-marker + div + div[data-testid="stButton"] > button:hover,
-    .nav-active-marker + div[data-testid="stButton"] > button:hover {
-        background: linear-gradient(135deg, rgba(99,102,241,0.25) 0%, rgba(168,85,247,0.2) 100%) !important;
+        box-shadow: 0 4px 16px var(--accent-glow) !important;
     }
 
     /* ── Favorites ── */
