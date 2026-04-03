@@ -10,41 +10,88 @@ def render_page(loader, lojas):
     st.markdown("## 📊 Feed")
     st.markdown("---")
     
-    # Botão para adicionar imagem
-    col_bt, col_cmp = st.columns([1, 4])
-    with col_bt:
-        if st.button("➕ Adicionar Imagem", key="btn_add_img"):
-            st.session_state.show_add_img = True
+    # Session states
+    if "feed_imagens" not in st.session_state:
+        st.session_state.feed_imagens = []
+    if "feed_page" not in st.session_state:
+        st.session_state.feed_page = 0
     
-    # Campo para adicionar (só mostra quando clica o botão)
-    if st.session_state.get("show_add_img", False):
-        with col_cmp:
-            nova_url = st.text_input("Cole a URL da imagem:", key="input_url_img", placeholder="https://...")
-            if nova_url:
-                if st.button("Salvar", key="salvar_img"):
-                    if "feed_imagens" not in st.session_state:
-                        st.session_state.feed_imagens = []
-                    st.session_state.feed_imagens.append(nova_url)
-                    st.session_state.show_add_img = False
+    # Adicionar imagem
+    with st.expander("➕ Adicionar Imagem"):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            uploaded = st.file_uploader("Do computador", type=['png', 'jpg', 'jpeg', 'gif', 'webp'])
+            if uploaded:
+                nome = st.text_input("Seu nome", key="nome_pc")
+                if nome and st.button("Enviar do PC"):
+                    st.session_state.feed_imagens.append({
+                        "tipo": "upload",
+                        "dados": uploaded,
+                        "usuario": nome,
+                        "data": datetime.now().strftime("%d/%m %H:%M")
+                    })
                     st.rerun()
-            
-            if st.button("Cancelar", key="cancelar_img"):
-                st.session_state.show_add_img = False
+        
+        with col2:
+            url_img = st.text_input("URL da imagem", key="url_img")
+            if url_img:
+                nome_url = st.text_input("Seu nome", key="nome_url")
+                if nome_url and st.button("Enviar URL"):
+                    st.session_state.feed_imagens.append({
+                        "tipo": "url",
+                        "dados": url_img,
+                        "usuario": nome_url,
+                        "data": datetime.now().strftime("%d/%m %H:%M")
+                    })
+                    st.rerun()
+    
+    st.markdown("---")
+    
+    # Exibir imagens (carousel de 3 em 3)
+    if st.session_state.feed_imagens:
+        total = len(st.session_state.feed_imagens)
+        por_pagina = 3
+        total_paginas = (total + por_pagina - 1) // por_pagina
+        
+        # Navegação
+        col_ant, col_pag, col_prox = st.columns([1, 2, 1])
+        with col_ant:
+            if st.button("◀") and st.session_state.feed_page > 0:
+                st.session_state.feed_page -= 1
                 st.rerun()
-    
-    # Exibir imagens
-    if "feed_imagens" in st.session_state and st.session_state.feed_imagens:
-        st.markdown("---")
+        with col_pag:
+            st.markdown(f"**Página {st.session_state.feed_page + 1} / {total_paginas}**")
+        with col_prox:
+            if st.button("▶") and st.session_state.feed_page < total_paginas - 1:
+                st.session_state.feed_page += 1
+                st.rerun()
         
-        cols = st.columns(3)
-        for i, url in enumerate(st.session_state.feed_imagens):
-            with cols[i % 3]:
-                st.image(url, width=300)
-                if st.button(f"🗑️", key=f"del_{i}"):
-                    st.session_state.feed_imagens.pop(i)
+        # Imagens da página atual
+        ini = st.session_state.feed_page * por_pagina
+        fim = min(ini + por_pagina, total)
+        imgs_pag = st.session_state.feed_imagens[ini:fim]
+        
+        cols = st.columns(len(imgs_pag))
+        for i, img in enumerate(imgs_pag):
+            with cols[i]:
+                try:
+                    if img["tipo"] == "upload":
+                        st.image(img["dados"], width=300)
+                    else:
+                        st.image(img["dados"], width=300)
+                except:
+                    st.error("Erro ao carregar imagem")
+                st.caption(f"📤 {img['usuario']} • {img['data']}")
+                if st.button(f"🗑️ Excluir", key=f"del_{ini+i}"):
+                    st.session_state.feed_imagens.pop(ini+i)
+                    if st.session_state.feed_page > 0:
+                        st.session_state.feed_page -= 1
                     st.rerun()
         
-        st.caption(f"Total: {len(st.session_state.feed_imagens)} imagem(ns)")
+        # Pontos de navegação
+        pontos = "".join([f"•" if p != st.session_state.feed_page else "●" for p in range(total_paginas)])
+        st.markdown(f"<div style='text-align: center; color: #888;'>{pontos}</div>", unsafe_allow_html=True)
     
     st.markdown("---")
     
