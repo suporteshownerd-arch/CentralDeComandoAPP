@@ -21,14 +21,27 @@ def render_page(loader, lojas):
     # Botão sutil para adicionar imagem
     with st.popover("➕ Imagem"):
         uploaded_file = st.file_uploader("Do PC", type=['png', 'jpg', 'jpeg', 'gif', 'webp'], key="feed_upload")
-        if uploaded_file and uploaded_file not in st.session_state.feed_uploaded_images:
-            st.session_state.feed_uploaded_images.append(uploaded_file)
-            st.rerun()
+        if uploaded_file:
+            # Pedir nome de quem está subiendo
+            nome_usuario = st.text_input("Seu nome:", placeholder="Digite seu nome", key="nome_upload")
+            if nome_usuario and st.button("Adicionar"):
+                st.session_state.feed_uploaded_images.append({
+                    "imagem": uploaded_file,
+                    "usuario": nome_usuario,
+                    "data": datetime.now().strftime("%d/%m/%Y %H:%M")
+                })
+                st.rerun()
         
         nova_url = st.text_input("URL", placeholder="https://...", key="feed_url")
-        if st.button("Adicionar") and nova_url:
-            st.session_state.feed_imagens.append(nova_url)
-            st.rerun()
+        if nova_url:
+            nome_url = st.text_input("Seu nome:", placeholder="Digite seu nome", key="nome_url")
+            if nome_url and st.button("Adicionar URL"):
+                st.session_state.feed_imagens.append({
+                    "url": nova_url,
+                    "usuario": nome_url,
+                    "data": datetime.now().strftime("%d/%m/%Y %H:%M")
+                })
+                st.rerun()
     
     st.markdown("---")
     
@@ -43,20 +56,22 @@ def render_page(loader, lojas):
         imagens_pagina = st.session_state.feed_uploaded_images[inicio:fim]
         
         if len(imagens_pagina) == 1:
-            st.image(imagens_pagina[0], width=320)
+            dados = imagens_pagina[0]
+            st.image(dados["imagem"], width=320)
+            st.caption(f"📤 {dados['usuario']} • {dados['data']}")
             if st.button("🗑️ Excluir", key=f"excluir_pc_{inicio}"):
                 st.session_state.feed_uploaded_images.pop(inicio)
                 st.rerun()
         else:
             cols = st.columns(3)
-            for i, img in enumerate(imagens_pagina):
+            for i, dados in enumerate(imagens_pagina):
                 with cols[i]:
-                    st.image(img, width=320)
+                    st.image(dados["imagem"], width=320)
+                    st.caption(f"📤 {dados['usuario']} • {dados['data']}")
                     if st.button(f"🗑️", key=f"excluir_pc_{inicio + i}"):
                         st.session_state.feed_uploaded_images.pop(inicio + i)
                         st.rerun()
         
-        # Navegação
         total_paginas = (total + QTD_POR_PAGINA - 1) // QTD_POR_PAGINA
         if total_paginas > 1:
             col_nav = st.columns([1, 2, 1])
@@ -82,15 +97,18 @@ def render_page(loader, lojas):
         imagens_pagina = st.session_state.feed_imagens[inicio:fim]
         
         if len(imagens_pagina) == 1:
-            st.image(imagens_pagina[0], width=320)
+            dados = imagens_pagina[0]
+            st.image(dados["url"], width=320)
+            st.caption(f"📤 {dados['usuario']} • {dados['data']}")
             if st.button("🗑️ Excluir", key=f"excluir_url_{inicio}"):
                 st.session_state.feed_imagens.pop(inicio)
                 st.rerun()
         else:
             cols = st.columns(3)
-            for i, img in enumerate(imagens_pagina):
+            for i, dados in enumerate(imagens_pagina):
                 with cols[i]:
-                    st.image(img, width=320)
+                    st.image(dados["url"], width=320)
+                    st.caption(f"📤 {dados['usuario']} • {dados['data']}")
                     if st.button(f"🗑️", key=f"excluir_url_{inicio + i}"):
                         st.session_state.feed_imagens.pop(inicio + i)
                         st.rerun()
