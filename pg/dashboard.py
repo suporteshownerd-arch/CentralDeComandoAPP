@@ -1,8 +1,9 @@
 """
 Página de Dashboard
-Central de Comando DPSP v4.1
+Central de Comando DPSP v4.2
 """
 
+import logging
 import streamlit as st
 
 try:
@@ -10,6 +11,19 @@ try:
     PLOTLY_OK = True
 except ImportError:
     PLOTLY_OK = False
+
+try:
+    from components.error_handler import handle_errors, render_empty_state
+except ImportError:
+    def handle_errors(title="Erro", show_trace=False):
+        def decorator(func):
+            return func
+        return decorator
+    
+    def render_empty_state(icon="📭", title="Nenhum dado", message="", action_label=None, action_callback=None):
+        st.info(f"{icon} {title}: {message}")
+
+logger = logging.getLogger(__name__)
 
 _DARK_BG    = "#0a0a0f"
 _CARD_BG    = "#12121a"

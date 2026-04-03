@@ -1,10 +1,23 @@
 """
 Página de Histórico
-Central de Comando DPSP v3.1
+Central de Comando DPSP v4.2
 """
 
+import logging
 import streamlit as st
 
+try:
+    from components.error_handler import handle_errors, render_empty_state
+except ImportError:
+    def handle_errors(title="Erro", show_trace=False):
+        def decorator(func):
+            return func
+        return decorator
+    
+    def render_empty_state(icon="📭", title="Nenhum dado", message="", action_label=None, action_callback=None):
+        st.info(f"{icon} {title}: {message}")
+
+logger = logging.getLogger(__name__)
 
 _TIPOS = ["Todos", "AExec", "GCrises", "Isolada"]
 

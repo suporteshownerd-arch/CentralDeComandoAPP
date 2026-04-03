@@ -1,11 +1,22 @@
 """
 Página de Abertura de Chamados
-Central de Comando DPSP v3.1
+Central de Comando DPSP v4.2
 """
 
+import logging
 import streamlit as st
 from datetime import datetime
 from templates import gerar_chamado_vivo, gerar_chamado_claro
+
+try:
+    from components.error_handler import handle_errors
+except ImportError:
+    def handle_errors(title="Erro", show_trace=False):
+        def decorator(func):
+            return func
+        return decorator
+
+logger = logging.getLogger(__name__)
 
 
 def _step(num: str, title: str, sub: str = ""):

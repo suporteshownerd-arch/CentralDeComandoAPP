@@ -1,10 +1,21 @@
 """
 Página de Gestão de Crises
-Central de Comando DPSP v3.1
+Central de Comando DPSP v4.2
 """
 
+import logging
 import streamlit as st
 from datetime import datetime, timedelta
+
+try:
+    from components.error_handler import handle_errors
+except ImportError:
+    def handle_errors(title="Erro", show_trace=False):
+        def decorator(func):
+            return func
+        return decorator
+
+logger = logging.getLogger(__name__)
 
 
 def _step(num: str, title: str, sub: str = ""):

@@ -1303,6 +1303,131 @@ def get_component_css() -> str:
         color: var(--text3);
         opacity: 0.7;
     }
+
+    /* ── Error Page ── */
+    .error-page {
+        text-align: center;
+        padding: 60px 40px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        margin: 40px 0;
+    }
+    .error-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+    .error-title {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 24px;
+        color: var(--text);
+        margin-bottom: 12px;
+    }
+    .error-message {
+        color: var(--text2);
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+    .error-suggestion {
+        color: var(--text3);
+        font-size: 13px;
+        margin-bottom: 24px;
+    }
+    .error-button {
+        background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .error-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px var(--accent-glow);
+    }
+
+    /* ── Empty State ── */
+    .empty-state {
+        text-align: center;
+        padding: 48px 32px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        margin: 24px 0;
+    }
+    .empty-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.7;
+    }
+    .empty-title {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 18px;
+        color: var(--text);
+        margin-bottom: 8px;
+    }
+    .empty-message {
+        color: var(--text2);
+        font-size: 14px;
+    }
+
+    /* ── Error Banner ── */
+    .error-banner {
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin: 16px 0;
+        font-size: 14px;
+        color: var(--text);
+    }
+
+    /* ── Loading Animation ── */
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px;
+    }
+    .loading-spinner {
+        width: 48px;
+        height: 48px;
+        border: 3px solid var(--surface);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    .loading-text {
+        margin-top: 16px;
+        color: var(--text2);
+        font-size: 14px;
+    }
+
+    /* ── Skeleton Loading ── */
+    .skeleton {
+        background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        border-radius: 8px;
+    }
+    .skeleton-card {
+        height: 180px;
+        margin-bottom: 16px;
+        border-radius: 16px;
+    }
+    .skeleton-text {
+        height: 16px;
+        margin-bottom: 8px;
+    }
+    .skeleton-text-short {
+        height: 16px;
+        width: 60%;
+    }
 """
 
 

@@ -1,5 +1,5 @@
 """
-Componentes reutilizáveis - Central de Comando DPSP v2.0
+Componentes reutilizáveis - Central de Comando DPSP v4.2
 """
 
 from .styles import (
@@ -45,6 +45,15 @@ from .nav import (
     setup_page_config
 )
 
+from .error_handler import (
+    ErrorHandler,
+    handle_errors,
+    render_error_page,
+    render_empty_state,
+    render_loading_spinner,
+    render_error_banner
+)
+
 __all__ = [
     # Styles
     'get_base_css',
@@ -83,5 +92,12 @@ __all__ = [
     'render_page_header',
     'render_footer',
     'init_session_state',
-    'setup_page_config'
+    'setup_page_config',
+    # Error Handler
+    'ErrorHandler',
+    'handle_errors',
+    'render_error_page',
+    'render_empty_state',
+    'render_loading_spinner',
+    'render_error_banner'
 ]
