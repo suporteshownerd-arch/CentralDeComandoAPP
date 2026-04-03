@@ -28,6 +28,7 @@ def render_page(data_loader, lojas):
             <p style="margin:4px 0 0 0;font-size:14px;color:#5c6370">
                 Busque qualquer loja do parque DPSP por VD, nome, endereço ou circuito
             </p>
+            <span style="font-size:11px;color:#5b8def">v3.1 — 03/04/2026</span>
         </div>
         """,
         unsafe_allow_html=True,
