@@ -4,6 +4,9 @@ Página Feed - Comunicados e imagens
 
 import streamlit as st
 from datetime import datetime
+from io import BytesIO
+from PIL import Image
+import requests
 
 
 def render_page(loader, lojas):
@@ -12,86 +15,87 @@ def render_page(loader, lojas):
     
     # Session states
     if "feed_imagens" not in st.session_state:
-        st.session_state.feed_imagens = []
-    if "feed_page" not in st.session_state:
-        st.session_state.feed_page = 0
+        st.session_state.feed_imagens = [
+            {"tipo": "url", "dados": "https://picsum.photos/600/400?random=1", "usuario": "João", "data": "03/04 10:00"},
+            {"tipo": "url", "dados": "https://picsum.photos/600/400?random=2", "usuario": "Maria", "data": "03/04 11:00"},
+        ]
+    if "feed_idx" not in st.session_state:
+        st.session_state.feed_idx = 0
     
     # Botão discreto para adicionar
     with st.popover("➕ Imagem"):
-        col1, col2 = st.columns(2)
+        st.markdown("**Adicionar imagem**")
         
-        with col1:
-            uploaded = st.file_uploader("PC", type=['png', 'jpg', 'jpeg', 'gif', 'webp'])
-            if uploaded:
-                nome = st.text_input("Nome", key="nome_pc")
-                if nome and st.button("Add PC"):
-                    st.session_state.feed_imagens.append({
-                        "tipo": "upload",
-                        "dados": uploaded,
-                        "usuario": nome,
-                        "data": datetime.now().strftime("%d/%m %H:%M")
-                    })
-                    st.rerun()
+        uploaded = st.file_uploader("Do computador", type=['png', 'jpg', 'jpeg', 'gif', 'webp'], key="upl_feed")
+        nome = st.text_input("Seu nome", key="nome_upl")
+        if uploaded and nome:
+            if st.button("Enviar"):
+                st.session_state.feed_imagens.append({
+                    "tipo": "upload",
+                    "dados": uploaded,
+                    "usuario": nome,
+                    "data": datetime.now().strftime("%d/%m %H:%M")
+                })
+                st.rerun()
         
-        with col2:
-            url_img = st.text_input("URL", key="url_img")
-            if url_img:
-                nome_url = st.text_input("Nome", key="nome_url")
-                if nome_url and st.button("Add URL"):
-                    st.session_state.feed_imagens.append({
-                        "tipo": "url",
-                        "dados": url_img,
-                        "usuario": nome_url,
-                        "data": datetime.now().strftime("%d/%m %H:%M")
-                    })
-                    st.rerun()
+        st.markdown("---")
+        
+        url_img = st.text_input("URL da imagem", key="url_feed")
+        nome_url = st.text_input("Seu nome", key="nome_url_feed")
+        if url_img and nome_url:
+            if st.button("Adicionar URL"):
+                st.session_state.feed_imagens.append({
+                    "tipo": "url",
+                    "dados": url_img,
+                    "usuario": nome_url,
+                    "data": datetime.now().strftime("%d/%m %H:%M")
+                })
+                st.rerun()
     
     st.markdown("---")
     
-    # Carousel de imagens
-    if st.session_state.feed_imagens:
+# Carousel de imagens
+    if not st.session_state.feed_imagens:
+        st.info("📷 Adicione imagens usando o botão ➕ acima")
+    else:
         total = len(st.session_state.feed_imagens)
-        por_pagina = 3
-        total_paginas = (total + por_pagina - 1) // por_pagina
         
-        # Navegação
-        col_ant, col_pag, col_prox = st.columns([1, 2, 1])
-        with col_ant:
-            if st.button("◀") and st.session_state.feed_page > 0:
-                st.session_state.feed_page -= 1
-                st.rerun()
-        with col_pag:
-            st.markdown(f"**Página {st.session_state.feed_page + 1} / {total_paginas}**")
-        with col_prox:
-            if st.button("▶") and st.session_state.feed_page < total_paginas - 1:
-                st.session_state.feed_page += 1
+        col_prev, col_img, col_next = st.columns([1, 6, 1])
+        
+        with col_prev:
+            if st.button("◀"):
+                st.session_state.feed_idx = (st.session_state.feed_idx - 1) % total
                 st.rerun()
         
-        # Imagens
-        ini = st.session_state.feed_page * por_pagina
-        fim = min(ini + por_pagina, total)
-        imgs_pag = st.session_state.feed_imagens[ini:fim]
+        with col_img:
+            img = st.session_state.feed_imagens[st.session_state.feed_idx]
+            
+            try:
+                if img["tipo"] == "upload":
+                    img_data = Image.open(img["dados"])
+                else:
+                    img_data = Image.open(BytesIO(requests.get(img["dados"]).content))
+                
+                img_data = img_data.resize((600, 400), Image.Resampling.LANCZOS)
+                buf = BytesIO()
+                img_data.save(buf, format="PNG")
+                st.image(buf.getvalue(), width=600)
+            except Exception as e:
+                st.image(img["dados"], width=600)
+            
+            st.markdown(f"📤 **{img['usuario']}** • {img['data']}")
+            if st.button("🗑️ Excluir", key="del_" + str(st.session_state.feed_idx)):
+                st.session_state.feed_imagens.pop(st.session_state.feed_idx)
+                if st.session_state.feed_idx >= len(st.session_state.feed_imagens):
+                    st.session_state.feed_idx = 0
+                st.rerun()
         
-        cols = st.columns(len(imgs_pag))
-        for i, img in enumerate(imgs_pag):
-            with cols[i]:
-                try:
-                    if img["tipo"] == "upload":
-                        st.image(img["dados"], width=300)
-                    else:
-                        st.image(img["dados"], width=300)
-                except:
-                    st.error("Erro")
-                st.caption(f"📤 {img['usuario']} • {img['data']}")
-                if st.button(f"🗑️", key=f"del_{ini+i}"):
-                    st.session_state.feed_imagens.pop(ini+i)
-                    if st.session_state.feed_page > 0:
-                        st.session_state.feed_page -= 1
-                    st.rerun()
+        with col_next:
+            if st.button("▶"):
+                st.session_state.feed_idx = (st.session_state.feed_idx + 1) % total
+                st.rerun()
         
-        # Pontos
-        pontos = "".join([f"•" if p != st.session_state.feed_page else "●" for p in range(total_paginas)])
-        st.markdown(f"<div style='text-align: center; color: #888;'>{pontos}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='text-align: center; color: #888; margin-top: 10px;'>{'●' * (st.session_state.feed_idx + 1)}{'○' * (total - st.session_state.feed_idx - 1)} <br><small>{st.session_state.feed_idx + 1} / {total}</small></div>", unsafe_allow_html=True)
     
     st.markdown("---")
     
