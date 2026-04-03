@@ -90,28 +90,36 @@ def render_sidebar(lojas, favoritos):
         
         /* Card de navegação */
         .nav-card {
-            background: linear-gradient(145deg, #1a1a24 0%, #12121a 100%);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 16px;
-            padding: 18px;
+            background: linear-gradient(145deg, #1e1e28 0%, #16161e 100%);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 16px;
             margin-bottom: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             display: flex;
             align-items: center;
             gap: 14px;
         }
         .nav-card:hover {
-            background: linear-gradient(145deg, #22222e 0%, #1a1a24 100%);
-            border-color: rgba(99, 102, 241, 0.3);
+            background: linear-gradient(145deg, #25252f 0%, #1e1e28 100%);
+            border-color: rgba(139, 92, 246, 0.4);
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
         }
+        .nav-card:hover .nav-card-icon {
+            transform: scale(1.1);
+        }
+        
         .nav-card.active {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.25) 100%);
-            border: 1px solid rgba(139, 92, 246, 0.5);
-            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.35) 0%, rgba(139, 92, 246, 0.3) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.6);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35), inset 0 1px 0 rgba(255,255,255,0.1);
         }
+        .nav-card.active:hover {
+            border-color: rgba(139, 92, 246, 0.8);
+        }
+        
         .nav-card-icon {
             width: 44px;
             height: 44px;
@@ -119,17 +127,16 @@ def render_sidebar(lojas, favoritos):
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 20px;
             flex-shrink: 0;
+            transition: transform 0.25s ease;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
         }
-        .nav-card-icon.home { background: rgba(99, 102, 241, 0.2); }
-        .nav-card-icon.feed { background: rgba(34, 197, 94, 0.2); }
-        .nav-card-icon.dashboard { background: rgba(59, 130, 246, 0.2); }
-        .nav-card-icon.search { background: rgba(245, 158, 11, 0.2); }
-        .nav-card-icon.crisis { background: rgba(239, 68, 68, 0.2); }
-        .nav-card-icon.ticket { background: rgba(168, 85, 247, 0.2); }
-        .nav-card-icon.history { background: rgba(6, 182, 212, 0.2); }
-        .nav-card-icon.help { background: rgba(156, 163, 175, 0.2); }
+        .nav-card.active .nav-card-icon {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.2);
+        }
         
         .nav-card-info {
             flex: 1;
@@ -138,20 +145,24 @@ def render_sidebar(lojas, favoritos):
         .nav-card-title {
             font-size: 14px;
             font-weight: 600;
-            color: white;
+            color: #e0e0e8;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
         .nav-card.active .nav-card-title {
             color: #c4b5fd;
+            font-weight: 700;
         }
         .nav-card-desc {
             font-size: 11px;
-            color: #666;
+            color: #6b6b7a;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
+        .nav-card.active .nav-card-desc {
+            color: #a5a5b8;
+        }
         
-        /* Usuário - mais sofisticado */
+        /* Usuário */
         .user-container {
             background: linear-gradient(180deg, #12121a 0%, #0a0a0f 100%);
             border: 1px solid rgba(255,255,255,0.06);
@@ -220,25 +231,25 @@ def render_sidebar(lojas, favoritos):
     
     # Menu de navegação com cards
     menu_itens = [
-        ("🏠", "Início", "Página inicial", "home", "🏠 Início"),
-        ("📊", "Feed", "Visão geral", "feed", "📊 Feed"),
-        ("📈", "Dashboard", "Gráficos e métricas", "dashboard", "📈 Dashboard"),
-        ("🏪", "Busca de Lojas", "Consultar lojas", "search", "🏪 Buscar uma loja"),
-        ("🚨", "Registro de Crises", "Cadastrar crise", "crisis", "🚨 Registrar uma crise"),
-        ("📞", "Abertura de Chamados", "Abrir chamado", "ticket", "📞 Abrir chamado na Vivo/Claro"),
-        ("📋", "Histórico", "Ver registros", "history", "📋 Ver histórico de alertas"),
-        ("❓", "Ajuda", "Manual e suporte", "help", "❓ Ajuda e manual"),
+        ("🏠", "Início", "Página inicial", "🏠 Início"),
+        ("📊", "Feed", "Visão geral", "📊 Feed"),
+        ("📈", "Dashboard", "Gráficos e métricas", "📈 Dashboard"),
+        ("🏪", "Busca de Lojas", "Consultar lojas", "🏪 Buscar uma loja"),
+        ("🚨", "Registro de Crises", "Cadastrar crise", "🚨 Registrar uma crise"),
+        ("📞", "Abertura de Chamados", "Abrir chamado", "📞 Abrir chamado na Vivo/Claro"),
+        ("📋", "Histórico", "Ver registros", "📋 Ver histórico de alertas"),
+        ("❓", "Ajuda", "Manual e suporte", "❓ Ajuda e manual"),
     ]
     
     current_page = st.session_state.get("nav_page", "🏠 Início")
     
-    for icon, title, desc, icon_class, page_value in menu_itens:
+    for icon, title, desc, page_value in menu_itens:
         is_active = current_page == page_value
         
         if is_active:
             st.markdown(f'''
             <div class="nav-card active">
-                <div class="nav-card-icon {icon_class}">{icon}</div>
+                <div class="nav-card-icon">{icon}</div>
                 <div class="nav-card-info">
                     <div class="nav-card-title">{title}</div>
                     <div class="nav-card-desc">{desc}</div>
@@ -246,7 +257,7 @@ def render_sidebar(lojas, favoritos):
             </div>
             ''', unsafe_allow_html=True)
         else:
-            if st.button(f"{icon} {title}", key=f"nav_{page_value}", use_container_width=True):
+            if st.button(f"{icon}  {title}", key=f"nav_{page_value}", use_container_width=True):
                 st.session_state.nav_page = page_value
                 st.rerun()
     
