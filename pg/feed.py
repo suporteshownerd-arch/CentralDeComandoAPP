@@ -103,19 +103,3 @@ def render_page(loader, lojas):
             <div class="com-body">{com['body']}</div>
         </div>
         """, unsafe_allow_html=True)
-    
-    # Estátisticas rápidas
-    if lojas:
-        st.markdown("---")
-        st.markdown("### 📈 Resumo")
-        
-        total = len(lojas)
-        ativas = sum(1 for l in lojas if l.get("status") == "open")
-        
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            st.metric("Total Lojas", total)
-        with c2:
-            st.metric("Ativas", ativas)
-        with c3:
-            st.metric("Inativas", total - ativas)
