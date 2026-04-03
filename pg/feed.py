@@ -16,15 +16,15 @@ def render_page(loader, lojas):
     if "feed_page" not in st.session_state:
         st.session_state.feed_page = 0
     
-    # Adicionar imagem
-    with st.expander("➕ Adicionar Imagem"):
+    # Botão discreto para adicionar
+    with st.popover("➕ Imagem"):
         col1, col2 = st.columns(2)
         
         with col1:
-            uploaded = st.file_uploader("Do computador", type=['png', 'jpg', 'jpeg', 'gif', 'webp'])
+            uploaded = st.file_uploader("PC", type=['png', 'jpg', 'jpeg', 'gif', 'webp'])
             if uploaded:
-                nome = st.text_input("Seu nome", key="nome_pc")
-                if nome and st.button("Enviar do PC"):
+                nome = st.text_input("Nome", key="nome_pc")
+                if nome and st.button("Add PC"):
                     st.session_state.feed_imagens.append({
                         "tipo": "upload",
                         "dados": uploaded,
@@ -34,10 +34,10 @@ def render_page(loader, lojas):
                     st.rerun()
         
         with col2:
-            url_img = st.text_input("URL da imagem", key="url_img")
+            url_img = st.text_input("URL", key="url_img")
             if url_img:
-                nome_url = st.text_input("Seu nome", key="nome_url")
-                if nome_url and st.button("Enviar URL"):
+                nome_url = st.text_input("Nome", key="nome_url")
+                if nome_url and st.button("Add URL"):
                     st.session_state.feed_imagens.append({
                         "tipo": "url",
                         "dados": url_img,
@@ -48,7 +48,7 @@ def render_page(loader, lojas):
     
     st.markdown("---")
     
-    # Exibir imagens (carousel de 3 em 3)
+    # Carousel de imagens
     if st.session_state.feed_imagens:
         total = len(st.session_state.feed_imagens)
         por_pagina = 3
@@ -67,7 +67,7 @@ def render_page(loader, lojas):
                 st.session_state.feed_page += 1
                 st.rerun()
         
-        # Imagens da página atual
+        # Imagens
         ini = st.session_state.feed_page * por_pagina
         fim = min(ini + por_pagina, total)
         imgs_pag = st.session_state.feed_imagens[ini:fim]
@@ -81,15 +81,15 @@ def render_page(loader, lojas):
                     else:
                         st.image(img["dados"], width=300)
                 except:
-                    st.error("Erro ao carregar imagem")
+                    st.error("Erro")
                 st.caption(f"📤 {img['usuario']} • {img['data']}")
-                if st.button(f"🗑️ Excluir", key=f"del_{ini+i}"):
+                if st.button(f"🗑️", key=f"del_{ini+i}"):
                     st.session_state.feed_imagens.pop(ini+i)
                     if st.session_state.feed_page > 0:
                         st.session_state.feed_page -= 1
                     st.rerun()
         
-        # Pontos de navegação
+        # Pontos
         pontos = "".join([f"•" if p != st.session_state.feed_page else "●" for p in range(total_paginas)])
         st.markdown(f"<div style='text-align: center; color: #888;'>{pontos}</div>", unsafe_allow_html=True)
     
