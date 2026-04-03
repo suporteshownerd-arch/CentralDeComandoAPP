@@ -1,5 +1,5 @@
 """
-Página Feed - Comunicados e informações
+Página Feed - Comunicados, imagens e informações
 """
 
 import streamlit as st
@@ -10,9 +10,65 @@ def render_page(loader, lojas):
     st.markdown("## 📊 Feed")
     st.markdown("---")
     
+    # Inicializar session state para imagens
+    if "feed_imagens" not in st.session_state:
+        st.session_state.feed_imagens = []
+    
+    # Seção de Imagens
+    st.markdown("### 🖼️ Imagens")
+    
+    # Botão para adicionar imagem
+    col_botao, col_limpar = st.columns([4, 1])
+    
+    with col_botao:
+        nova_url = st.text_input("Adicionar URL da imagem:", placeholder="https://...")
+    
+    with col_limpar:
+        if st.button("➕ Add", key="add_imagem") and nova_url:
+            st.session_state.feed_imagens.append(nova_url)
+            st.rerun()
+    
+    # Exibir imagens
+    if st.session_state.feed_imagens:
+        # Se só 1 imagem, mostra normal
+        if len(st.session_state.feed_imagens) == 1:
+            st.image(st.session_state.feed_imagens[0], use_container_width=True)
+            
+            # Botão de excluir
+            if st.button("🗑️ Excluir", key="excluir_img_0"):
+                st.session_state.feed_imagens.pop(0)
+                st.rerun()
+        
+        # Se mais de 1, carousel
+        else:
+            col_prev, col_img, col_next = st.columns([1, 6, 1])
+            
+            with col_prev:
+                if st.button("◀"):
+                    st.session_state.feed_idx = (st.session_state.get("feed_idx", 0) - 1) % len(st.session_state.feed_imagens)
+                    st.rerun()
+            
+            with col_img:
+                idx = st.session_state.get("feed_idx", 0)
+                st.image(st.session_state.feed_imagens[idx], use_container_width=True)
+                st.caption(f"{idx + 1} / {len(st.session_state.feed_imagens)}")
+                
+                if st.button("🗑️ Excluir esta", key=f"excluir_img_{idx}"):
+                    st.session_state.feed_imagens.pop(idx)
+                    if st.session_state.feed_imagens:
+                        st.session_state.feed_idx = 0
+                    st.rerun()
+            
+            with col_next:
+                if st.button("▶"):
+                    st.session_state.feed_idx = (st.session_state.get("feed_idx", 0) + 1) % len(st.session_state.feed_imagens)
+                    st.rerun()
+    
+    st.markdown("---")
+    
+    # Seção de Comunicados
     st.markdown("### 📢 Comunicados")
     
-    # Card de comunicado exemplo
     st.markdown("""
     <style>
         .comunicado-card {
@@ -21,11 +77,6 @@ def render_page(loader, lojas):
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 16px;
-            transition: all 0.2s ease;
-        }
-        .comunicado-card:hover {
-            border-color: var(--border2);
-            transform: translateY(-2px);
         }
         .comunicado-header {
             display: flex;
@@ -47,7 +98,6 @@ def render_page(loader, lojas):
             font-size: 15px;
             font-weight: 600;
             color: var(--text);
-            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .comunicado-date {
             font-size: 11px;
@@ -57,7 +107,6 @@ def render_page(loader, lojas):
         .comunicado-body {
             font-size: 13px;
             color: var(--text2);
-            font-family: 'Plus Jakarta Sans', sans-serif;
             line-height: 1.6;
         }
         .comunicado-tag {
@@ -75,13 +124,12 @@ def render_page(loader, lojas):
     </style>
     """, unsafe_allow_html=True)
     
-    # Comunicados fixos (exemplo)
     comunicados = [
         {
             "icon": "🔧",
             "title": "Manutenção Programada",
             "date": datetime.now().strftime("%d/%m/%Y"),
-            "body": "Atenção! Manutenção preventiva programada para o banco de dados neste sábado (05/04) das 02h às 06h. Pode haver instabilidade.",
+            "body": "Atenção! Manutenção preventiva programada para o banco de dados neste sábado das 02h às 06h.",
             "tag": "aviso",
             "tag_text": "AVISO"
         },
@@ -89,17 +137,9 @@ def render_page(loader, lojas):
             "icon": "📱",
             "title": "Nova Versão Disponível",
             "date": datetime.now().strftime("%d/%m/%Y"),
-            "body": "A versão 5.1 do sistema está disponível com melhorias na consulta de lojas e correção de bugs.",
+            "body": "A versão 5.1 do sistema está disponível com melhorias na consulta de lojas.",
             "tag": "info",
             "tag_text": "INFO"
-        },
-        {
-            "icon": "⚠️",
-            "title": "Alerta de Segurança",
-            "date": datetime.now().strftime("%d/%m/%Y"),
-            "body": "Recomendamos que todos alterem suas senhas periodicamente. Não compartilhe credenciais.",
-            "tag": "alerta",
-            "tag_text": "ALERTA"
         }
     ]
     
@@ -117,21 +157,3 @@ def render_page(loader, lojas):
             <span class="comunicado-tag tag-{com['tag']}">{com['tag_text']}</span>
         </div>
         """, unsafe_allow_html=True)
-    
-    st.markdown("---")
-    
-    # Estátisticas rápidas
-    if lojas:
-        total = len(lojas)
-        ativas = sum(1 for l in lojas if l.get("status") == "open")
-        inativas = total - ativas
-        
-        st.markdown("### 📈 Resumo")
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("🏪 Total", total)
-        with col2:
-            st.metric("✅ Ativas", ativas)
-        with col3:
-            st.metric("❌ Inativas", inativas)
